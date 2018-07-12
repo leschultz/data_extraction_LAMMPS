@@ -13,7 +13,7 @@ boundary	                            p p p
 ###############################################################################
 
 # Percent mixture
-variable                                    number_of_atoms           equal  42592
+variable                                    number_of_atoms           equal  500
 variable                                    percent                   equal  0.04
 
 # Temperature variables
@@ -33,14 +33,14 @@ variable                                    z_lo                      equal  0
 variable                                    z_hi                      equal  90
 
 # Time variables
-variable                                    hold_0                    equal  50000
-variable                                    hold_1                    equal  50000
-variable                                    melt                      equal  300000
-variable                                    hold_2                    equal  300000
-variable                                    quench                    equal  50000
-variable                                    hold_3                    equal  30000
-variable                                    annealing_ramp            equal  15000
-variable                                    annealing                 equal  500000
+variable                                    hold_0                    equal  500
+variable                                    hold_1                    equal  500
+variable                                    melt                      equal  3000
+variable                                    hold_2                    equal  3000
+variable                                    quench                    equal  500
+variable                                    hold_3                    equal  300
+variable                                    annealing_ramp            equal  150
+variable                                    annealing                 equal  5000
 variable                                    step_size                 equal  0.001
 variable                                    data_display_frequency    equal  1
 
