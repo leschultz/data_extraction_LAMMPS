@@ -13,22 +13,25 @@ boundary	                            p p p
 ###############################################################################
 
 # Temperature variables
+variable                                    temp_solid                equal  300
 variable                                    temp_melt                 equal  2000
 variable                                    temp_cool                 equal  100
-variable                                    temp_anne                 equal  393
+variable                                    temp_anne                 equal  380
 
 # Geometric variables
 variable                                    structure                 string fcc
 variable                                    lattice_parameter         equal  4.04092655671750
 variable                                    x_lo                      equal  0
-variable                                    x_hi                      equal  9
+variable                                    x_hi                      equal  90
 variable                                    y_lo                      equal  0
-variable                                    y_hi                      equal  9
+variable                                    y_hi                      equal  90
 variable                                    z_lo                      equal  0
-variable                                    z_hi                      equal  9 
+variable                                    z_hi                      equal  90
 
 # Time variables
-variable                                    hold_1                    equal  300000
+variable                                    hold_0                    equal  50000
+variable                                    hold_1                    equal  50000
+variable                                    melt                      equal  300000
 variable                                    hold_2                    equal  300000
 variable                                    quench                    equal  50000
 variable                                    hold_3                    equal  30000
@@ -38,7 +41,7 @@ variable                                    step_size                 equal  0.0
 variable                                    data_display_frequency    equal  1
 
 # Data output
-variable                                    data_file_characteristics string ../data/data_characteristics.txt
+variable                                    data_file_characteristics string ../data/data_380.txt
 
 
 ################################################################################
@@ -76,7 +79,7 @@ timestep                                    ${step_size}
 # Initial conditions
 fix                                         1 all nve
 velocity                                    all create 300 4928459 mom yes rot yes dist gaussian
-run                                         ${hold_1}
+run                                         ${hold_0}
 unfix                                       1
 
 ################################################################################
@@ -84,7 +87,17 @@ unfix                                       1
 # Open save data
 fix                                         1 all ave/time 1 1 1 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
-# Constant temperature and pressure mixing
+# Hold at solid
+fix                                         2 all npt temp ${temp_solid} ${temp_solid} 0.1 iso 0 0 1
+run                                         ${hold_1}
+unfix                                       2
+
+# Melting
+fix                                         2 all npt temp ${temp_solid} ${temp_melt} 0.1 iso 0 0 1
+run                                         ${melt}
+unfix                                       2
+
+# Constant temperature and pressure at melt
 fix                                         2 all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
 run                                         ${hold_2}
 unfix                                       2
