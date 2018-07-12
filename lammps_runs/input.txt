@@ -38,7 +38,7 @@ variable                                    step_size                 equal  0.0
 variable                                    data_display_frequency    equal  1
 
 # Data output
-variable                                    data_file_characteristics string data_characteristics.txt
+variable                                    data_file_characteristics string ../data/data_characteristics.txt
 
 
 ################################################################################
@@ -53,7 +53,7 @@ create_atoms                                1 box
 
 # Data
 pair_style                                  eam/fs
-pair_coeff                                  * * Al_Sm.eam.fs Al Sm
+pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
 
 ################################################################################
 
@@ -112,3 +112,4 @@ unfix                                       2
 # Close save data
 unfix                                       1
 
+################################################################################

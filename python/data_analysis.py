@@ -2,7 +2,7 @@ import matplotlib.pyplot as pl
 import pandas as pd
 
 data = pd.read_csv(
-                   'data.txt',
+                   '../data//data.txt',
                    comment='#',
                    sep=' ',
                    skiprows=1,
