@@ -12,6 +12,10 @@ boundary	                            p p p
 
 ###############################################################################
 
+# Percent mixture
+variable                                    number_of_atoms           equal  42592
+variable                                    percent                   equal  0.04
+
 # Temperature variables
 variable                                    temp_solid                equal  300
 variable                                    temp_melt                 equal  2000
@@ -50,7 +54,8 @@ variable                                    data_file_dump            string ../
 lattice                                     ${structure} ${lattice_parameter}
 region                                      my_box block ${x_lo} ${x_hi} ${y_lo} ${y_hi} ${z_lo} ${z_hi}
 create_box                                  2 my_box
-create_atoms                                1 box
+create_atoms                                1 random ${number_of_atoms} 34095 NULL
+set                                         group all type/fraction 2 ${percent} 23984 
 
 ################################################################################
 
@@ -78,7 +83,7 @@ timestep                                    ${step_size}
 
 # Initial conditions
 fix                                         1 all nve
-velocity                                    all create 300 4928459 mom yes rot yes dist gaussian
+velocity                                    all create ${temp_solid} 4928459 mom yes rot yes dist gaussian
 run                                         ${hold_0}
 unfix                                       1
 
