@@ -27,13 +27,13 @@ variable                                    y_hi                      equal  9
 variable                                    z_lo                      equal  0
 variable                                    z_hi                      equal  9 
 
-# Time variables 30000 30000 5000 3000 1500 5e5
-variable                                    hold_1                    equal  300
-variable                                    hold_2                    equal  300
-variable                                    quench                    equal  500
-variable                                    hold_3                    equal  30 
-variable                                    annealing_ramp            equal  15
-variable                                    annealing                 equal  500 
+# Time variables
+variable                                    hold_1                    equal  300000
+variable                                    hold_2                    equal  300000
+variable                                    quench                    equal  50000
+variable                                    hold_3                    equal  30000
+variable                                    annealing_ramp            equal  15000
+variable                                    annealing                 equal  500000
 variable                                    step_size                 equal  0.001
 variable                                    data_display_frequency    equal  1
 
