@@ -19,9 +19,9 @@ parser.add_argument('-n',
 
 args = parser.parse_args()
 
-for item in args.n:
+for item1 in args.n:
     data = pd.read_csv(
-                       '../data/'+str(item)+'.txt',
+                       '../data/'+str(item1)+'.txt',
                        comment='#',
                        sep=' ',
                        skiprows=1,
@@ -29,18 +29,20 @@ for item in args.n:
                        )
 
     data.columns = ([
-                     'time step',
-                     'temperature',
-                     'pressure',
-                     'volume',
-                     'potential energy',
-                     'kinetic energy'
+                     'Time Step [fs]',
+                     'Temperature [K]',
+                     'Pressure [bar]',
+                     'Volume [A^3]',
+                     'Potential Energy [eV]',
+                     'Kinetic Energy [eV]'
                      ])
 
-    pl.plot(data['time step'], data['temperature'])
-    pl.xlabel('Time Step [fs]')
-    pl.ylabel('Temperature [K]')
-    pl.legend([str(item)+' [K] annealing'])
-    pl.grid(True)
-    pl.savefig('../images/'+str(item))
-    pl.clf()
+    for item2 in data.columns:
+
+        pl.plot(data['Time Step [fs]'], data[item2], 'b.')
+        pl.xlabel('Time Step [fs]')
+        pl.ylabel(str(item2))
+        pl.legend([str(item1)+' [K] annealing'])
+        pl.grid(True)
+        pl.savefig('../images/'+str(item1)+'_'+str(item2)+'temp_step')
+        pl.clf()
