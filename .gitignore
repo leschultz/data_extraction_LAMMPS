@@ -1,3 +1,4 @@
 data_characteristics.txt
 log*
-../data/*
+data/*
+images/*

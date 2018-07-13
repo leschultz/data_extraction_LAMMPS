@@ -2,6 +2,7 @@
 
 cd ../lammps_runs/
 
-temperature=$1
-
-replaced=$(grep -l "replace_here" template.in | xargs sed "s/replace_here/$temperature/g" > "$temperature.in")
+for var in "$@"
+do
+	replaced=$(grep -l "replace_here" template.in | xargs sed "s/replace_here/$var/g" > "$var.in")
+done
