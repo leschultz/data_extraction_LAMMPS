@@ -1,7 +1,7 @@
-TTT Generation Documentation
-============================
+General Documentation
+=====================
 
-Note: Python 2.7 is required.
+Note: Python 2.7 and LAMMPS is required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
 ----------------------------
