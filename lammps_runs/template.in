@@ -89,7 +89,7 @@ unfix                                       1
 
 ################################################################################
 # Save atom positions
-dump                                        my_dump all custom 100 ${data_file_dump} id type x y z
+dump                                        my_dump all custom 10 ${data_file_dump} id type x y z
 dump_modify                                 my_dump sort id
 
 ################################################################################

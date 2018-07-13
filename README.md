@@ -4,7 +4,7 @@ TTT Generation Documentation
 Note: Python 2.7 is required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
-----------------------------------------
+----------------------------
 
 1. Located in bash folder. To generate input files at a specified temperature in kelving, the following could be used:
 
