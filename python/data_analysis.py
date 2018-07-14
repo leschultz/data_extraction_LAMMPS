@@ -38,11 +38,10 @@ for item1 in args.n:
                      ])
 
     for item2 in data.columns:
-
-        pl.plot(data['Time Step [fs]'], data[item2], 'b.')
+        pl.plot(data['Time Step [fs]'], data[item2])
         pl.xlabel('Time Step [fs]')
         pl.ylabel(str(item2))
-        pl.legend([str(item1)+' [K] annealing'])
+        pl.legend([str(item1)+' [K]'])
         pl.grid(True)
         pl.savefig('../images/'+str(item1)+'_'+str(item2)+'temp_step')
         pl.clf()

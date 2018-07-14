@@ -25,32 +25,21 @@ variable                                    number_of_atoms           equal  rep
 variable                                    percent                   equal  0.04
 
 # Temperature variables
-variable                                    temp_solid                equal  300
 variable                                    temp_melt                 equal  2000
-variable                                    temp_cool                 equal  100
-variable                                    temp_anne                 equal  replace_here
 
 # Geometric variables
 variable                                    structure                 string fcc
 variable                                    lattice_parameter         equal  4.04092655671750
 variable                                    x_lo                      equal  0
-variable                                    x_hi                      equal  90
+variable                                    x_hi                      equal  10
 variable                                    y_lo                      equal  0
-variable                                    y_hi                      equal  90
+variable                                    y_hi                      equal  10
 variable                                    z_lo                      equal  0
-variable                                    z_hi                      equal  90
+variable                                    z_hi                      equal  10
 
 # Time variables
-variable                                    hold_0                    equal  500
-variable                                    hold_1                    equal  500
-variable                                    melt                      equal  3000
-variable                                    hold_2                    equal  3000
-variable                                    quench                    equal  500
-variable                                    hold_3                    equal  300
-variable                                    annealing_ramp            equal  150
-variable                                    annealing                 equal  5000
+variable                                    hold                      equal  10000
 variable                                    step_size                 equal  0.001
-variable                                    data_display_frequency    equal  1
 
 # Random seed
 variable                                    seed                      equal  replace_seed
@@ -67,8 +56,8 @@ variable                                    data_restart              string ../
 lattice                                     ${structure} ${lattice_parameter}
 region                                      my_box block ${x_lo} ${x_hi} ${y_lo} ${y_hi} ${z_lo} ${z_hi}
 create_box                                  2 my_box
-create_atoms                                1 random ${number_of_atoms} 34095 NULL
-set                                         group all type/fraction 2 ${percent} 23984 
+create_atoms                                1 random ${number_of_atoms} ${seed} NULL
+set                                         group all type/fraction 2 ${percent} ${seed} 
 
 ################################################################################
 
@@ -95,15 +84,12 @@ timestep                                    ${step_size}
 # Parameters printe on the screen
 
 # Initial conditions
-fix                                         initial_configuration all nve
-velocity                                    all create ${temp_solid} ${seed} mom yes rot yes dist gaussian
-run                                         ${hold_0}
-unfix                                       initial_configuration
+minimize                                    1.0e-4 1.0e-6 100 1000
 
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump all custom 10 ${data_file_dump} id type x y z
+dump                                        my_dump all custom ${hold} ${data_file_dump} id type x y z
 dump_modify                                 my_dump sort id
 
 ################################################################################
@@ -111,39 +97,9 @@ dump_modify                                 my_dump sort id
 # Open save data
 fix                                         data_saving all ave/time 1 1 1 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
-# Hold at solid
-fix                                         run all npt temp ${temp_solid} ${temp_solid} 0.1 iso 0 0 1
-run                                         ${hold_1}
-unfix                                       run
-
-# Melting
-fix                                         run all npt temp ${temp_solid} ${temp_melt} 0.1 iso 0 0 1
-run                                         ${melt}
-unfix                                       run
-
-# Constant temperature and pressure at melt
+# Hold
 fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
-run                                         ${hold_2}
-unfix                                       run
-
-# Cooling at a specific rate
-fix                                         run all npt temp ${temp_melt} ${temp_cool} 0.1 iso 0 0 1
-run                                         ${quench}
-unfix                                       run
-
-# Relaxation
-fix                                         run all npt temp ${temp_cool} ${temp_cool} 0.1 iso 0 0 1
-run                                         ${hold_3}
-unfix                                       run
-
-# Heat to annealing
-fix                                         run all npt temp ${temp_cool} ${temp_anne} 0.1 iso 0 0 1
-run                                         ${annealing_ramp}
-unfix                                       run
-
-# Annealing
-fix                                         run all npt temp ${temp_anne} ${temp_anne} 0.1 iso 0 0 1
-run                                         ${annealing}
+run                                         ${hold}
 unfix                                       run
 
 # Close save data
