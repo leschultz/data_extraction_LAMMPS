@@ -12,8 +12,16 @@ boundary	                            p p p
 
 ###############################################################################
 
+# Potential file
+variable                                    potentials                string ../potentials/Al_Sm.eam.fs
+variable                                    element1                  string Al
+variable                                    element2                  string Sm
+variable                                    element3                  string replace_element_here_3
+variable                                    element4                  string replace_element_here_4
+variable                                    element5                  string replace_element_here_5
+
 # Percent mixture
-variable                                    number_of_atoms           equal  500
+variable                                    number_of_atoms           equal  replace_atom_number
 variable                                    percent                   equal  0.04
 
 # Temperature variables
@@ -44,9 +52,14 @@ variable                                    annealing                 equal  500
 variable                                    step_size                 equal  0.001
 variable                                    data_display_frequency    equal  1
 
+# Random seed
+variable                                    seed                      equal  replace_seed
+
 # Data output
-variable                                    data_file_characteristics string ../data/replace_here.txt
-variable                                    data_file_dump            string ../data/replace_here.lammpstrj
+variable                                    data_file_characteristics string ../data/txt/replace_here.txt
+variable                                    data_file_dump            string ../data/lammpstrj/replace_here.lammpstrj
+variable                                    data_positions_final      string ../data/dat/replace_here.dat
+variable                                    data_restart              string ../data/rest/replace_here.rest
 
 ################################################################################
 
@@ -61,7 +74,7 @@ set                                         group all type/fraction 2 ${percent}
 
 # Data
 pair_style                                  eam/fs
-pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
+pair_coeff                                  * * ${potentials} ${element1} ${element2}
 
 ################################################################################
 
@@ -82,55 +95,62 @@ timestep                                    ${step_size}
 # Parameters printe on the screen
 
 # Initial conditions
-fix                                         1 all nve
-velocity                                    all create ${temp_solid} 4928459 mom yes rot yes dist gaussian
+fix                                         initial_configuration all nve
+velocity                                    all create ${temp_solid} ${seed} mom yes rot yes dist gaussian
 run                                         ${hold_0}
-unfix                                       1
+unfix                                       initial_configuration
 
 ################################################################################
-# Save atom positions
+
+# Save atom positions at an interval
 dump                                        my_dump all custom 10 ${data_file_dump} id type x y z
 dump_modify                                 my_dump sort id
 
 ################################################################################
 
 # Open save data
-fix                                         1 all ave/time 1 1 1 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
+fix                                         data_saving all ave/time 1 1 1 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 # Hold at solid
-fix                                         2 all npt temp ${temp_solid} ${temp_solid} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_solid} ${temp_solid} 0.1 iso 0 0 1
 run                                         ${hold_1}
-unfix                                       2
+unfix                                       run
 
 # Melting
-fix                                         2 all npt temp ${temp_solid} ${temp_melt} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_solid} ${temp_melt} 0.1 iso 0 0 1
 run                                         ${melt}
-unfix                                       2
+unfix                                       run
 
 # Constant temperature and pressure at melt
-fix                                         2 all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
 run                                         ${hold_2}
-unfix                                       2
+unfix                                       run
 
 # Cooling at a specific rate
-fix                                         2 all npt temp ${temp_melt} ${temp_cool} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_melt} ${temp_cool} 0.1 iso 0 0 1
 run                                         ${quench}
-unfix                                       2
+unfix                                       run
 
 # Relaxation
-fix                                         2 all npt temp ${temp_cool} ${temp_cool} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_cool} ${temp_cool} 0.1 iso 0 0 1
 run                                         ${hold_3}
-unfix                                       2
+unfix                                       run
 
 # Heat to annealing
-fix                                         2 all npt temp ${temp_cool} ${temp_anne} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_cool} ${temp_anne} 0.1 iso 0 0 1
 run                                         ${annealing_ramp}
-unfix                                       2
+unfix                                       run
 
 # Annealing
-fix                                         2 all npt temp ${temp_anne} ${temp_anne} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_anne} ${temp_anne} 0.1 iso 0 0 1
 run                                         ${annealing}
-unfix                                       2
+unfix                                       run
 
 # Close save data
-unfix                                       1
+unfix                                       data_saving
+
+################################################################################
+
+# Data for final position and properties
+write_data                                  ${data_positions_final}
+write_restart                               ${data_restart}

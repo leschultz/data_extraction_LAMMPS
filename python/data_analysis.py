@@ -21,7 +21,7 @@ args = parser.parse_args()
 
 for item1 in args.n:
     data = pd.read_csv(
-                       '../data/'+str(item1)+'.txt',
+                       '../data/txt/'+str(item1)+'.txt',
                        comment='#',
                        sep=' ',
                        skiprows=1,
