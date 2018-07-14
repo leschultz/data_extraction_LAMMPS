@@ -46,7 +46,8 @@ variable                                    seed                      equal  rep
 
 # Data output
 variable                                    data_file_characteristics string ../data/txt/replace_here.txt
-variable                                    data_file_dump            string ../data/lammpstrj/replace_here.lammpstrj
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_here_rate.lammpstrj
+variable                                    data_file_dump_final      string ../data/lammpstrj/replace_here_final.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_here.dat
 variable                                    data_restart              string ../data/rest/replace_here.rest
 
@@ -89,8 +90,11 @@ minimize                                    1.0e-4 1.0e-6 100 1000
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump all custom ${hold} ${data_file_dump} id type x y z
-dump_modify                                 my_dump sort id
+dump                                        my_dump_rate  all custom 1       ${data_file_dump_rate} id type x y z
+dump_modify                                 my_dump_rate  sort id
+
+dump                                        my_dump_final all custom ${hold} ${data_file_dump_final}   id type x y z
+dump_modify                                 my_dump_final sort id
 
 ################################################################################
 
