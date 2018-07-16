@@ -96,4 +96,8 @@ for item1 in args.n:
     delta_z = data2['z']-data1['z']
 
     distance_traveled = (delta_x**2+delta_y**2+delta_z**2)**(1.0/2.0)
-    print distance_traveled
+    distance_traveled_average = distance_traveled.mean()
+
+    filewrite = open('distance_traveled_average'+str(item1),'w+')
+    filewrite.write(str(distance_traveled_average))
+    filewrite.close()
