@@ -1,37 +1,33 @@
 import matplotlib.pyplot as pl
 import pandas as pd
-import argparse
 import os
+import re
 
-# The parser is used to add commandline arguments
-parser = argparse.ArgumentParser(
-                                 description='Terminal execution of the tool.',
-                                 usage='Create plots.',
-                                 formatter_class=argparse.RawTextHelpFormatter,
-                                 )
-help_temperature_anneal = (
-        """Plot the values for the annealing temperature
-        """
-        )
+first_directory = os.getcwd()
+lammpstrj_directory = first_directory+'/../data/lammpstrj/'
 
-parser.add_argument(
-                    '-n',
-                    type=str,
-                    nargs='+',
-                    help=help_temperature_anneal
-                    )
+# The names of mean dislacements for each runi
+lammpstrj_file_names = os.listdir(lammpstrj_directory)
 
-args = parser.parse_args()
+# Gather the temprature and run number
+names = []
+for item in lammpstrj_file_names:
+    if item.endswith('rate.lammpstrj'):
+        name = item
+        name = ''.join(name.split())
+        names.append(name[:-15])
 
-# For each argument value generate graphs
-for item1 in args.n:
+# Gather the data and from files
+for item1 in names:
+
+    # For each argument value generate graphs
     data = pd.read_csv(
                        '../data/txt/'+str(item1)+'.txt',
                        comment='#',
                        sep=' ',
                        skiprows=1,
                        header=None
-                       )
+                                  )
 
     # This is the orger of exported data
     data.columns = ([
@@ -43,25 +39,16 @@ for item1 in args.n:
                      'Kinetic Energy [eV]'
                      ])
 
-    # This loops over each data plot type
-    for item2 in data.columns:
-        pl.plot(data['Step'], data[item2])
-        pl.xlabel('Step')
-        pl.ylabel(str(item2))
-        pl.legend([str(item1)+' [K]'])
-        pl.grid(True)
-        pl.savefig('../images/'+str(item1)+'_'+str(item2)+'temp_step')
-        pl.clf()
 
     # Grab the number of items from a file
     number_of_atoms = pd.read_csv(
-                                   '../data/lammpstrj/' +
-                                   str(item1) +
-                                   '_final.lammpstrj',
-                                   skiprows=3,
-                                   nrows=1,
-                                   header=None
-                                   )
+                                  '../data/lammpstrj/' +
+                                  str(item1) +
+                                  '_final.lammpstrj',
+                                  skiprows=3,
+                                  nrows=1,
+                                  header=None
+                                  )
 
     number_of_atoms = number_of_atoms[0][0]
 

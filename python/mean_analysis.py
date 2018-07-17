@@ -1,7 +1,5 @@
 import matplotlib.pyplot as pl
 from scipy import mean
-from glob import glob
-import re
 import os
 
 first_directory = os.getcwd()
@@ -41,4 +39,5 @@ for key, value in data_means.iteritems():
 pl.plot(temp, dist, 'b*')
 pl.xlabel('Temperature [K]')
 pl.ylabel('Distance Traveled [A]')
+pl.grid(True)
 pl.show()
