@@ -13,10 +13,10 @@ User must be in the directories noted below for functionality or add the folder 
 
 2. Located in bash folder. To run lamps through each input file generated, the following could be used:
 
-	bash lammps_looper.sh <lamps tool used> <list of temperature files generated>
-	bash lammps_looper.sh lammps-daily 300 350 400 450 500 550 600 650 700 750
+	bash lammps_looper.sh <lamps tool used>
+	bash lammps_looper.sh lammps-daily
 
 3. Located in python folder. To generate plots for data generated, teh following could be used:
 
-	python data_analysis.py -n <list of temperatures without units>
-	python data_analysis.py -n 300 350 400 450 500 550 600 650 700 750
+	python data_analysis.py -n <list of file names>
+	python data_analysis.py -n 300K_1 300K_2 400K_1 400K_2
