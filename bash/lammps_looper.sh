@@ -1,12 +1,12 @@
 #!/bin/bash
 
-cd ../lammps_runs/
+cd ../input_files/
 
 program=$1
 
 shift
 
-for var in "$@"
+for filename in *.in
 do
-	$program < $var.in 
+	$program < $filename 
 done

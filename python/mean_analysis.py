@@ -18,12 +18,12 @@ file_names = os.listdir(data_directory)
 temperatures = {}
 separator = 'K'
 for item in file_names:
-    value = item[26 : item.find(separator)]
-    temperatures.update({value:[]})
+    value = item[26:item.find(separator)]
+    temperatures.update({value: []})
 
 # Appending distances for each temperature run
 for item in file_names:
-    value = item[26 : item.find(separator)]
+    value = item[26:item.find(separator)]
     fileread = open(str(item), 'r')
     temperatures[value].append(float(fileread.read()))
 
@@ -38,7 +38,7 @@ for key, value in data_means.iteritems():
     temp.append(float(key))
     dist.append(data_means[key])
 
-pl.plot(temp,dist)
+pl.plot(temp, dist, 'b*')
 pl.xlabel('Temperature [K]')
 pl.ylabel('Distance Traveled [A]')
 pl.show()
