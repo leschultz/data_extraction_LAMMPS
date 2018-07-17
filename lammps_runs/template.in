@@ -45,11 +45,11 @@ variable                                    step_size                 equal  0.0
 variable                                    seed                      equal  replace_seed
 
 # Data output
-variable                                    data_file_characteristics string ../data/txt/replace_here.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_here_rate.lammpstrj
-variable                                    data_file_dump_final      string ../data/lammpstrj/replace_here_final.lammpstrj
-variable                                    data_positions_final      string ../data/dat/replace_here.dat
-variable                                    data_restart              string ../data/rest/replace_here.rest
+variable                                    data_file_characteristics string ../data/txt/replace_temperatureK_replace_run.txt
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_temperatureK_replace_run_rate.lammpstrj
+variable                                    data_file_dump_final      string ../data/lammpstrj/replace_temperatureK_replace_run_final.lammpstrj
+variable                                    data_positions_final      string ../data/dat/replace_temperature_replaceK_run.dat
+variable                                    data_restart              string ../data/rest/replace_temperature_replaceK_run.rest
 
 ################################################################################
 

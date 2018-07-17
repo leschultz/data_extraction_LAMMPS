@@ -8,5 +8,5 @@ shift
 
 for var in "$@"
 do
-	lammps-daily < $var.in 
+	$program < $var.in 
 done

@@ -13,12 +13,10 @@ data = {}
 # Loop for viewing files
 def file_looper(file_number):
     for item in directories:
-        os.chdir(directory+'/motion_curves'+str(file_number)+'/python')
+        os.chdir(directory+'/data/lammpstrj')
         path, dirs, files = next(
                                  os.walk(directory+
-                                 '/motion_curves'+
-                                 str(file_number)+
-                                 '/python')
+                                 '/data/lammpstrj')
                                  )
         return files
 
