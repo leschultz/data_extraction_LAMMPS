@@ -25,7 +25,7 @@ variable                                    number_of_atoms           equal  rep
 variable                                    percent                   equal  0.04
 
 # Temperature variables
-variable                                    temp_melt                 equal  2000
+variable                                    temp_melt                 equal  replace_temperature
 
 # Geometric variables
 variable                                    structure                 string fcc
