@@ -1,6 +1,7 @@
 import matplotlib.pyplot as pl
 import pandas as pd
 import argparse
+import os
 
 # The parser is used to add commandline arguments
 parser = argparse.ArgumentParser(
@@ -15,7 +16,7 @@ help_temperature_anneal = (
 
 parser.add_argument(
                     '-n',
-                    type=int,
+                    type=str,
                     nargs='+',
                     help=help_temperature_anneal
                     )
@@ -53,8 +54,10 @@ for item1 in args.n:
         pl.clf()
 
     # Grab the number of items from a file
-    number_of_atoms =  pd.read_csv(
-                                   '../data/lammpstrj/'+str(item1)+'_final.lammpstrj',
+    number_of_atoms = pd.read_csv(
+                                   '../data/lammpstrj/' +
+                                   str(item1) +
+                                   '_final.lammpstrj',
                                    skiprows=3,
                                    nrows=1,
                                    header=None
@@ -62,9 +65,19 @@ for item1 in args.n:
 
     number_of_atoms = number_of_atoms[0][0]
 
+    # Settling temp from file name
+    temperature_settled = []
+    separator = 'K'
+    for character in item1:
+        if character != separator:
+            temperature_settled.append(character)
+        else:
+            break
+    temperature_settled = int(''.join(temperature_settled))
+
     # Look for the moment equilibration temperature is met
     count = 0
-    while (data['Temperature [K]'][count] <= item1):
+    while (data['Temperature [K]'][count] <= temperature_settled):
         count += 1
 
     # The order of imported data
@@ -109,7 +122,10 @@ for item1 in args.n:
     distance_traveled = (delta_x**2+delta_y**2+delta_z**2)**(1.0/2.0)
     distance_traveled_average = distance_traveled.mean()
 
-    # Save average data on a file
-    filewrite = open('distance_traveled_average'+str(item1),'w+')
+    # Save average data on a file in a directory
+    directory = os.getcwd()
+    os.chdir(directory+'/../data/analysis/')
+    filewrite = open('distance_traveled_average_'+str(item1), 'w+')
     filewrite.write(str(distance_traveled_average))
+    os.chdir(directory)
     filewrite.close()

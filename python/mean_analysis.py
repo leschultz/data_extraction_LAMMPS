@@ -4,61 +4,41 @@ from glob import glob
 import re
 import os
 
-directory = os.getcwd()
-directories = glob(directory+'/*/')
+first_directory = os.getcwd()
+data_directory = first_directory+'/../data/analysis/'
+os.chdir(data_directory)
 
 # Data that will hold distances
 data = {}
 
-# Loop for viewing files
-def file_looper(file_number):
-    for item in directories:
-        os.chdir(directory+'/data/lammpstrj')
-        path, dirs, files = next(
-                                 os.walk(directory+
-                                 '/data/lammpstrj')
-                                 )
-        return files
+# The names of mean dislacements for each run
+file_names = os.listdir(data_directory)
 
-# Create key names from first directory
-file_names = file_looper(1)
+# The temperatures from each run extrated from file name
+temperatures = {}
+separator = 'K'
+for item in file_names:
+    value = item[26 : item.find(separator)]
+    temperatures.update({value:[]})
 
-for name in file_names:
-    if re.match('distance_*',name):
-        data[name]=[]
+# Appending distances for each temperature run
+for item in file_names:
+    value = item[26 : item.find(separator)]
+    fileread = open(str(item), 'r')
+    temperatures[value].append(float(fileread.read()))
 
-# Append data to keys
-count = 1
-for item in directories:
-    os.chdir(directory+'/motion_curves'+str(count)+'/python')
-    for name in file_looper(count):
-        if re.match('distance_*',name):
-            fileread = open(str(name),'r')
-            data[name].append(float(fileread.read()))
-    count += 1
+# Taking the averages of distances
+data_means = {}
+for key, value in temperatures.iteritems():
+    data_means[key] = mean(value)
 
-data_averages = {}
-for key, value in data.iteritems():
-    data_averages[key] = mean(value)
+temp = []
+dist = []
+for key, value in data_means.iteritems():
+    temp.append(float(key))
+    dist.append(data_means[key])
 
-temperatures = [900, 910, 920, 930, 933, 940, 950, 960, 970, 980, 990, 1000]
-
-average_mobility = [
-                    data_averages['distance_traveled_average900'],
-                    data_averages['distance_traveled_average910'],
-                    data_averages['distance_traveled_average920'],
-                    data_averages['distance_traveled_average930'],
-                    data_averages['distance_traveled_average933'],
-                    data_averages['distance_traveled_average940'],
-                    data_averages['distance_traveled_average950'],
-                    data_averages['distance_traveled_average960'],
-                    data_averages['distance_traveled_average970'],
-                    data_averages['distance_traveled_average980'],
-                    data_averages['distance_traveled_average990'],
-                    data_averages['distance_traveled_average1000']
-                    ]
-
-pl.plot(temperatures, average_mobility)
-pl.xlabel('Temperatures [K]')
+pl.plot(temp,dist)
+pl.xlabel('Temperature [K]')
 pl.ylabel('Distance Traveled [A]')
 pl.show()
