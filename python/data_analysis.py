@@ -1,7 +1,6 @@
 import matplotlib.pyplot as pl
 import pandas as pd
 import os
-import re
 
 from scipy import mean
 
@@ -92,7 +91,6 @@ for item1 in names:
     # Imported positions from when equlibration temperature is met
     data1 = pd.read_csv(
                         '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
-                        comment='#',
                         sep=' ',
                         skiprows=first_step,
                         nrows=number_of_atoms,
@@ -107,7 +105,6 @@ for item1 in names:
     # Final positions of atoms
     data2 = pd.read_csv(
                         '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
-                        comment='#',
                         sep=' ',
                         skiprows=last_step,
                         nrows=number_of_atoms,
