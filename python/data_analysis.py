@@ -105,8 +105,8 @@ for item1 in names:
     delta_y = data2['y']-data1['y']
     delta_z = data2['z']-data1['z']
 
-    # Grab absolute distance traveled and then average it for all atoms
-    distance_traveled = (delta_x**2+delta_y**2+delta_z**2)**(1.0/2.0)
+    # Grab the mean of the squared displacement
+    distance_traveled = (delta_x**2.0+delta_y**2.0+delta_z**2.0)**2.0
     distance_traveled_average = distance_traveled.mean()
 
     # Save average data on a file in a directory

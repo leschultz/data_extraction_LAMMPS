@@ -38,6 +38,6 @@ for key, value in data_means.iteritems():
 
 pl.plot(temp, dist, 'b*')
 pl.xlabel('Temperature [K]')
-pl.ylabel('Distance Traveled [A]')
+pl.ylabel('Propensity for Motion [A^2]')
 pl.grid(True)
 pl.show()

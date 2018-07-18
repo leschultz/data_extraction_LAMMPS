@@ -18,5 +18,4 @@ User must be in the directories noted below for functionality or add the folder 
 
 3. Located in python folder. To generate plots for data generated, teh following could be used:
 
-	python data_analysis.py -n <list of file names>
-	python data_analysis.py -n 300K_1 300K_2 400K_1 400K_2
+	python data_analysis.py
