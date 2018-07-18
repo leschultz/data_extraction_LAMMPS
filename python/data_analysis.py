@@ -3,10 +3,12 @@ import pandas as pd
 import os
 import re
 
+from scipy import mean
+
 first_directory = os.getcwd()
 lammpstrj_directory = first_directory+'/../data/lammpstrj/'
 
-# The names of mean dislacements for each runi
+# The names of mean dislacements for each run
 lammpstrj_file_names = os.listdir(lammpstrj_directory)
 
 # Gather the temprature and run number
@@ -16,6 +18,14 @@ for item in lammpstrj_file_names:
         name = item
         name = ''.join(name.split())
         names.append(name[:-15])
+
+# Grab the temperatures for each travel distance
+temperatures = {}
+for item1 in names:
+      # Grab the temperatures for each travel distance
+      separator = 'K'
+      for item2 in ''.join(item1.split()):
+          temperatures.update({float(item1[0:item1.find(separator)]): []})
 
 # Gather the data and from files
 for item1 in names:
@@ -39,12 +49,11 @@ for item1 in names:
                      'Kinetic Energy [eV]'
                      ])
 
-
     # Grab the number of items from a file
     number_of_atoms = pd.read_csv(
                                   '../data/lammpstrj/' +
                                   str(item1) +
-                                  '_final.lammpstrj',
+                                  '_rate.lammpstrj',
                                   skiprows=3,
                                   nrows=1,
                                   header=None
@@ -77,24 +86,31 @@ for item1 in names:
                 'junk'
                 ])
 
+    # Capture the first step when equilibration temperature is met
+    first_step = count*(number_of_atoms+9)+9
+
     # Imported positions from when equlibration temperature is met
     data1 = pd.read_csv(
                         '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
                         comment='#',
                         sep=' ',
-                        skiprows=9+(9+number_of_atoms)*count,
+                        skiprows=first_step,
                         nrows=number_of_atoms,
                         header=None
                         )
 
     data1.columns = columns
 
-    # Initial positions of atoms
+    # Capture last step of trajectory data
+    last_step = (data['Step'][len(data['Step'])-1]-data['Step'][0])*(number_of_atoms+9)+9
+
+    # Final positions of atoms
     data2 = pd.read_csv(
-                        '../data/lammpstrj/'+str(item1)+'_final.lammpstrj',
+                        '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
                         comment='#',
                         sep=' ',
-                        skiprows=9,
+                        skiprows=last_step,
+                        nrows=number_of_atoms,
                         header=None
                         )
 
@@ -106,13 +122,26 @@ for item1 in names:
     delta_z = data2['z']-data1['z']
 
     # Grab the mean of the squared displacement
-    distance_traveled = (delta_x**2.0+delta_y**2.0+delta_z**2.0)**2.0
+    distance_traveled = delta_x**2.0+delta_y**2.0+delta_z**2.0
     distance_traveled_average = distance_traveled.mean()
 
-    # Save average data on a file in a directory
-    directory = os.getcwd()
-    os.chdir(directory+'/../data/analysis/')
-    filewrite = open('distance_traveled_average_'+str(item1), 'w+')
-    filewrite.write(str(distance_traveled_average))
-    os.chdir(directory)
-    filewrite.close()
+    # Grab the temperatures for each travel distance
+    temperatures[float(item1[0:item1.find(separator)])].append(distance_traveled_average)
+
+# Taking the averages of distances
+data_means = {}
+for key, value in temperatures.iteritems():
+    data_means[key] = mean(value)
+
+# Creating arrays for plotting
+temp = []
+dist = []
+for key, value in data_means.iteritems():
+    temp.append(key)
+    dist.append(data_means[key])
+
+pl.plot(temp, dist, '.b')
+pl.xlabel('Temperature [K]')
+pl.ylabel('Propensity for Motion [A^2]')
+pl.grid(True)
+pl.show()

@@ -47,7 +47,6 @@ variable                                    seed                      equal  rep
 # Data output
 variable                                    data_file_characteristics string ../data/txt/replace_temperatureK_replace_run.txt
 variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_temperatureK_replace_run_rate.lammpstrj
-variable                                    data_file_dump_final      string ../data/lammpstrj/replace_temperatureK_replace_run_final.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_temperature_replaceK_run.dat
 variable                                    data_restart              string ../data/rest/replace_temperature_replaceK_run.rest
 
@@ -92,9 +91,6 @@ minimize                                    1.0e-4 1.0e-6 100 1000
 # Save atom positions at an interval
 dump                                        my_dump_rate  all custom 1       ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate  sort id
-
-dump                                        my_dump_final all custom ${hold} ${data_file_dump_final}   id type xu yu zu
-dump_modify                                 my_dump_final sort id
 
 ################################################################################
 
