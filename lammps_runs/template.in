@@ -90,10 +90,10 @@ minimize                                    1.0e-4 1.0e-6 100 1000
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump_rate  all custom 1       ${data_file_dump_rate} id type x y z
+dump                                        my_dump_rate  all custom 1       ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate  sort id
 
-dump                                        my_dump_final all custom ${hold} ${data_file_dump_final}   id type x y z
+dump                                        my_dump_final all custom ${hold} ${data_file_dump_final}   id type xu yu zu
 dump_modify                                 my_dump_final sort id
 
 ################################################################################
