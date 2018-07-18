@@ -4,6 +4,8 @@ General Documentation
 Note: Python 2.7 and LAMMPS is required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
+If initially cloned from a repository, run the setup.sh to create needed folders.
+
 ----------------------------
 
 1. Located in bash folder. To generate input files at a specified temperature in kelving, the following could be used:
