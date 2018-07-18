@@ -21,10 +21,9 @@ for item in lammpstrj_file_names:
 # Grab the temperatures for each travel distance
 temperatures = {}
 for item1 in names:
-      # Grab the temperatures for each travel distance
-      separator = 'K'
-      for item2 in ''.join(item1.split()):
-          temperatures.update({float(item1[0:item1.find(separator)]): []})
+    separator = 'K'
+    for item2 in ''.join(item1.split()):
+        temperatures.update({float(item1[0:item1.find(separator)]): []})
 
 # Gather the data and from files
 for item1 in names:
@@ -36,7 +35,7 @@ for item1 in names:
                        sep=' ',
                        skiprows=1,
                        header=None
-                                  )
+                       )
 
     # This is the orger of exported data
     data.columns = ([
@@ -47,18 +46,6 @@ for item1 in names:
                      'Potential Energy [eV]',
                      'Kinetic Energy [eV]'
                      ])
-
-    # Grab the number of items from a file
-    number_of_atoms = pd.read_csv(
-                                  '../data/lammpstrj/' +
-                                  str(item1) +
-                                  '_rate.lammpstrj',
-                                  skiprows=3,
-                                  nrows=1,
-                                  header=None
-                                  )
-
-    number_of_atoms = number_of_atoms[0][0]
 
     # Settling temp from file name
     temperature_settled = []
@@ -74,6 +61,18 @@ for item1 in names:
     count = 0
     while (data['Temperature [K]'][count] <= temperature_settled):
         count += 1
+
+    # Grab the number of items from a file
+    number_of_atoms = pd.read_csv(
+                                  '../data/lammpstrj/' +
+                                  str(item1) +
+                                  '_rate.lammpstrj',
+                                  skiprows=3,
+                                  nrows=1,
+                                  header=None
+                                  )
+
+    number_of_atoms = number_of_atoms[0][0]
 
     # The order of imported data
     columns = ([
@@ -100,7 +99,9 @@ for item1 in names:
     data1.columns = columns
 
     # Capture last step of trajectory data
-    last_step = (data['Step'][len(data['Step'])-1]-data['Step'][0])*(number_of_atoms+9)+9
+    last_step = (
+                 data['Step'][len(data['Step'])-1] -
+                 data['Step'][0])*(number_of_atoms+9)+9
 
     # Final positions of atoms
     data2 = pd.read_csv(
@@ -123,7 +124,9 @@ for item1 in names:
     distance_traveled_average = distance_traveled.mean()
 
     # Grab the temperatures for each travel distance
-    temperatures[float(item1[0:item1.find(separator)])].append(distance_traveled_average)
+    temperatures[
+                 float(item1[0:item1.find(separator)])
+                 ].append(distance_traveled_average)
 
 # Taking the averages of distances
 data_means = {}
