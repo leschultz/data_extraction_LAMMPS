@@ -66,6 +66,9 @@ for item1 in names:
     while (data['Temperature [K]'][count] <= temperature_settled):
         count += 1
 
+    while (data['Temperature [K]'][count] >= temperature_settled):
+        count += 1
+
     # Grab average temperature and standard deviation from data
     temp_mean.append(mean(data['Temperature [K]'][count:]))
     temp_std.append(std(data['Temperature [K]'][count:]))
@@ -196,9 +199,10 @@ pl.errorbar(
             temp_mean_average,
             dist_mean_average,
             dist_std_average,
-            temp_mean_average,
+            temp_std_average,
             'b.'
             )
+
 pl.xlabel('Temperature [K]')
 pl.ylabel('Propensity for Motion [A^2]')
 pl.grid(True)
