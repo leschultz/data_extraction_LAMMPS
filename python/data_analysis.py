@@ -158,8 +158,6 @@ result = result.reset_index(drop=True)
 os.chdir(data_export_directory)
 result.to_csv(r'data_for_each_run', header=None, index=None, sep=' ', mode='a')
 
-print result
-
 # Count the number of runs for each temperature
 run_separator = '_'
 run_numbers = []
@@ -167,7 +165,7 @@ for item in names:
     run_numbers.append(int(item.split(run_separator,1)[1]))
 
 # Match the termperatures with their averages
-run_number_max = max(run_numbers)  # Need to automate this number
+run_number_max = max(run_numbers)
 temp_mean_average = []
 temp_std_average = []
 dist_mean_average = []
