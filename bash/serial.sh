@@ -23,16 +23,4 @@ echo "PBS_NODEFILE"
 cat $PBS_NODEFILE
 
 ## Put the commands you want to run, one per line
-lmp_bardeeneth < 900.in
-lmp_bardeeneth < 910.in
-lmp_bardeeneth < 920.in
-lmp_bardeeneth < 930.in
-lmp_bardeeneth < 933.in
-lmp_bardeeneth < 940.in
-lmp_bardeeneth < 950.in
-lmp_bardeeneth < 960.in
-lmp_bardeeneth < 970.in
-lmp_bardeeneth < 980.in
-lmp_bardeeneth < 990.in
-lmp_bardeeneth < 1000.in
-
+bash lammps_looper.sh lmp_bardeeneth
