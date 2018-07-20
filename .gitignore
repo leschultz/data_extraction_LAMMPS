@@ -4,3 +4,4 @@ log*
 *_traveled_*
 data_for_each_run
 propensity_for_motion*
+*.txt

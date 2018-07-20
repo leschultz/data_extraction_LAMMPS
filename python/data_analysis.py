@@ -1,4 +1,3 @@
-import matplotlib.pyplot as pl
 import pandas as pd
 import os
 import re
@@ -159,13 +158,19 @@ result = result.reset_index(drop=True)
 
 # Save data in analysis folder
 os.chdir(data_export_directory)
-result.to_csv(r'data_for_each_run', header=None, index=None, sep=' ', mode='a')
+result.to_csv(
+              r'data_for_each_run.txt',
+              header=None,
+              index=None,
+              sep=' ',
+              mode='a'
+              )
 
 # Count the number of runs for each temperature
 run_separator = '_'
 run_numbers = []
 for item in names:
-    run_numbers.append(int(item.split(run_separator,1)[1]))
+    run_numbers.append(int(item.split(run_separator, 1)[1]))
 
 # Match the termperatures with their averages
 run_number_max = max(run_numbers)
@@ -195,16 +200,30 @@ while count < run_number_max:
 
     count += 1
 
-pl.errorbar(
-            temp_mean_average,
-            dist_mean_average,
-            dist_std_average,
-            temp_std_average,
-            'b.'
-            )
+frame_mean = {
+              'temp_mean': temp_mean_average,
+              'temp_std': temp_std_average,
+              'dist_mean': dist_mean_average,
+              'dist_std': dist_std_average
+              }
 
-pl.xlabel('Temperature [K]')
-pl.ylabel('Propensity for Motion [A^2]')
-pl.grid(True)
-pl.savefig('propensity_for_motion.png')
-pl.clf()
+dataframe_mean = pd.DataFrame(data=frame_mean)
+
+dataframe_mean = dataframe_mean[[
+                                 'temp_mean',
+                                 'temp_std',
+                                 'dist_mean',
+                                 'dist_std'
+                                 ]]
+
+result_mean = dataframe_mean.sort_values(['temp_mean'])
+result_mean = result_mean.reset_index(drop=True)
+
+# Save data in analysis folder
+result_mean.to_csv(
+                   r'data_for_each_run_mean.txt',
+                   header=None,
+                   index=None,
+                   sep=' ',
+                   mode='a'
+                   )
