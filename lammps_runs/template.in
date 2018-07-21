@@ -7,63 +7,45 @@
 units	        	                    metal
 atom_style                                  atomic
 dimension		                    3
-processors		                    * * *
 boundary	                            p p p
 
 ###############################################################################
 
-# Potential file
-variable                                    potentials                string ../potentials/Al_Sm.eam.fs
-variable                                    element1                  string Al
-variable                                    element2                  string Sm
-variable                                    element3                  string replace_element_here_3
-variable                                    element4                  string replace_element_here_4
-variable                                    element5                  string replace_element_here_5
-
-# Percent mixture
+# Atoms
 variable                                    number_of_atoms           equal  replace_atom_number
-variable                                    percent                   equal  0.04
 
 # Temperature variables
-variable                                    temp_melt                 equal  replace_temperature
-
-# Geometric variables
-variable                                    structure                 string fcc
-variable                                    lattice_parameter         equal  4.04092655671750
-variable                                    x_lo                      equal  0
-variable                                    x_hi                      equal  10
-variable                                    y_lo                      equal  0
-variable                                    y_hi                      equal  10
-variable                                    z_lo                      equal  0
-variable                                    z_hi                      equal  10
+variable                                    temp_melt                 equal  replace_melt_temperature
+variable                                    temp_final                equal  replace_final_temperature
 
 # Time variables
-variable                                    hold                      equal  10000
-variable                                    step_size                 equal  0.001
+variable                                    hold_1                    equal  replace_hold_1
+variable                                    hold_2                    equal  replace_hold_2
+variable                                    hold_3                    equal  replace_hold_3
 
 # Random seed
 variable                                    seed                      equal  replace_seed
 
 # Data output
-variable                                    data_file_characteristics string ../data/txt/replace_temperatureK_replace_run.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_temperatureK_replace_run_rate.lammpstrj
-variable                                    data_positions_final      string ../data/dat/replace_temperature_replaceK_run.dat
-variable                                    data_restart              string ../data/rest/replace_temperature_replaceK_run.rest
+variable                                    data_file_characteristics string ../data/txt/replace_final_temperatureK_replace_run.txt
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run_rate.lammpstrj
+variable                                    data_positions_final      string ../data/dat/replace_final_temperatureK_replace_run.dat
+variable                                    data_restart              string ../data/rest/replace_final_temperatureK_replace_run.rest
 
 ################################################################################
 
 # Simulation space
-lattice                                     ${structure} ${lattice_parameter}
-region                                      my_box block ${x_lo} ${x_hi} ${y_lo} ${y_hi} ${z_lo} ${z_hi}
+lattice                                     fcc 4.04092655671750
+region                                      my_box block 0 100 0 100 0 100
 create_box                                  2 my_box
-create_atoms                                1 random ${number_of_atoms} ${seed} NULL
-set                                         group all type/fraction 2 ${percent} ${seed} 
+create_atoms                                1 random 90 ${seed} NULL
+create_atoms                                2 random 10 ${seed} NULL
 
 ################################################################################
 
 # Data
 pair_style                                  eam/fs
-pair_coeff                                  * * ${potentials} ${element1} ${element2}
+pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
 
 ################################################################################
 
@@ -79,27 +61,35 @@ variable                                    myvol       equal vol
 ################################################################################
 
 # Time step
-timestep                                    ${step_size}
-
-# Parameters printe on the screen
+timestep                                    0.001
 
 # Initial conditions
-minimize                                    1.0e-4 1.0e-6 100 1000
+minimize                                    1.0e-10 1.0e-10 100000 100000
 
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump_rate  all custom 1       ${data_file_dump_rate} id type xu yu zu
-dump_modify                                 my_dump_rate  sort id
+dump                                        my_dump_rate all custom 1 ${data_file_dump_rate} id type xu yu zu
+dump_modify                                 my_dump_rate sort id
 
 ################################################################################
 
 # Open save data
 fix                                         data_saving all ave/time 1 1 1 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
-# Hold
-fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
-run                                         ${hold}
+# Hold as melt
+fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.01
+run                                         ${hold_1}
+unfix                                       run
+
+# Quench
+fix                                         run all nvt temp ${temp_melt} ${temp_final} 0.01
+run                                         ${hold_2}
+unfix                                       run
+
+# Hold at final temperature
+fix                                         run all nvt temp ${temp_final} ${temp_final} 0.01
+run                                         ${hold_3}
 unfix                                       run
 
 # Close save data
