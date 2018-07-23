@@ -117,7 +117,8 @@ for item1 in names:
     data1.columns = columns
 
     # Capture the number of RECORDED steps until the final step
-    last_step = (data['Step'][len(data['Step'])-1])/(data['Step'][1]-data['Step'][0])
+    recording_frequency = (data['Step'][1]-data['Step'][0])
+    last_step = (data['Step'][len(data['Step'])-1])/recording_frequency
 
     count = count_cut
     while count <= last_step-1:
@@ -142,10 +143,11 @@ for item1 in names:
         distance_traveled_means.append(mean(distance_traveled**2.0))
         count += 1
 
-    dist_v_time_x[item1] = data['Step'][count_cut:]
+    dist_v_time_x[item1] = list(data['Step'][count_cut:])
     dist_v_time_y[item1] = distance_traveled_means
     dist_mean.append(distance_traveled_means[-1])
     dist_std.append(std(distance_traveled_means[-1]))
+    distance_traveled_means = []
 
 # Creating dataframe from lists
 frame = {
@@ -241,8 +243,8 @@ result_mean.to_csv(
                    mode='a'
                    )
 
-with open('dist.txt', 'w') as file:
-    file.write(cPickle.dumps(dist_v_time_y))
+with open('dist.pkl', 'wb') as f:
+    cPickle.dump(dist_v_time_y, f, cPickle.HIGHEST_PROTOCOL)
 
-with open('time.txt', 'w') as file:
-    file.write(cPickle.dumps(dist_v_time_x))
+with open('time.pkl', 'wb') as f:
+    cPickle.dump(dist_v_time_x, f, cPickle.HIGHEST_PROTOCOL)

@@ -33,19 +33,24 @@ pl.plot(
 pl.xlabel('Temperature [K]')
 pl.ylabel('Propensity for Motion [A^2]')
 pl.grid(True)
-pl.savefig('propensity_for_motion.png')
+pl.savefig('propensity_for_motion_temperature.png')
 pl.clf()
 
-with open('time.txt', 'rb') as file:
+with open('time.pkl', 'rb') as file:
     x = cPickle.load(file)
 
-with open('dist.txt', 'rb') as file:
+with open('dist.pkl', 'rb') as file:
     y = cPickle.load(file)
 
+pl.figure()
+runs = []
 for key in x:
-    pl.plot(x[key]*0.001, y[key], '.')
-    pl.xlabel('Time [fs]')
-    pl.ylabel('Root mean squared displacement [<r^2>]')
-    pl.legend(['1500 [K]'])
-    pl.grid(True)
-    pl.show()
+    pl.plot(x[key], y[key], '.')
+    runs.append(key)
+
+pl.xlabel('Step [-]')
+pl.ylabel('Root mean squared displacement [<r^2>]')
+pl.legend(runs)
+pl.grid(True)
+pl.savefig('propensity_for_motion_time.png')
+pl.clf()
