@@ -45,7 +45,8 @@ with open('dist.pkl', 'rb') as file:
 pl.figure()
 runs = []
 for key in x:
-    pl.plot(x[key], y[key], '.')
+    x[key] = x[key] - x[key][0]  # Normalize
+    pl.plot(x[key][:17], y[key][:17], '.')
     runs.append(key)
 
 pl.xlabel('Step [-]')
