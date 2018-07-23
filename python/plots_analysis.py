@@ -49,7 +49,7 @@ for key in x:
     runs.append(key)
 
 pl.xlabel('Step [-]')
-pl.ylabel('Root mean squared displacement [<r^2>]')
+pl.ylabel('Propensity for Motion <r^2> [A]')
 pl.legend(runs)
 pl.grid(True)
 pl.savefig('propensity_for_motion_time.png')
