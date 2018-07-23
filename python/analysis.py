@@ -1,4 +1,5 @@
 import pandas as pd
+import cPickle
 import os
 import re
 
@@ -11,6 +12,11 @@ data_export_directory = first_directory+'/../data/analysis/'
 
 # The names of mean dislacements for each run
 lammpstrj_file_names = os.listdir(lammpstrj_directory)
+
+# List of root mean displacement for different times
+distance_traveled_means = []
+dist_v_time_x = {}
+dist_v_time_y = {}
 
 # The actual temperatures and standard deviation variable
 temp_mean = []
@@ -68,6 +74,8 @@ for item1 in names:
     while (data['Temperature [K]'][count] >= temperature_settled):
         count += 1
 
+    count_cut = count
+
     # Grab average temperature and standard deviation from data
     temp_mean.append(mean(data['Temperature [K]'][count:]))
     temp_std.append(std(data['Temperature [K]'][count:]))
@@ -95,7 +103,7 @@ for item1 in names:
                 ])
 
     # Capture the first step when equilibration temperature is met
-    first_step = count*(number_of_atoms+9)+9
+    first_step = count_cut*(number_of_atoms+9)+9
 
     # Imported positions from when equlibration temperature is met
     data1 = pd.read_csv(
@@ -108,31 +116,36 @@ for item1 in names:
 
     data1.columns = columns
 
-    # Capture last step of trajectory data
-    last_step = (
-                 data['Step'][len(data['Step'])-1] -
-                 data['Step'][0])*(number_of_atoms+9)+9
+    # Capture the number of RECORDED steps until the final step
+    last_step = (data['Step'][len(data['Step'])-1])/(data['Step'][1]-data['Step'][0])
 
-    # Final positions of atoms
-    data2 = pd.read_csv(
-                        '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
-                        sep=' ',
-                        skiprows=last_step,
-                        nrows=number_of_atoms,
-                        header=None
-                        )
+    count = count_cut
+    while count <= last_step-1:
+        # Final positions of atoms
+        data2 = pd.read_csv(
+                            '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
+                            sep=' ',
+                            skiprows=count*(number_of_atoms+9)+9,
+                            nrows=number_of_atoms,
+                            header=None
+                            )
 
-    data2.columns = columns
+        data2.columns = columns
 
-    # 3D translations
-    delta_x = data2['x']-data1['x']
-    delta_y = data2['y']-data1['y']
-    delta_z = data2['z']-data1['z']
+        # 3D translations
+        delta_x = data2['x']-data1['x']
+        delta_y = data2['y']-data1['y']
+        delta_z = data2['z']-data1['z']
 
-    # Grab the mean of the squared displacement
-    distance_traveled = delta_x**2.0+delta_y**2.0+delta_z**2.0
-    dist_mean.append(distance_traveled.mean())
-    dist_std.append(std(distance_traveled))
+        # Grab the mean of the squared displacement (make key for each run)
+        distance_traveled = (delta_x**2.0+delta_y**2.0+delta_z**2.0)**(1.0/2.0)
+        distance_traveled_means.append(mean(distance_traveled**2.0))
+        count += 1
+
+    dist_v_time_x[item1] = data['Step'][count_cut:]
+    dist_v_time_y[item1] = distance_traveled_means
+    dist_mean.append(distance_traveled_means[-1])
+    dist_std.append(std(distance_traveled_means[-1]))
 
 # Creating dataframe from lists
 frame = {
@@ -227,3 +240,9 @@ result_mean.to_csv(
                    sep=' ',
                    mode='a'
                    )
+
+with open('dist.txt', 'w') as file:
+    file.write(cPickle.dumps(dist_v_time_y))
+
+with open('time.txt', 'w') as file:
+    file.write(cPickle.dumps(dist_v_time_x))
