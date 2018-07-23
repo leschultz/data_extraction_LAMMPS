@@ -67,11 +67,12 @@ for item1 in names:
     temps.append(temperature_settled)
 
     # Look for the moment equilibration temperature is met
-    count = 0
-    while (data['Temperature [K]'][count] <= temperature_settled):
+    # Added some beggining time to avoid odd spikes
+    count = 100
+    while (data['Temperature [K]'][count] >= temperature_settled):
         count += 1
 
-    while (data['Temperature [K]'][count] >= temperature_settled):
+    while (data['Temperature [K]'][count] <= temperature_settled):
         count += 1
 
     count_cut = count
@@ -121,7 +122,7 @@ for item1 in names:
     last_step = (data['Step'][len(data['Step'])-1])/recording_frequency
 
     count = count_cut
-    while count <= last_step-1:
+    while count <= last_step:
         # Final positions of atoms
         data2 = pd.read_csv(
                             '../data/lammpstrj/'+str(item1)+'_rate.lammpstrj',
