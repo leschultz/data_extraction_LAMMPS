@@ -61,7 +61,7 @@ variable                                    myvol       equal vol
 ################################################################################
 
 # Time step
-timestep                                    0.001
+timestep                                    0.003
 
 # Initial conditions
 minimize                                    1.0e-10 1.0e-10 100000 100000
@@ -69,26 +69,26 @@ minimize                                    1.0e-10 1.0e-10 100000 100000
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump_rate all custom 1000 ${data_file_dump_rate} id type xu yu zu
+dump                                        my_dump_rate all custom 100 ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate sort id
 
 ################################################################################
 
 # Open save data
-fix                                         data_saving all ave/time 1 1 1000 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
+fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 # Hold as melt
-fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.01
+fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
 run                                         ${hold_1}
 unfix                                       run
 
 # Quench
-fix                                         run all nvt temp ${temp_melt} ${temp_final} 0.01
+fix                                         run all npt temp ${temp_melt} ${temp_final} 0.1 iso 0 0 1
 run                                         ${hold_2}
 unfix                                       run
 
 # Hold at final temperature
-fix                                         run all nvt temp ${temp_final} ${temp_final} 0.01
+fix                                         run all npt temp ${temp_final} ${temp_final} 0.1 iso 0 0 1
 run                                         ${hold_3}
 unfix                                       run
 

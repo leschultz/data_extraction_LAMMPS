@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Declare a name for this job
-#PBS -N schultz
+#PBS -N propensity_for_motion
 ## Request the queue for this job (e.g. morganshort, morganeth, izabelaeth)
 #PBS -q morganshort
 ## Request a total of 1 processor for this job (1 node and 1 processor per node)

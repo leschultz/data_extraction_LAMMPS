@@ -15,7 +15,7 @@ for ((i=1;i<=$number_runs;i++))
 do
 	for var in "$@"
 	do
-		replaced=$(grep -l "replace_final_temperature" ../lammps_runs/template.in | xargs sed "
+		replaced=$(grep -l "replace_final_temperature" ../templates/template.in | xargs sed "
 		s/replace_final_temperature/$var/g;
 	       	s/replace_seed/$RANDOM/g;
 	       	s/replace_atom_number/$atom_number/g;
