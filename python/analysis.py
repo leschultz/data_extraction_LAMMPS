@@ -1,5 +1,5 @@
-import _pickle as cPickle
 import pandas as pd
+import pickle
 import os
 import re
 
@@ -245,7 +245,7 @@ result_mean.to_csv(
                    )
 
 with open('dist.pkl', 'wb') as f:
-    cPickle.dump(dist_v_time_y, f)
+    pickle.dump(dist_v_time_y, f)
 
 with open('time.pkl', 'wb') as f:
-    cPickle.dump(dist_v_time_x, f)
+    pickle.dump(dist_v_time_x, f)

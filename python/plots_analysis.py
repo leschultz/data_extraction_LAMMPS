@@ -1,7 +1,7 @@
 from matplotlib import pyplot as pl
 
-import _pickle as cPickle
 import pandas as pd
+import pickle
 import numpy
 import os
 
@@ -39,10 +39,10 @@ pl.savefig('propensity_for_motion_temperature.png')
 pl.clf()
 
 with open('time.pkl', 'rb') as file:
-    x = cPickle.load(file)
+    x = pickle.load(file)
 
 with open('dist.pkl', 'rb') as file:
-    y = cPickle.load(file)
+    y = pickle.load(file)
 
 pl.figure()
 runs = []
