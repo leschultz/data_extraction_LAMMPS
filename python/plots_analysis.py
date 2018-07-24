@@ -44,11 +44,11 @@ with open('time.pkl', 'rb') as file:
 with open('dist.pkl', 'rb') as file:
     y = pickle.load(file)
 
-pl.figure()
+pl.figure(figsize=(24,18))
 runs = []
 for key in x:
     x[key] = numpy.array(x[key]) - x[key][0]  # Normalize
-    pl.plot(x[key][:17], y[key][:17], '.')
+    pl.plot(x[key][:17], y[key][:17])
     runs.append(key)
 
 pl.xlabel('Step [-]')
