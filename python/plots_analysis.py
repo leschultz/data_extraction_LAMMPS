@@ -1,6 +1,8 @@
-import matplotlib.pyplot as pl
+from matplotlib import pyplot as pl
+
+import _pickle as cPickle
 import pandas as pd
-import cPickle
+import numpy
 import os
 
 # Get the current directory and saved data analysis directory
@@ -45,7 +47,7 @@ with open('dist.pkl', 'rb') as file:
 pl.figure()
 runs = []
 for key in x:
-    x[key] = x[key] - x[key][0]  # Normalize
+    x[key] = numpy.array(x[key]) - x[key][0]  # Normalize
     pl.plot(x[key][:17], y[key][:17], '.')
     runs.append(key)
 
