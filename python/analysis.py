@@ -2,6 +2,7 @@ from numpy import array
 from scipy import mean
 
 import pandas as pd
+import pickle
 import os
 
 # The order of imported data from lammpstrj files
@@ -46,6 +47,7 @@ for item in names:
     run_numbers.append(item.split('K_')[1])
 
 # Variable to append data in order
+temp_mean = []
 steps = []
 dists = []
 temps = []
@@ -87,6 +89,9 @@ for item in names:
 
     count_cut = count
 
+    # Get the average temperature after cutoff
+    temp_mean.append(mean(data['Temperature [K]'][count_cut:]))
+
     # Grab the number of items from a file
     number_of_atoms = load_lammpstrj(item, 3, 1, None)
     number_of_atoms = number_of_atoms[0][0]
@@ -126,7 +131,7 @@ for item in names:
     dists.append(dists_per_interval)
 
 # Arbitrary cutoff of data (can change in the future)
-stop_criterion = 2
+stop_criterion = 170
 
 steps_cut = []
 for item in steps:
@@ -143,7 +148,8 @@ for item in steps_cut:
     count += 1
 
 df = {
-      'temperatures': temps,
+      'input_temperature': temps,
+      'temperatures': temp_mean,
       'run' : run_numbers,
       'steps': steps_cut,
       'dists': dists_cut
@@ -151,8 +157,9 @@ df = {
 
 df = pd.DataFrame(data=df)
 df = df[[
-         'temperatures',
+         'input_temperature',
          'run',
+         'temperatures',
          'steps',
          'dists'
          ]]
@@ -160,4 +167,7 @@ df = df[[
 df = df.sort_values(['temperatures', 'run'])
 df = df.reset_index(drop=True)
 
-print(df)
+# Save data
+os.chdir(data_export_directory)
+with open('data.pickle', 'wb') as handle:
+    pickle.dump(df, handle)
