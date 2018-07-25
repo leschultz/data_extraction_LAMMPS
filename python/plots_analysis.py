@@ -54,7 +54,7 @@ for item in x:
     count += 1
 
 pl.xlabel('Step [-]')
-pl.ylabel('Root mean squared displacement [A]')
+pl.ylabel('Mean Squared Displacement [A^2]')
 pl.legend(df['temperatures'])
 pl.grid(True)
 pl.savefig('propensity_for_motion_time.png')
