@@ -1,14 +1,14 @@
 General Documentation
 =====================
 
-Note: Python 2.7 and LAMMPS is required.
+Note: Python 3 and LAMMPS are required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
 If initially cloned from a repository, run the setup.sh to create needed folders.
 
 ----------------------------
 
-1. Located in bash folder. To generate input files at a specified temperature in kelving, the following could be used:
+1. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):
 
 	bash input_file_generator.sh <number of runs> <number of atoms> <melting temperature> <time steps at melt> <time steps of quench> <time steps final hold> <list of final temperatures without units>
 	bash input_file_generator.sh 10 100 2000 1000000 33000000 36000000 900
@@ -24,8 +24,8 @@ If initially cloned from a repository, run the setup.sh to create needed folders
 
 4. Located in python folder. To generate displacement data, the folllowing could be used:
 
-	python data_analysis.py
+	python analysis.py
 
 5. Located in python folder. To generate displacement plot, the following could be used:
 
-	plot_propensity_for_motion.py
+	plot_analysis.py
