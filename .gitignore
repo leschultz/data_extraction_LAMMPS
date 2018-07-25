@@ -2,3 +2,4 @@ data/*
 images/*
 input_files/*
 *.swp
+__pycache__*
