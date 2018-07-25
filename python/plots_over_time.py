@@ -28,6 +28,8 @@ for item1 in txt_file_names:
                      'Kinetic Energy [eV]'
                      ])
 
+    print('Plotting system information for '+str(item1))
+
     # This loops over each data plot type
     for item2 in data.columns:
         pl.plot(data['Step'], data[item2])
@@ -35,5 +37,5 @@ for item1 in txt_file_names:
         pl.ylabel(str(item2))
         pl.legend([str(item1)])
         pl.grid(True)
-        pl.savefig('../images/system/'+str(item2)+'_'+str(item1)+'.png')
+        pl.savefig('../images/system/'+str(item2)+'_'+str(item1)[:-4]+'.png')
         pl.clf()

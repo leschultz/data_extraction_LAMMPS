@@ -15,8 +15,10 @@ columns = ([
             'junk'
             ])
 
+
 # Function for loading data from lammpstrj files
 def load_lammpstrj(name, skip, length, columns):
+    '''This function gathers position data from lammpstrj files'''
 
     # Imported positions from when equlibration temperature is met
     return pd.read_csv(
@@ -25,7 +27,7 @@ def load_lammpstrj(name, skip, length, columns):
                        skiprows=skip,
                        nrows=length,
                        header=None,
-                       names = columns
+                       names=columns
                        )
 
 # Get directories
@@ -54,6 +56,8 @@ temps = []
 
 # Gather the data and from files
 for item in names:
+
+    print('Processing '+item)
 
     # For each argument value generate graphs
     data = pd.read_csv(
@@ -130,8 +134,6 @@ for item in names:
     steps.append(list(data['Step'][count_cut:]))
     dists.append(dists_per_interval)
 
-    print(item)
-
 # Arbitrary cutoff of data (can change in the future)
 stop_criterion = 170
 
@@ -152,7 +154,7 @@ for item in steps_cut:
 df = {
       'input_temperature': temps,
       'temperatures': temp_mean,
-      'run' : run_numbers,
+      'run': run_numbers,
       'steps': steps_cut,
       'dists': dists_cut
       }

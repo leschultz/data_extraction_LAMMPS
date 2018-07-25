@@ -18,6 +18,8 @@ with open('data.pickle', 'rb') as file:
 # Change to image directory after loading data
 os.chdir(image_directory)
 
+print('Plotting all mean squared diplacements together')
+
 x = []
 for item in df['steps']:
     x.append(item)
@@ -40,6 +42,13 @@ pl.clf()
 
 count = 0
 for item in x:
+    print(
+          'Plotting mean squared displacement for ' +
+          str(df['input_temperature'][count]) +
+          'K_' +
+          str(df['run'][count])
+          )
+
     pl.plot(df['steps'][count], df['dists'][count])
     pl.ylabel('Mean Squared Displacement [A^2]')
     pl.xlabel('Step [-]')
