@@ -7,12 +7,16 @@ import os
 # Get the current directory and saved data analysis directory
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/analysis/'
+image_directory = first_directory+'/../images/motion/'
 
 # Change to data analysis directory
 os.chdir(data_directory)
 
 with open('data.pickle', 'rb') as file:
     df = pickle.load(file)
+
+# Change to image directory after loading data
+os.chdir(image_directory)
 
 x = []
 for item in df['steps']:
@@ -44,6 +48,7 @@ for item in x:
     pl.savefig(
                'propensity_for_motion_step_' +
                str(df['input_temperature'][count]) +
+               'K_' +
                str(df['run'][count])
                )
     pl.clf()

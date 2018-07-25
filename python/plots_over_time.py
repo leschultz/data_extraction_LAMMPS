@@ -35,5 +35,5 @@ for item1 in txt_file_names:
         pl.ylabel(str(item2))
         pl.legend([str(item1)])
         pl.grid(True)
-        pl.savefig('../images/'+str(item1)+'_'+str(item2)+'.png')
+        pl.savefig('../images/system/'+str(item2)+'_'+str(item1)+'.png')
         pl.clf()
