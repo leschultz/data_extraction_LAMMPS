@@ -24,12 +24,27 @@ for item in df['dists']:
 
 count = 0
 for item in x:
-    pl.plot(x[count], y[count], '.')
+    pl.plot(x[count], y[count])
     count += 1
 
 pl.xlabel('Step [-]')
 pl.ylabel('Mean Squared Displacement [A^2]')
 pl.legend(df['temperatures'])
 pl.grid(True)
-pl.savefig('propensity_for_motion_time.png')
+pl.savefig('propensity_for_motion_step.png')
 pl.clf()
+
+count = 0
+for item in x:
+    pl.plot(df['steps'][count], df['dists'][count])
+    pl.ylabel('Mean Squared Displacement [A^2]')
+    pl.xlabel('Step [-]')
+    pl.legend([df['temperatures'][count]])
+    pl.grid(True)
+    pl.savefig(
+               'propensity_for_motion_step_' +
+               str(df['input_temperature'][count]) +
+               str(df['run'][count])
+               )
+    pl.clf()
+    count += 1
