@@ -4,8 +4,6 @@ General Documentation
 Note: Python 3 and LAMMPS are required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
-If initially cloned from a repository, run the setup.sh to create needed folders.
-
 ----------------------------
 
 1. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):

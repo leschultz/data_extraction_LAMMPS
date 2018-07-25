@@ -1,6 +1,10 @@
 import plots_over_time
 import plots_analysis
 import analysis
+import setup
+
+# Check for needed directories at start
+setup.setup()
 
 
 class control(object):
@@ -17,3 +21,7 @@ class control(object):
     def plots_analysis():
         print('Plotting the analysis data')
         plots_analysis.plot()
+
+    def clean():
+        print('Deleting all data')
+        setup.clean()
