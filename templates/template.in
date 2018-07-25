@@ -75,17 +75,17 @@ dump_modify                                 my_dump_rate sort id
 fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 # Hold as melt
-fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
+fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.1
 run                                         ${hold_1}
 unfix                                       run
 
 # Quench
-fix                                         run all npt temp ${temp_melt} ${temp_final} 0.1 iso 0 0 1
+fix                                         run all nvt temp ${temp_melt} ${temp_final} 0.1
 run                                         ${hold_2}
 unfix                                       run
 
 # Hold at final temperature
-fix                                         run all npt temp ${temp_final} ${temp_final} 0.1 iso 0 0 1
+fix                                         run all nvt temp ${temp_final} ${temp_final} 0.1
 run                                         ${hold_3}
 unfix                                       run
 

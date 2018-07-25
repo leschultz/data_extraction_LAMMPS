@@ -130,6 +130,8 @@ for item in names:
     steps.append(list(data['Step'][count_cut:]))
     dists.append(dists_per_interval)
 
+    print(item)
+
 # Arbitrary cutoff of data (can change in the future)
 stop_criterion = 170
 
