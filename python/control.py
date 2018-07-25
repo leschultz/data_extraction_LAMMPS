@@ -10,17 +10,17 @@ setup.setup()
 class control(object):
     '''A class for controlling the sequence of scripts run'''
 
-    def analyze(initial_skip, stop):
+    def analyze(initial_skip):
         print('Crunching data')
-        analysis.analyze(initial_skip, stop)
+        analysis.analyze(initial_skip)
 
     def plot_system():
         print('Plotting data from systems')
         plots_over_time.plot()
 
-    def plot_analysis():
+    def plot_analysis(stop):
         print('Plotting the analysis data')
-        plots_analysis.plot()
+        plots_analysis.plot(stop)
 
     def clean():
         print('Deleting all data')

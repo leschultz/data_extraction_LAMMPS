@@ -5,7 +5,7 @@ import pickle
 import os
 
 
-def plot():
+def plot(stop):
 
     # Get the current directory and saved data analysis directory
     first_directory = os.getcwd()
@@ -55,7 +55,7 @@ def plot():
               str(df['run'][count])
               )
 
-        pl.plot(df['steps'][count], df['dists'][count])
+        pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.xlabel('Step [-]')
         pl.legend([df['temperatures'][count]])

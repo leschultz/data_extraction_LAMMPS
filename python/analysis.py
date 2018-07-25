@@ -6,7 +6,7 @@ import pickle
 import os
 
 
-def analyze(initial_skip, stop):
+def analyze(initial_skip):
     '''
     This function gathers the mean squared displacement for atoms with respect
     to time. The first argument allows skipping odd transient behavior when
@@ -147,8 +147,13 @@ def analyze(initial_skip, stop):
         steps.append(list(data['Step'][count_cut:]))
         dists.append(dists_per_interval)
 
-    # Arbitrary cutoff of data (can change in the future)
-    stop_criterion = stop
+    # Cutoff data at minimum sample length so that all runs are equal length
+    count = 0
+    lengths_of_steps = []
+    for item in steps:
+        lengths_of_steps.append(len(steps[count]))
+
+    stop_criterion = min(lengths_of_steps)
 
     steps_cut = []
     for item in steps:
