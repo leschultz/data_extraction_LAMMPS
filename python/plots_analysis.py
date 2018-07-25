@@ -11,32 +11,6 @@ data_directory = first_directory+'/../data/analysis/'
 # Change to data analysis directory
 os.chdir(data_directory)
 
-
-data = pd.read_csv(
-                   'data_for_each_run_mean.txt',
-                   sep=' ',
-                   header=None
-                   )
-
-data.columns = ([
-                 'temperature',
-                 'temperature_std',
-                 'distance',
-                 'distance_std'
-                 ])
-
-pl.plot(
-        data['temperature'],
-        data['distance'],
-        'b.'
-        )
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Propensity for Motion [A^2]')
-pl.grid(True)
-pl.savefig('propensity_for_motion_temperature.png')
-pl.clf()
-
 with open('data.pickle', 'rb') as file:
     df = pickle.load(file)
 
