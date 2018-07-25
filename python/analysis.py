@@ -6,7 +6,13 @@ import pickle
 import os
 
 
-def analyze():
+def analyze(initial_skip, stop):
+    '''
+    This function gathers the mean squared displacement for atoms with respect
+    to time. The first argument allows skipping odd transient behavior when
+    calculating settling temperature step. The second argument lets the user
+    define the end of the interval for gathering data.
+    '''
 
     # The order of imported data from lammpstrj files
     columns = ([
@@ -86,7 +92,7 @@ def analyze():
 
         # Look for the moment equilibration temperature is met
         # Added some beggining time to avoid odd spikes
-        count = 100
+        count = initial_skip
         while (data['Temperature [K]'][count] >= temperature_settled):
             count += 1
 
@@ -142,7 +148,7 @@ def analyze():
         dists.append(dists_per_interval)
 
     # Arbitrary cutoff of data (can change in the future)
-    stop_criterion = 170
+    stop_criterion = stop
 
     steps_cut = []
     for item in steps:
