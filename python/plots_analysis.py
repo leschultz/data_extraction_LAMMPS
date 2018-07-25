@@ -23,6 +23,7 @@ def plot():
 
     print('Plotting all mean squared diplacements together')
 
+    # Gather values to plot
     x = []
     for item in df['steps']:
         x.append(item)
@@ -31,6 +32,7 @@ def plot():
     for item in df['dists']:
         y.append(item)
 
+    # Plot all displacement values together
     count = 0
     for item in x:
         pl.plot(x[count], y[count])
@@ -43,6 +45,7 @@ def plot():
     pl.savefig('propensity_for_motion_step.png')
     pl.clf()
 
+    # Plot displacements for each run
     count = 0
     for item in x:
         print(
