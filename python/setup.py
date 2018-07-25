@@ -32,7 +32,7 @@ directories = [
 
 def check(directory):
     if not os.path.exists(directory):
-        print('Creating needed directories')
+        print('Creating directory: '+directory)
         os.makedirs(directory)
 
 

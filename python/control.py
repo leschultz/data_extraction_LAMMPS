@@ -14,11 +14,11 @@ class control(object):
         print('Crunching data')
         analysis.analyze()
 
-    def plots_system():
+    def plot_system():
         print('Plotting data from systems')
         plots_over_time.plot()
 
-    def plots_analysis():
+    def plot_analysis():
         print('Plotting the analysis data')
         plots_analysis.plot()
 
