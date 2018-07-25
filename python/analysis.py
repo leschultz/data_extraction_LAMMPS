@@ -122,9 +122,9 @@ for item in names:
         delta_y = data2['y']-data1['y']
         delta_z = data2['z']-data1['z']
 
-        # Grab the mean of the squared displacement (make key for each run)
+        # Grab the mean squared displacement (NOT root mean squared)
         distance_traveled = (delta_x**2.0+delta_y**2.0+delta_z**2.0)**(1.0/2.0)
-        dists_per_interval.append(mean(distance_traveled)**(1.0/2.0))
+        dists_per_interval.append(mean(distance_traveled**(2.0)))
         count += 1
 
     steps.append(list(data['Step'][count_cut:]))
