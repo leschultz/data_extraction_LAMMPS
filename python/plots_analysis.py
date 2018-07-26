@@ -92,26 +92,5 @@ def plot(stop):
     pl.savefig('propensity_for_motion_all.png')
     pl.clf
 
-    # Plot the averages
-    count = 0
-    for item in df_avg['temperature']:
-        print(
-              'Plotting propensity for motion for ' +
-              str(df_avg['temperature'][count]) +
-              ' K'
-              )
-        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
-        pl.xlabel('Step [-]')
-        pl.ylabel('Propensity for motion <r^2> [A^2]')
-        pl.legend([str(item)+' [K]'])
-        pl.grid(True)
-        pl.savefig(
-                   'propensity_for_motion_' +
-                   str(item) +
-                   'K.png'
-                   )
-        pl.clf()
-        count += 1
-
     # Go back to starting directory
     os.chdir(first_directory)

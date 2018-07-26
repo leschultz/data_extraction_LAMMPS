@@ -13,9 +13,9 @@ def run_average(thing, frame, values, length, run):
     '''
 
     count = 0
-    for i in range(0, length, run):
+    for i in range(0, length-1, run+1):
         thing.append(
-                     mean(array(list(frame[values][i:run*(count+1)])), axis=0)
+                     mean(array(list(frame[values][i:count*(run+1)+run])), axis=0)
                      )
         count += 1
 
@@ -60,7 +60,6 @@ def propensity(stop):
     dists = run_average(dists, df, 'dists', run_length, max_run)
     temps = run_average(temps, df, 'temperatures', run_length, max_run)
     steps = run_average(steps, df, 'steps', run_length, max_run)
-
     df = {
           'temperature': temps,
           'distances': dists,
@@ -81,5 +80,10 @@ def propensity(stop):
     with open('averages.pickle', 'wb') as handle:
         pickle.dump(df, handle)
 
-    # Go back to starting directory after loading data
+   # Go back to starting directory after loading data
     os.chdir(first_directory)
+
+    print(run_length)
+    print(max_run)
+    print(temps)
+    print(df)
