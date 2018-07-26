@@ -6,6 +6,10 @@ import os
 
 
 def plot(stop):
+    '''
+    The stop argument allows the user to define the end of the interval for
+    plotting data.
+    '''
 
     # Get the current directory and saved data analysis directory
     first_directory = os.getcwd()
@@ -15,8 +19,12 @@ def plot(stop):
     # Change to data analysis directory
     os.chdir(data_directory)
 
-    with open('data.pickle', 'rb') as file:
-        df = pickle.load(file)
+    with open('data.pickle', 'rb') as handle:
+        df = pickle.load(handle)
+
+    # Open the data containing averages for each temperature run
+    with open('averages.pickle', 'rb') as handle:
+        df_avg = pickle.load(handle)
 
     # Change to image directory after loading data
     os.chdir(image_directory)
@@ -33,6 +41,7 @@ def plot(stop):
         y.append(item)
 
     # Plot all displacement values together
+    print('Plotting the mean squared displacement for all')
     count = 0
     for item in x:
         pl.plot(x[count], y[count])
@@ -42,7 +51,7 @@ def plot(stop):
     pl.ylabel('Mean Squared Displacement [A^2]')
     pl.legend(df['temperatures'])
     pl.grid(True)
-    pl.savefig('propensity_for_motion_step.png')
+    pl.savefig('mean_squared_displacement_all.png')
     pl.clf()
 
     # Plot displacements for each run
@@ -56,15 +65,50 @@ def plot(stop):
               )
 
         pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
-        pl.ylabel('Mean Squared Displacement [A^2]')
         pl.xlabel('Step [-]')
-        pl.legend([df['temperatures'][count]])
+        pl.ylabel('Mean Squared Displacement [A^2]')
+        pl.legend([str(df['temperatures'][count])+' [K]'])
         pl.grid(True)
         pl.savefig(
-                   'propensity_for_motion_step_' +
+                   'mean_squared_displacement_' +
                    str(df['input_temperature'][count]) +
                    'K_' +
                    str(df['run'][count])
+                   )
+        pl.clf()
+        count += 1
+
+    # Plot the averages together
+    print('Plotting the propensity for motion for all')
+    count = 0
+    for item in df_avg['steps']:
+        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+        count += 1
+
+    pl.xlabel('Step [-]')
+    pl.ylabel('Propensity for motion <r^2> [A^2]')
+    pl.legend(df_avg['temperature'])
+    pl.grid(True)
+    pl.savefig('propensity_for_motion_all.png')
+    pl.clf
+
+    # Plot the averages
+    count = 0
+    for item in df_avg['temperature']:
+        print(
+              'Plotting propensity for motion for ' +
+              str(df_avg['temperature'][count]) +
+              ' K'
+              )
+        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+        pl.xlabel('Step [-]')
+        pl.ylabel('Propensity for motion <r^2> [A^2]')
+        pl.legend([str(item)+' [K]'])
+        pl.grid(True)
+        pl.savefig(
+                   'propensity_for_motion_' +
+                   str(item) +
+                   'K.png'
                    )
         pl.clf()
         count += 1

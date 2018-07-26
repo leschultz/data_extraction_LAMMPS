@@ -4,11 +4,13 @@ General Documentation
 Note: Python 3 and LAMMPS are required.
 User must be in the directories noted below for functionality or add the folder to environment variables.
 
+All calulations depend on the units used in LAMMPS. Ignore default units.
+
 ----------------------------
 
 The python tool can be run via the commandline with the follwing command:
 
-	python3 -c 'from control import control; control.analyze(100); control.plot_analysis(170); control.plot_system()'
+	python3 -c 'from control import control; control.analyze(100, 170); control.plot_analysis(170); control.plot_system()'
 
 1. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):
 

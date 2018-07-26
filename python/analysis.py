@@ -10,8 +10,7 @@ def analyze(initial_skip):
     '''
     This function gathers the mean squared displacement for atoms with respect
     to time. The first argument allows skipping odd transient behavior when
-    calculating settling temperature step. The second argument lets the user
-    define the end of the interval for gathering data.
+    calculating settling temperature step.
     '''
 
     # The order of imported data from lammpstrj files
@@ -186,11 +185,13 @@ def analyze(initial_skip):
              'dists'
              ]]
 
-    df = df.sort_values(['temperatures', 'run'])
+    df = df.sort_values(['input_temperature', 'run'])
     df = df.reset_index(drop=True)
 
-    # Save data
+    # Save the order of runs with names
     os.chdir(data_export_directory)
+
+    # Save dataframe
     with open('data.pickle', 'wb') as handle:
         pickle.dump(df, handle)
 
