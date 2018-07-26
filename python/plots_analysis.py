@@ -46,7 +46,7 @@ def plot(stop):
     temperature_run = []
     for item in x:
         pl.plot(x[count], y[count])
-        temperature_run.append(str(df['temperatures'][count])+' [K]')
+        temperature_run.append(str(df['temperature'][count])+' [K]')
         count += 1
 
     pl.xlabel('Step [-]')
@@ -69,7 +69,7 @@ def plot(stop):
         pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
         pl.xlabel('Step [-]')
         pl.ylabel('Mean Squared Displacement [A^2]')
-        pl.legend([str(df['temperatures'][count])+' [K]'])
+        pl.legend([str(df['temperature'][count])+' [K]'])
         pl.grid(True)
         pl.savefig(
                    'mean_squared_displacement_' +
@@ -83,16 +83,38 @@ def plot(stop):
     # Plot the averages together
     print('Plotting the propensity for motion for all')
     count = 0
+    temperature_run = []
     for item in df_avg['steps']:
         pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+        temperature_run.append(str(df_avg['temperature'][count])+' [K]')
         count += 1
 
     pl.xlabel('Step [-]')
     pl.ylabel('Propensity for motion <r^2> [A^2]')
-    pl.legend(df_avg['temperature'])
+    pl.legend(temperature_run)
     pl.grid(True)
     pl.savefig('propensity_for_motion_all.png')
-    pl.clf
+    pl.clf()
+
+    # Plot the averages separately
+    count = 0
+    for item in df_avg['temperature']:
+        print(
+              'Plotting the propensity for motion for ' +
+              str(df_avg['temperature'][count])+' [K]'
+              )
+        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+        pl.xlabel('Step [-]')
+        pl.ylabel('Propensity for motion <r^2> [A^2]')
+        pl.legend([str(df_avg['temperature'][count])+' [K]'])
+        pl.grid(True)
+        pl.savefig(
+                   'propensity_for_motion_' +
+                   str(df_avg['temperature'][count]) +
+                   '.png'
+                   )
+        pl.clf()
+        count += 1
 
     # Go back to starting directory
     os.chdir(first_directory)

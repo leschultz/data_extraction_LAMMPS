@@ -170,7 +170,7 @@ def analyze(initial_skip):
 
     df = {
           'input_temperature': temps,
-          'temperatures': temp_mean,
+          'temperature': temp_mean,
           'run': run_numbers,
           'steps': steps_cut,
           'dists': dists_cut
@@ -180,7 +180,7 @@ def analyze(initial_skip):
     df = df[[
              'input_temperature',
              'run',
-             'temperatures',
+             'temperature',
              'steps',
              'dists'
              ]]

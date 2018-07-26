@@ -58,7 +58,7 @@ def propensity(stop):
     temps = []
     steps = []
     dists = run_average(dists, df, 'dists', run_length, max_run)
-    temps = run_average(temps, df, 'temperatures', run_length, max_run)
+    temps = run_average(temps, df, 'temperature', run_length, max_run)
     steps = run_average(steps, df, 'steps', run_length, max_run)
     df = {
           'temperature': temps,
