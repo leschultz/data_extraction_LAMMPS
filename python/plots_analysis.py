@@ -43,13 +43,15 @@ def plot(stop):
     # Plot all displacement values together
     print('Plotting the mean squared displacement for all')
     count = 0
+    temperature_run = []
     for item in x:
         pl.plot(x[count], y[count])
+        temperature_run.append(str(df['temperatures'][count])+' [K]')
         count += 1
 
     pl.xlabel('Step [-]')
     pl.ylabel('Mean Squared Displacement [A^2]')
-    pl.legend(df['temperatures'])
+    pl.legend(temperature_run)
     pl.grid(True)
     pl.savefig('mean_squared_displacement_all.png')
     pl.clf()
