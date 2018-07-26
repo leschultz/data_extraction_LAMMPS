@@ -50,8 +50,8 @@ def propensity(stop):
         df['dists'][count] = df['dists'][count][:stop]
         count += 1
 
-    max_run = int(max(df['run']))
-    run_length = len(df['run'])
+    max_run = int(max(df['run']))  # The number of runs for each temperature
+    run_length = len(df['run'])  # The length of data analyzed
 
     # Create averages
     dists = []
