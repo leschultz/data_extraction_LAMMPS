@@ -6,7 +6,7 @@ import pickle
 import os
 
 
-def run_average(thing, frame, values, length, run):
+def run_average(thing, frame, length, run):
     '''
     Takes averages of runs. The number of runs for each temperature needs
     to be the same length.
@@ -15,7 +15,7 @@ def run_average(thing, frame, values, length, run):
     count = 0
     for i in range(0, length, run+1):
         thing.append(
-                     mean(array(list(frame[values][i:(count+1)*(run+1)])), axis=0)
+                     mean(array(list(frame[i:(count+1)*(run+1)])), axis=0)
                      )
         count += 1
 
@@ -57,9 +57,9 @@ def propensity(stop):
     dists = []
     temps = []
     steps = []
-    dists = run_average(dists, df, 'dists', run_length, max_run)
-    temps = run_average(temps, df, 'temperature', run_length, max_run)
-    steps = run_average(steps, df, 'steps', run_length, max_run)
+    dists = run_average(dists, df['dists'], run_length, max_run)
+    temps = run_average(temps, df['temperature'], run_length, max_run)
+    steps = run_average(steps, df['steps'], run_length, max_run)
     df = {
           'temperature': temps,
           'distances': dists,
