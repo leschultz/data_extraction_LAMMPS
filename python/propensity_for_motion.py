@@ -22,7 +22,7 @@ def run_average(thing, frame, length, run):
     return thing
 
 
-def propensity(stop):
+def propensity():
     '''
     Averages for each run type are taken here for calculate the propensity for
     motion. However, all runs averaged must contain the same number of runs
@@ -40,16 +40,6 @@ def propensity(stop):
     with open('data.pickle', 'rb') as handle:
         df = pickle.load(handle)
 
-    # Remove warning from dataframe slice
-    pd.options.mode.chained_assignment = None  # default='warn'
-
-    # Truncate data to take averages
-    count = 0
-    for item in df['steps']:
-        df['steps'][count] = df['steps'][count][:stop]
-        df['dists'][count] = df['dists'][count][:stop]
-        count += 1
-
     max_run = int(max(df['run']))  # The number of runs for each temperature
     run_length = len(df['run'])  # The length of data analyzed
 
@@ -60,6 +50,7 @@ def propensity(stop):
     dists = run_average(dists, df['dists'], run_length, max_run)
     temps = run_average(temps, df['temperature'], run_length, max_run)
     steps = run_average(steps, df['steps'], run_length, max_run)
+
     df = {
           'temperature': temps,
           'distances': dists,

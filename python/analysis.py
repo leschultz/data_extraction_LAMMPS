@@ -151,13 +151,17 @@ def analyze(initial_skip):
     lengths_of_steps = []
     for item in steps:
         lengths_of_steps.append(len(steps[count]))
+        count += 1
 
+    # Find the minimum list length that is used to truncate all data
     stop_criterion = min(lengths_of_steps)
 
+    # Cut the data in steps to the minimum
     steps_cut = []
     for item in steps:
         steps_cut.append(item[:stop_criterion])
 
+    # Cut the distance data to the minimum
     dists_cut = []
     for item in dists:
         dists_cut.append(item[:stop_criterion])
@@ -168,6 +172,7 @@ def analyze(initial_skip):
         steps_cut[count] = array(steps_cut[count]) - steps_cut[count][0]
         count += 1
 
+    # Create a pandas dataframe containing data from the analysis
     df = {
           'input_temperature': temps,
           'temperature': temp_mean,
