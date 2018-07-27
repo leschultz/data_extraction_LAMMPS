@@ -31,21 +31,12 @@ def plot(stop):
 
     print('Plotting all mean squared diplacements together')
 
-    # Gather values to plot
-    x = []
-    for item in df['steps']:
-        x.append(item)
-
-    y = []
-    for item in df['dists']:
-        y.append(item)
-
     # Plot all displacement values together
     print('Plotting the mean squared displacement for all')
     count = 0
     temperature_run = []
-    for item in x:
-        pl.plot(x[count], y[count])
+    for item in df['steps']:
+        pl.plot(df['steps'][count], df['dists'][count])
         temperature_run.append(str(df['temperature'][count])+' [K]')
         count += 1
 
@@ -58,7 +49,7 @@ def plot(stop):
 
     # Plot displacements for each run
     count = 0
-    for item in x:
+    for item in df['steps']:
         print(
               'Plotting mean squared displacement for ' +
               str(df['input_temperature'][count]) +
@@ -85,7 +76,12 @@ def plot(stop):
     count = 0
     temperature_run = []
     for item in df_avg['steps']:
-        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+
+        pl.plot(
+                df_avg['steps'][count][:stop],
+                df_avg['distances'][count][:stop]
+                )
+
         temperature_run.append(str(df_avg['temperature'][count])+' [K]')
         count += 1
 
@@ -103,7 +99,12 @@ def plot(stop):
               'Plotting the propensity for motion for ' +
               str(df_avg['temperature'][count])+' [K]'
               )
-        pl.plot(df_avg['steps'][count], df_avg['distances'][count])
+
+        pl.plot(
+                df_avg['steps'][count][:stop],
+                df_avg['distances'][count][:stop]
+                )
+
         pl.xlabel('Step [-]')
         pl.ylabel('Propensity for motion <r^2> [A^2]')
         pl.legend([str(df_avg['temperature'][count])+' [K]'])
