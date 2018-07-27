@@ -71,5 +71,5 @@ def propensity():
     with open('averages.pickle', 'wb') as handle:
         pickle.dump(df, handle)
 
-   # Go back to starting directory after loading data
+    # Go back to starting directory after loading data
     os.chdir(first_directory)
