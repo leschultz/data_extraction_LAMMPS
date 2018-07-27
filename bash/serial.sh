@@ -23,4 +23,9 @@ echo "PBS_NODEFILE"
 cat $PBS_NODEFILE
 
 ## Put the commands you want to run, one per line
+bash input_file_generator.sh 100 100 2000 100000 15000 36000 1500
+bash input_file_generator.sh 100 100 2000 100000 21000 36000 1300
+bash input_file_generator.sh 100 100 2000 100000 27000 36000 1100
+bash input_file_generator.sh 100 100 2000 100000 33000 36000 900
 bash lammps_looper.sh lmp_bardeeneth
+python3 -c 'from control import control; control.analyze(100); control.plot_analysis(180); control.plot_system()'
