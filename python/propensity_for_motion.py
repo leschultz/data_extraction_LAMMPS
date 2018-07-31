@@ -13,9 +13,9 @@ def run_average(thing, frame, length, run):
     '''
 
     count = 0
-    for i in range(0, length, run+1):
+    for i in range(0, length, run):
         thing.append(
-                     mean(array(list(frame[i:(count+1)*(run+1)])), axis=0)
+                     mean(array(list(frame[i:(count+1)*run])), axis=0)
                      )
         count += 1
 

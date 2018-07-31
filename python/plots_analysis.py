@@ -36,7 +36,7 @@ def plot(stop):
     count = 0
     temperature_run = []
     for item in df['steps']:
-        pl.plot(df['steps'][count], df['dists'][count])
+        pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
         temperature_run.append(str(df['temperature'][count])+' [K]')
         count += 1
 
