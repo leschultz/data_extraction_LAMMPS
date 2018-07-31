@@ -40,7 +40,8 @@ def propensity():
     with open('data.pickle', 'rb') as handle:
         df = pickle.load(handle)
 
-    max_run = int(max(df['run']))  # The number of runs for each temperature
+    # The number of runs for each temperature
+    max_run = int(max(df['run'], key=int))
     run_length = len(df['run'])  # The length of data analyzed
 
     # Create averages
