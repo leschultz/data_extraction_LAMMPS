@@ -22,7 +22,7 @@ def run_average(thing, frame, length, run):
     return thing
 
 
-def propensity():
+def traveled():
     '''
     Averages for each run type are taken here for calculate the propensity for
     motion. However, all runs averaged must contain the same number of runs
@@ -49,23 +49,23 @@ def propensity():
     temps = []
     steps = []
     dists = run_average(dists, df['dists'], run_length, max_run)
-    temps = run_average(temps, df['temperature'], run_length, max_run)
+    temps = run_average(temps, df['temps'], run_length, max_run)
     steps = run_average(steps, df['steps'], run_length, max_run)
 
     df = {
-          'temperature': temps,
-          'distances': dists,
+          'temps': temps,
+          'dists': dists,
           'steps': steps
           }
 
     df = pd.DataFrame(data=df)
     df = df[[
-             'temperature',
+             'temps',
              'steps',
-             'distances'
+             'dists'
              ]]
 
-    df = df.sort_values(['temperature'])
+    df = df.sort_values(['temps'])
     df = df.reset_index(drop=True)
 
     # Save dataframe

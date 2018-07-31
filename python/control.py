@@ -1,6 +1,6 @@
-import propensity_for_motion
 import plots_over_time
 import plots_analysis
+import positions
 import analysis
 import setup
 
@@ -19,7 +19,7 @@ class control(object):
 
         print('Crunching data')
         analysis.analyze(initial_skip)
-        propensity_for_motion.propensity()
+        positions.traveled()
 
     def plot_system():
         '''

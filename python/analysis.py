@@ -174,8 +174,8 @@ def analyze(initial_skip):
 
     # Create a pandas dataframe containing data from the analysis
     df = {
-          'input_temperature': temps,
-          'temperature': temp_mean,
+          'input_temps': temps,
+          'temps': temp_mean,
           'run': run_numbers,
           'steps': steps_cut,
           'dists': dists_cut
@@ -183,14 +183,14 @@ def analyze(initial_skip):
 
     df = pd.DataFrame(data=df)
     df = df[[
-             'input_temperature',
+             'input_temps',
              'run',
-             'temperature',
+             'temps',
              'steps',
              'dists'
              ]]
 
-    df = df.sort_values(['input_temperature', 'run'])
+    df = df.sort_values(['input_temps', 'run'])
     df = df.reset_index(drop=True)
 
     # Save the order of runs with names

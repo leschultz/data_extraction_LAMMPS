@@ -37,7 +37,7 @@ def plot(stop):
     temperature_run = []
     for item in df['steps']:
         pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
-        temperature_run.append(str(df['temperature'][count])+' [K]')
+        temperature_run.append(str(df['temps'][count])+' [K]')
         count += 1
 
     pl.xlabel('Step [-]')
@@ -52,7 +52,7 @@ def plot(stop):
     for item in df['steps']:
         print(
               'Plotting mean squared displacement for ' +
-              str(df['input_temperature'][count]) +
+              str(df['input_temps'][count]) +
               'K_' +
               str(df['run'][count])
               )
@@ -60,11 +60,11 @@ def plot(stop):
         pl.plot(df['steps'][count][:stop], df['dists'][count][:stop])
         pl.xlabel('Step [-]')
         pl.ylabel('Mean Squared Displacement [A^2]')
-        pl.legend([str(df['temperature'][count])+' [K]'])
+        pl.legend([str(df['temps'][count])+' [K]'])
         pl.grid(True)
         pl.savefig(
                    'mean_squared_displacement_' +
-                   str(df['input_temperature'][count]) +
+                   str(df['input_temps'][count]) +
                    'K_' +
                    str(df['run'][count])
                    )
@@ -79,10 +79,10 @@ def plot(stop):
 
         pl.plot(
                 df_avg['steps'][count][:stop],
-                df_avg['distances'][count][:stop]
+                df_avg['dists'][count][:stop]
                 )
 
-        temperature_run.append(str(df_avg['temperature'][count])+' [K]')
+        temperature_run.append(str(df_avg['temps'][count])+' [K]')
         count += 1
 
     pl.xlabel('Step [-]')
@@ -94,24 +94,24 @@ def plot(stop):
 
     # Plot the averages separately
     count = 0
-    for item in df_avg['temperature']:
+    for item in df_avg['temps']:
         print(
               'Plotting the propensity for motion for ' +
-              str(df_avg['temperature'][count])+' [K]'
+              str(df_avg['temps'][count])+' [K]'
               )
 
         pl.plot(
                 df_avg['steps'][count][:stop],
-                df_avg['distances'][count][:stop]
+                df_avg['dists'][count][:stop]
                 )
 
         pl.xlabel('Step [-]')
         pl.ylabel('Propensity for motion <r^2> [A^2]')
-        pl.legend([str(df_avg['temperature'][count])+' [K]'])
+        pl.legend([str(df_avg['temps'][count])+' [K]'])
         pl.grid(True)
         pl.savefig(
                    'propensity_for_motion_' +
-                   str(df_avg['temperature'][count]) +
+                   str(df_avg['temps'][count]) +
                    '.png'
                    )
         pl.clf()
