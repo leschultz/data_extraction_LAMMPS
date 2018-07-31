@@ -114,7 +114,7 @@ def analyze(initial_skip):
         data1 = load_lammpstrj(item, first_step, number_of_atoms, columns)
 
         # Capture the number of RECORDED steps until the final step
-        recording_frequency = (data['Step'][1]-data['Step'][0])
+        recording_frequency = data['Step'][1]-data['Step'][0]
         last_step = (data['Step'][len(data['Step'])-1])/recording_frequency
 
         count = count_cut
