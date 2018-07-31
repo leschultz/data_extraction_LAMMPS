@@ -2,20 +2,21 @@
 
 cd ../input_files
 
-number_runs=$1
-atom_number=$2
-temperature_melt=$3
-hold_1=$4
-hold_2=$5
-hold_3=$6
+template_file=$1
+number_runs=$2
+atom_number=$3
+temperature_melt=$4
+hold_1=$5
+hold_2=$6
+hold_3=$7
 
-shift 6
+shift 7
 
 for ((i=1;i<=$number_runs;i++))
 do
 	for var in "$@"
 	do
-		replaced=$(grep -l "replace_final_temperature" ../templates/template.in | xargs sed "
+		replaced=$(grep -l "replace_final_temperature" ../templates/$template_file | xargs sed "
 		s/replace_final_temperature/$var/g;
 	       	s/replace_seed/$RANDOM/g;
 	       	s/replace_atom_number/$atom_number/g;
