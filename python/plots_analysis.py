@@ -26,6 +26,10 @@ def plot(stop):
     with open('averages.pickle', 'rb') as handle:
         df_avg = pickle.load(handle)
 
+    # Open the data containing overal travel distance
+    with open('propensity.pickle', 'rb') as handle:
+        df_sum = pickle.load(handle)
+
     # Change to image directory after loading data
     os.chdir(image_directory)
 
@@ -77,11 +81,7 @@ def plot(stop):
     temperature_run = []
     for item in df_avg['steps']:
 
-        pl.plot(
-                df_avg['steps'][count][:stop],
-                df_avg['dists'][count][:stop]
-                )
-
+        pl.plot(df_avg['steps'][count][:stop], df_avg['dists'][count][:stop])
         temperature_run.append(str(df_avg['temps'][count])+' [K]')
         count += 1
 
@@ -97,14 +97,11 @@ def plot(stop):
     for item in df_avg['temps']:
         print(
               'Plotting the propensity for motion for ' +
-              str(df_avg['temps'][count])+' [K]'
+              str(df_avg['temps'][count]) +
+              ' [K]'
               )
 
-        pl.plot(
-                df_avg['steps'][count][:stop],
-                df_avg['dists'][count][:stop]
-                )
-
+        pl.plot(df_avg['steps'][count][:stop], df_avg['dists'][count][:stop])
         pl.xlabel('Step [-]')
         pl.ylabel('Propensity for motion <r^2> [A^2]')
         pl.legend([str(df_avg['temps'][count])+' [K]'])
@@ -112,6 +109,44 @@ def plot(stop):
         pl.savefig(
                    'propensity_for_motion_' +
                    str(df_avg['temps'][count]) +
+                   '.png'
+                   )
+        pl.clf()
+        count += 1
+
+    # Plot the data for the displacements over time for all
+    print('Plotting distance traversed for all averaged runs')
+    count = 0
+    temperature_run = []
+    for item in df_sum['steps']:
+        pl.plot(df_sum['steps'][count][:stop], df_sum['dists'][count][:stop])
+        temperature_run.append(str(df_sum['temps'][count])+' [K]')
+        count += 1
+
+    pl.ylabel('Distances summed <r^2> [A^2]')
+    pl.xlabel('Step [-]')
+    pl.legend(temperature_run)
+    pl.grid(True)
+    pl.savefig('distance_sum.png')
+    pl.clf()
+
+    # Plot the data for the displacements over time for each temperature
+    count = 0
+    for item in df_sum['steps']:
+        print(
+              'Plotting distances summed for ' +
+              str(df_sum['temps'][count]) +
+              ' [K]'
+              )
+
+        pl.plot(df_sum['steps'][count][:stop], df_sum['dists'][count][:stop])
+        pl.ylabel('Distances summed <r^2> [A^2]')
+        pl.xlabel('Step [-]')
+        pl.legend([str(df_sum['temps'][count])+' [K]'])
+        pl.grid(True)
+        pl.savefig(
+                   'distance_sum' +
+                   str(df_sum['temps'][count]) +
                    '.png'
                    )
         pl.clf()

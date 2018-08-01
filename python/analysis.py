@@ -40,7 +40,7 @@ def analyze(initial_skip):
     # Get directories
     first_directory = os.getcwd()  # Python scripts
     lammpstrj_directory = first_directory+'/../data/lammpstrj/'  # Trajectory
-    data_export_directory = first_directory+'/../data/analysis/'  # Export
+    data_directory = first_directory+'/../data/analysis/'  # Export
 
     # The names of mean dislacements for each run
     lammpstrj_file_names = os.listdir(lammpstrj_directory)
@@ -194,7 +194,7 @@ def analyze(initial_skip):
     df = df.reset_index(drop=True)
 
     # Save the order of runs with names
-    os.chdir(data_export_directory)
+    os.chdir(data_directory)
 
     # Save dataframe
     with open('data.pickle', 'wb') as handle:

@@ -4,7 +4,8 @@ import pandas as pd
 import pickle
 import os
 
-def propensity(stop):
+
+def propensity():
     '''
     This function sums the distance traveled between each period of recorded
     time. This is differenct than absolue position because it approximates
@@ -46,7 +47,7 @@ def propensity(stop):
     df = {
           'temps': df['temps'],
           'steps': df['steps'],
-          'dists': df['dists']
+          'dists': displacement_sum
           }
 
     df = pd.DataFrame(data=df)
@@ -67,17 +68,3 @@ def propensity(stop):
 
     # Go back to starting directory
     os.chdir(first_directory)
-
-    # Plot the data for the displacements over time
-    count = 0
-    for item in displacement_sum:
-        pl.plot(df['steps'][count][:stop], displacement_sum[count][:stop])
-        count += 1
-
-    pl.ylabel('Propensity for motion <r^2> [A^3]')
-    pl.xlabel('Step [-]')
-    pl.legend(df['temps'])
-    pl.grid(True)
-    pl.show()
-    pl.clf()
-

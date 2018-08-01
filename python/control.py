@@ -1,5 +1,6 @@
 import plots_over_time
 import plots_analysis
+import propensity
 import positions
 import analysis
 import setup
@@ -15,11 +16,13 @@ class control(object):
         '''
         The mean squared displacement is calculated by analysis.
         The propensity for motion is calculated by propensity_for_motion.
+        The sum of displacements is calculated by propensity.
         '''
 
         print('Crunching data')
         analysis.analyze(initial_skip)
         positions.traveled()
+        propensity.propensity()
 
     def plot_system():
         '''
