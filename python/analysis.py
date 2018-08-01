@@ -6,6 +6,20 @@ import pickle
 import os
 
 
+def load_lammpstrj(name, skip, length, columns):
+    '''This function gathers position data from lammpstrj files'''
+
+    # Imported positions from when equlibration temperature is met
+    return pd.read_csv(
+                       '../data/lammpstrj/'+name+'_rate.lammpstrj',
+                       sep=' ',
+                       skiprows=skip,
+                       nrows=length,
+                       header=None,
+                       names=columns
+                       )
+
+
 def analyze(initial_skip):
     '''
     This function gathers the mean squared displacement for atoms with respect
@@ -23,26 +37,12 @@ def analyze(initial_skip):
                 'junk'
                 ])
 
-    # Function for loading data from lammpstrj files
-    def load_lammpstrj(name, skip, length, columns):
-        '''This function gathers position data from lammpstrj files'''
-
-        # Imported positions from when equlibration temperature is met
-        return pd.read_csv(
-                           '../data/lammpstrj/'+name+'_rate.lammpstrj',
-                           sep=' ',
-                           skiprows=skip,
-                           nrows=length,
-                           header=None,
-                           names=columns
-                           )
-
     # Get directories
     first_directory = os.getcwd()  # Python scripts
     lammpstrj_directory = first_directory+'/../data/lammpstrj/'  # Trajectory
     data_directory = first_directory+'/../data/analysis/'  # Export
 
-    # The names of mean dislacements for each run
+    # List the names of files in the lammpstrj directory
     lammpstrj_file_names = os.listdir(lammpstrj_directory)
 
     # Gather the temprature and run number

@@ -12,7 +12,7 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
 
 	python3 -c 'import control'
 
-2.  The python tool requires an initial skip to near the data to be recorded. Two while loops located in analysis.py determine when data is recorded. This only works for a cooling setup.
+2.  The python tool requires an initial skip to near the data to be recorded. Two while loops located in analysis.py determine when data is recorded. This only works for a cooling setup. If data is recorded every 100 steps, then a skip of 100 would skip to step 100*100.
 
 3. Data points to plot can include the number of recorded instances to be plotted. If data was recorded every 100 steps, then 10 points would be 10*100 steps. This can be used to reduce the number of points plotted. If the number is greater than the number of available points, then only the maximum number of points will be plotted.
 
