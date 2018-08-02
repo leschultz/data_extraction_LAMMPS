@@ -1,5 +1,4 @@
-from numpy import array
-from numpy import mean
+from numpy import array, mean
 
 import pandas as pd
 import pickle

@@ -1,3 +1,4 @@
+import radial_distribution
 import plots_over_time
 import plots_analysis
 import propensity
@@ -33,16 +34,17 @@ class control(object):
         print('Plotting data from systems')
         plots_over_time.plot()
 
-    def plot_analysis(stop):
+    def plot_analysis(stop, point):
         '''
         The plots for mean squared displacement and propensity for motion are
         generated here. Each run has its own plot as well as an overall plot
         that contains all runs for both mean squred displacement and propensity
-        for motion.
+        for motion. Radial distribution function plots are also saved.
         '''
 
         print('Plotting the analysis data')
         plots_analysis.plot(stop)
+        radial_distribution.plot(point)
 
     def clean():
         '''

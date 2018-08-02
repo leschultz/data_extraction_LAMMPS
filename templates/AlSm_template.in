@@ -31,6 +31,7 @@ variable                                    data_file_characteristics string ../
 variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run_rate.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_final_temperatureK_replace_run.dat
 variable                                    data_restart              string ../data/rest/replace_final_temperatureK_replace_run.rest
+variable                                    data_rdf                  string ../data/rdf/replace_final_temperatureK_replace_run.rdf
 
 ################################################################################
 
@@ -50,6 +51,7 @@ pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
 ################################################################################
 
 # Computed values by LAMMPS
+compute                                     myrdf       all   rdf 10
 compute                                     mytemp      all   temp
 compute                                     mypress     all   pressure thermo_temp
 compute                                     PE          all   pe
@@ -73,6 +75,8 @@ dump_modify                                 my_dump_rate sort id
 
 # Open save data
 fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
+
+fix                                         rdf_saving all ave/time 1 1 100 c_myrdf[*] file ${data_rdf} mode vector
 
 # Hold as melt
 fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.1

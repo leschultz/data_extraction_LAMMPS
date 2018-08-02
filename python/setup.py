@@ -9,15 +9,17 @@ data_directory = first_directory+'/../data/'
 image_directory = first_directory+'/../images/'
 
 # The directories were data will be saved
-analysis = data_directory+'/analysis/'
-dat = data_directory+'/dat/'
-lammpstrj = data_directory+'/lammpstrj/'
-rest = data_directory+'/rest/'
-txt = data_directory+'/txt/'
+analysis = data_directory+'analysis/'
+dat = data_directory+'dat/'
+lammpstrj = data_directory+'lammpstrj/'
+rest = data_directory+'rest/'
+txt = data_directory+'txt/'
+rdf = data_directory+'rdf/'
 
 # The directories were images will be saved
-motion = image_directory+'/motion/'
-system = image_directory+'/system/'
+motion = image_directory+'motion/'
+system = image_directory+'system/'
+rdf_plots = image_directory+'rdf/'
 
 directories = [
                analysis,
@@ -25,8 +27,10 @@ directories = [
                lammpstrj,
                rest,
                txt,
+               rdf,
                motion,
-               system
+               system,
+               rdf_plots
                ]
 
 
