@@ -24,7 +24,9 @@ def analyze(initial_skip):
     '''
     This function gathers the mean squared displacement for atoms with respect
     to time. The first argument allows skipping odd transient behavior when
-    calculating settling temperature step.
+    calculating settling temperature step. For instance, an input of 1000 will
+    make the analysis skip to 1000*100 if the data aquisition rate is 100
+    steps/aquisition.
     '''
 
     # The order of imported data from lammpstrj files

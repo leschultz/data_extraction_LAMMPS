@@ -1,7 +1,7 @@
 import radial_distribution
 import plots_over_time
 import plots_analysis
-import propensity
+import distance_sum
 import positions
 import analysis
 import setup
@@ -23,7 +23,7 @@ class control(object):
         print('Crunching data')
         analysis.analyze(initial_skip)
         positions.traveled()
-        propensity.propensity()
+        distance_sum.sum()
 
     def plot_system():
         '''

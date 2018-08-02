@@ -9,8 +9,8 @@ def plot(start):
     This function imports the radial distribution function (RDF) data that
     LAMMPS writes and plots it. The start were data is impored is defined as
     follows:
-        Step = 100*100 for a data recording frequency of 100 steps/aquisition
-        and an input of 100.
+        Step = 100*1000 for a data recording frequency of 100 steps/aquisition
+        and an input of 1000.
     '''
 
     # Get directories

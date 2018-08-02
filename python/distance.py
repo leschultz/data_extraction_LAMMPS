@@ -5,7 +5,7 @@ import pickle
 import os
 
 
-def propensity():
+def sum():
     '''
     This function sums the distance traveled between each period of recorded
     time. This is differenct than absolue position because it approximates
