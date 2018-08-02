@@ -37,7 +37,7 @@ variable                                    data_rdf                  string ../
 
 # Simulation space
 lattice                                     fcc 4.04092655671750
-region                                      my_box block 0 3 0 3 0 3
+region                                      my_box block 0 4 0 4 0 4
 create_box                                  2 my_box
 create_atoms                                1 random ${number_of_atoms} ${seed} NULL
 set                                         group all type/fraction 2 0.1 ${seed}
