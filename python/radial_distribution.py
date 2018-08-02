@@ -1,4 +1,5 @@
 from analysis import load_lammpstrj
+from matplotlib import pyplot as pl
 from math import pi
 
 import os
@@ -17,6 +18,7 @@ def wrap(names, calculation_step, number_of_atoms, columns, dimensions):
     distance = {}
 
     for item1 in names:
+        # Load the data from a specific step
         data = load_lammpstrj(
                               item1,
                               calculation_step,
@@ -26,9 +28,11 @@ def wrap(names, calculation_step, number_of_atoms, columns, dimensions):
 
         for key in dimensions:
 
+            # Check if atom is within a box
             count = 0
             for item2 in data[key]:
 
+                # If outside negatively, then add box dimension until positive
                 if data[key][count] < 0:
                     while data[key][count] < 0:
                         data[key][count] = (
@@ -36,6 +40,8 @@ def wrap(names, calculation_step, number_of_atoms, columns, dimensions):
                                             dimensions[key]
                                             )
 
+                # If outside positively, then subract box dimension until less
+                # than the box dimension
                 elif data[key][count] > dimensions[key]:
                     while data[key][count] > dimensions[key]:
                         data[key][count] = (
@@ -43,13 +49,16 @@ def wrap(names, calculation_step, number_of_atoms, columns, dimensions):
                                             dimensions[key]
                                             )
 
+                # Save data point if already within box
                 else:
                     data[key][count] =  data[key][count]
 
                 count += 1
 
+        # Save the data for each run
         data_wrap[item1] = data
 
+        # Gather the sitance from the center of the box for each atom
         distance[item1] = (
                            (data_wrap[item1]['x']-dimensions['x']/2.0)**2.0 +
                            (data_wrap[item1]['y']-dimensions['y']/2.0)**2.0 +
@@ -118,8 +127,11 @@ def radial_distribution(point, samples):
                 (dimensions['z']/2.0)**2.0
                 )**(0.5)
 
+    # The volume with a radius of the fartherst point in the simulation box
+    sphere_vol = 4.0/3.0*pi*dist_far**3.0
+
     # The distance interval for with data will be sampled
-    delta_dist = dist_far/float(samples)
+    delta_dist = dist_far/samples
 
     # Count the number of atoms between incrementing distances
     sample_data = {}
@@ -128,6 +140,7 @@ def radial_distribution(point, samples):
         sample_data[run] = [0]*samples
         count_sample = 0
         incremental_dist = []
+        incremental_vol = []
         while dist <= dist_far:
             count = 0
             for atom in distance[run]:
@@ -137,24 +150,23 @@ def radial_distribution(point, samples):
                 count += 1
 
             count_sample += 1
+            incremental_vol.append(
+                                   4.0*pi*(dist+delta_dist)**2.0*delta_dist
+                                   )
             dist += delta_dist
             incremental_dist.append(dist)  # Max distance from range
-
-    shell_volumes = []
-    for item in incremental_dist:
-        shell_volumes.append(4.0*pi*item**2.0*delta_dist)
 
     for key in sample_data:
         count = 0
         for item in sample_data[key]:
-            dividend1 = samples
-            dividend2 = 4.0*pi*incremental_dist[count]**2.0*delta_dist
-            dividend3 = shell_volumes[count]
-            quotient = sample_data[key][count]
-            dividend = dividend1  # *dividend2*dividend3
+            quotient = sample_data[key][count]*sphere_vol
+            dividend = float(number_of_atoms)*incremental_vol[count]
             sample_data[key][count] = quotient/dividend
             count += 1
 
+    for key in sample_data:
+        print(len(sample_data[key]))
         print(sum(sample_data[key]))
 
-    print(shell_volumes)
+    pl.plot(incremental_dist[:-1], sample_data[key])
+    pl.show()
