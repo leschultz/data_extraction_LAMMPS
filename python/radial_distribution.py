@@ -52,8 +52,23 @@ def plot(start):
     # Go to the image save directory
     os.chdir(image_directory)
 
+    # Create a plot for all runs
+    print('Plotting the radial distribution function for all in one plot')
+    legend_run = []
+    for item in data:
+        pl.plot(data[item][1], data[item][2])
+        legend_run.append(item.split('.')[0])
+
+    pl.xlabel('Center of Bin Coordinate [A]')
+    pl.ylabel('g(r)')
+    pl.legend(legend_run)
+    pl.grid(True)
+    pl.savefig('all_rdf.png')
+    pl.clf()
+
     # Create plots for each run
     for item in data:
+        print('Plotting the radial distribution function for ' + item)
         pl.plot(data[item][1], data[item][2])
         pl.xlabel('Center of Bin Coordinate [A]')
         pl.ylabel('g(r)')
