@@ -39,7 +39,7 @@
 ##bash input_file_generator.sh Si_template.in 100 85184 2000 100000 34000 10000 300
 
 ## -----Loops for each input file and then used LAMMPS to compute-----
-##bash lammps_looper.sh lmp_bardeeneth
+##bash lammps_looper.sh lmp_turnbull
 
 ## -----Change the directory to where the python scripts are-----
 ##cd ../python
