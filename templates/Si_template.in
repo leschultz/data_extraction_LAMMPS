@@ -44,8 +44,9 @@ create_atoms                                1 random ${number_of_atoms} ${seed} 
 ################################################################################
 
 # Data
-pair_style                                  eam/fs
-pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
+pair_style                                  sw
+pair_coeff                                  * * ../potentials/Si.sw Si
+mass                                        1 28.0855
 
 ################################################################################
 
