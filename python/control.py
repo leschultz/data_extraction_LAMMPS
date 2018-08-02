@@ -23,7 +23,7 @@ class control(object):
         print('Crunching data')
         analysis.analyze(initial_skip)
         positions.traveled()
-        distance.sum()
+        distance.dist_sum()
 
     def plot_system():
         '''

@@ -49,6 +49,7 @@ def plot(start):
                                  nrows=bin_number,
                                  header=None
                                  )
+
     # Go to the image save directory
     os.chdir(image_directory)
 
