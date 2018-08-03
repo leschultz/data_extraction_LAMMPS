@@ -1,6 +1,7 @@
 import radial_distribution
 import plots_over_time
 import plots_analysis
+import linearization
 import positions
 import distance
 import analysis
@@ -24,6 +25,7 @@ class control(object):
         analysis.analyze(initial_skip)
         positions.traveled()
         distance.dist_sum()
+        linearization.fit()
 
     def plot_system():
         '''
