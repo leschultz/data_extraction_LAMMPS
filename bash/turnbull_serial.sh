@@ -45,4 +45,4 @@
 ##cd ../python
 
 ## -----Use the python scripts to analyze data-----
-##python3 -c 'from control import control; control.analyze(1000); control.plot_analysis(180, 1000); control.plot_system()'
+##python3 -c 'from control import control; control.analyze(1000,3000); control.plot_analysis(180, 1000); control.plot_system()'

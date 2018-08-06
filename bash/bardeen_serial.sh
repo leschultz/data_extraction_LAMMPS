@@ -3,11 +3,11 @@
 ## Declare a name for this job
 #PBS -N propensity_for_motion
 ## Request the queue for this job (e.g. morganshort, morganeth, izabelaeth)
-#PBS -q morganshort
+#PBS -q morgan2
 ## Request a total of 1 processor for this job (1 node and 1 processor per node)
 #PBS -l nodes=1:ppn=1,pvmem=2000mb
 ## Request walltime. Max walltime for morganshort is 4:00:00
-#PBS -l walltime=4:00:00
+#PBS -l walltime=96:00:00
 ## These are PBS standard output and error files.  Uncomment only if you don't want the defaults.
 #PBS -o output.$PBS_JOBID
 #PBS -e error.$PBS_JOBID
@@ -46,4 +46,4 @@ cat $PBS_NODEFILE
 ##cd ../python
 
 ## -----Use the python scripts to analyze data-----
-##python3 -c 'from control import control; control.analyze(1000); control.plot_analysis(180, 1000); control.plot_system()'
+##python3 -c 'from control import control; control.analyze(1000,3000); control.plot_analysis(180, 1000); control.plot_system()'
