@@ -14,18 +14,20 @@ setup.setup()
 class control(object):
     '''A class for controlling the sequence of scripts run'''
 
-    def analyze(initial_skip):
+    def analyze(initial_skip, linear_stop):
         '''
         The mean squared displacement is calculated by analysis.
         The propensity for motion is calculated by propensity_for_motion.
         The sum of displacements is calculated by propensity.
+	Diffusion is calculated by linearization.
+	Datapoints to be linearized can be specified by linear_stop.
         '''
 
         print('Crunching data')
         analysis.analyze(initial_skip)
         positions.traveled()
         distance.dist_sum()
-        linearization.fit()
+        linearization.fit(linear_stop)
 
     def plot_system():
         '''

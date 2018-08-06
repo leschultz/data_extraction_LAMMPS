@@ -18,8 +18,8 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
 
 4. Located in the python folder. The python tool can be run via the commandline with the following command:
 
-	python3 -c 'from control import control; control.analyze(<initial skip>); control.plot_analysis(<data points to plot>, <RDF point>); control.plot_system()'
-	python3 -c 'from control import control; control.analyze(1000); control.plot_analysis(180, 1000); control.plot_system()'
+	python3 -c 'from control import control; control.analyze(<initial skip>, <data points for linearization>); control.plot_analysis(<data points to plot>, <RDF point>); control.plot_system()'
+	python3 -c 'from control import control; control.analyze(1000, 3000); control.plot_analysis(180, 1000); control.plot_system()'
 
 2. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):
 
