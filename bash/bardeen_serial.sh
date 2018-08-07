@@ -33,7 +33,7 @@ cat $PBS_NODEFILE
 ##bash input_file_generator.sh AlSm_template.in 10 100 2000 100000 27000 36000 1100
 ##bash input_file_generator.sh AlSm_template.in 10 100 2000 100000 33000 36000 900
 
-## -----Sample Si diamond cubic configuration runs to generate input files-----
+## -----Sample Si diamond cubic configuration runs to generate input files (Number of atoms has no effect on purpose)-----
 ##bash input_file_generator.sh Si_template.in 100 85184 2000 100000 34000000 10000 300
 ##bash input_file_generator.sh Si_template.in 100 85184 2000 100000 3400000 10000 300
 ##bash input_file_generator.sh Si_template.in 100 85184 2000 100000 340000 10000 300

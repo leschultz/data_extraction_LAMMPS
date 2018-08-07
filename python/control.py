@@ -3,9 +3,8 @@ import plots_over_time
 import plots_analysis
 import linearization
 import positions
-import distance
-import analysis
 import setup
+import msd
 
 # Check for needed directories at start
 setup.setup()
@@ -14,20 +13,18 @@ setup.setup()
 class control(object):
     '''A class for controlling the sequence of scripts run'''
 
-    def analyze(initial_skip, linear_stop, middle):
+    def analyze(initial_skip, initial, final):
         '''
-        The mean squared displacement is calculated by analysis.
-        The propensity for motion is calculated by propensity_for_motion.
-        The sum of displacements is calculated by propensity.
-    	Diffusion is calculated by linearization.
-    	Datapoints to be linearized can be specified by linear_stop.
+        The mean squared displacement is calculated by msd.
+        The propensity for motion is calculated by positions.
+        Diffusion is calculated by linearization.
+        Datapoints to be linearized by interval [initial, final].
         '''
 
         print('Crunching data')
-        analysis.analyze(initial_skip)
+        msd.analyze(initial_skip)
         positions.traveled()
-        distance.dist(middle)
-        linearization.fit(linear_stop)
+        linearization.fit(initial, final)
 
     def plot_system(start):
         '''
@@ -43,7 +40,10 @@ class control(object):
         The plots for mean squared displacement and propensity for motion are
         generated here. Each run has its own plot as well as an overall plot
         that contains all runs for both mean squred displacement and propensity
-        for motion. Radial distribution function plots are also saved.
+        for motion. Radial distribution function plots are also saved. The
+        point where the RDF is taken is defined by point. If the point is
+        defined as 10 for a data aquisition of 100 steps/aquisition, then the
+        RDF is taken at step 10*100.
         '''
 
         print('Plotting the analysis data')

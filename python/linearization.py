@@ -6,7 +6,7 @@ import pickle
 import os
 
 
-def fit(linear_stop):
+def fit(innitial, final):
     '''
     This function takes the line of best fit for the propensity for motion.
     The linear_stop input defines the number of datapoints to linearize.
@@ -29,8 +29,8 @@ def fit(linear_stop):
     intercept = []
     for item in df['temps']:
         b, m = polyfit(
-                       df['steps'][count][:linear_stop],
-                       df['dists'][count][:linear_stop],
+                       df['steps'][count][innitial:final],
+                       df['dists'][count][innitial:final],
                        1
                        )
         slope.append(m)
