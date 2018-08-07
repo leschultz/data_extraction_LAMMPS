@@ -1,15 +1,15 @@
 from matplotlib import pyplot as pl
 
 import pandas as pd
+import numpy as np
 import pickle
 import os
 
 
-def dist_sum():
+def dist(middle):
     '''
-    This function sums the distance traveled between each period of recorded
-    time. This is differenct than absolue position because it approximates
-    total translation.
+    This function find the distance between points accross a defined middle of
+    data processed.
     '''
 
     # Get the current directory and saved data analysis directory
@@ -25,37 +25,21 @@ def dist_sum():
 
     # Take the difference between a later point and the point before
     displacement = []
-    for item1 in df['dists']:
-        diff = [0.0]  # Initial point set to zero
-        count = 0
-        for item2 in item1[1:]:
-            diff.append(abs(item1[count+1]-item1[count]))
-            count += 1
+    for run in df['dists']:
+        diff = []
+        for item in range(int(len(run)/2)):
+            diff.append(abs(run[middle+item]-run[item]))
+
         displacement.append(diff)
-
-    # Take the sum off the previous steps for time
-    displacement_sum = []
-    for item1 in displacement:
-        disp = []
-        count = 0
-        for item2 in item1:
-            disp.append(sum(item1[:count]))
-            count += 1
-
-        displacement_sum.append(disp)
 
     df = {
           'temps': df['temps'],
-          'steps': df['steps'],
-          'dists': displacement_sum
+          'steps': df['steps'][:middle],
+          'dists': displacement
           }
 
     df = pd.DataFrame(data=df)
-    df = df[[
-             'temps',
-             'steps',
-             'dists'
-             ]]
+    df = df[['temps', 'steps', 'dists']]
     df = df.sort_values(['temps'])
     df = df.reset_index(drop=True)
 

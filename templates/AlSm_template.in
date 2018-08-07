@@ -67,9 +67,6 @@ timestep                                    0.001
 
 ################################################################################
 
-# Minimize the enrgy of the system for stability
-minimize                                    1.0e-4 1.0e-6 100 1000
-
 # Save atom positions at an interval
 dump                                        my_dump_rate all custom 100 ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate sort id
@@ -80,6 +77,9 @@ dump_modify                                 my_dump_rate sort id
 fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 fix                                         rdf_saving all ave/time 1 1 100 c_myrdf[*] file ${data_rdf} mode vector
+
+# Define the initial velocities
+velocity                                    all create ${temp_melt} ${seed} rot yes dist gaussian
 
 # Hold as melt
 fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.1

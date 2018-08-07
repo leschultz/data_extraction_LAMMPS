@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 
-def plot():
+def plot(start):
 
     first_directory = os.getcwd()
     txt_directory = first_directory+'/../data/txt/'
@@ -35,7 +35,7 @@ def plot():
 
         # This loops over each data plot type
         for item2 in data.columns:
-            pl.plot(data['Step'], data[item2])
+            pl.plot(data['Step'][start:], data[item2][start:])
             pl.xlabel('Step')
             pl.ylabel(str(item2))
             pl.legend([str(item1)])

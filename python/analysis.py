@@ -91,26 +91,15 @@ def analyze(initial_skip):
         temperature_settled = int(item.split('K')[0])
         temps.append(temperature_settled)
 
-        # Look for the moment equilibration temperature is met
-        # Added some beggining time to avoid odd spikes
-        count = initial_skip
-        while (data['Temperature [K]'][count] >= temperature_settled):
-            count += 1
-
-        while (data['Temperature [K]'][count] <= temperature_settled):
-            count += 1
-
-        count_cut = count
-
         # Get the average temperature after cutoff
-        temp_mean.append(mean(data['Temperature [K]'][count_cut:]))
+        temp_mean.append(mean(data['Temperature [K]'][initial_skip:]))
 
         # Grab the number of items from a file
         number_of_atoms = load_lammpstrj(item, 3, 1, None)
         number_of_atoms = number_of_atoms[0][0]
 
         # Capture the first step when equilibration temperature is met
-        first_step = count_cut*(number_of_atoms+9)+9
+        first_step = initial_skip*(number_of_atoms+9)+9
 
         # Imported positions from when equlibration temperature is met
         data1 = load_lammpstrj(item, first_step, number_of_atoms, columns)
@@ -119,7 +108,7 @@ def analyze(initial_skip):
         recording_frequency = data['Step'][1]-data['Step'][0]
         last_step = (data['Step'][len(data['Step'])-1])/recording_frequency
 
-        count = count_cut
+        count = initial_skip
         dists_per_interval = []
         while count <= last_step:
             # Load data at increments from datum positon
@@ -145,7 +134,7 @@ def analyze(initial_skip):
             dists_per_interval.append(mean(distance_traveled**(2.0)))
             count += 1
 
-        steps.append(list(data['Step'][count_cut:]))
+        steps.append(list(data['Step'][initial_skip:]))
         dists.append(dists_per_interval)
 
     # Cutoff data at minimum sample length so that all runs are equal length
