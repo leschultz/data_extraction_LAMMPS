@@ -9,7 +9,7 @@ hold_1=$4
 hold_2=$5
 hold_3=$6
 
-shift 7
+shift 6 
 
 for ((i=1;i<=$number_runs;i++))
 do
