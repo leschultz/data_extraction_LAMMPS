@@ -4,6 +4,8 @@ import pandas as pd
 import pickle
 import os
 
+pl.switch_backend('agg')
+
 
 def plot(stop):
     '''

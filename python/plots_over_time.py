@@ -1,6 +1,9 @@
 import matplotlib.pyplot as pl
+
 import pandas as pd
 import os
+
+pl.switch_backend('agg')
 
 
 def plot(start):
