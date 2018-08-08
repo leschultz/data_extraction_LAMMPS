@@ -31,4 +31,4 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
 2. Located in bash folder. To run lamps through each input file generated, the following could be used:
 
 	bash lammps_looper.sh <lamps tool used>
-	bash lammps_looper.sh lammps-daily
+	bash lammps_looper.sh lmp_serial
