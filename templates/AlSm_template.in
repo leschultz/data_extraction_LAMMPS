@@ -5,8 +5,8 @@
 
 # Starting parameters
 units	        	                    metal
-atom_style                                  atomic
-dimension		                    3
+atom_style                              atomic
+dimension		                        3
 boundary	                            p p p
 
 ###############################################################################
@@ -37,9 +37,9 @@ variable                                    data_rdf                  string ../
 
 # Simulation space
 lattice                                     fcc 4.04092655671750
-region                                      my_box block 0 4 0 4 0 4
+region                                      my_box block 0 3 0 3 0 3
 create_box                                  2 my_box
-create_atoms                                1 random ${number_of_atoms} ${seed} NULL
+create_atoms                                1 box
 set                                         group all type/fraction 2 0.1 ${seed}
 
 ################################################################################

@@ -12,14 +12,16 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
 
 	python3 -c 'import control'
 
-2.  The python tool requires an initial skip to near the data to be recorded. Two while loops located in analysis.py determine when data is recorded. This only works for a cooling setup. If data is recorded every 100 steps, then a skip of 100 would skip to step 100*100.
+2.  The python tool requires an initial skip to near the data to be recorded. If data is recorded every 10 steps, then a skip of 100 would skip to step 10*100. This holds true for all inputs into the python tool.
+
+3.  Linearization can be used to linearize the propensity for motion. The beginning and enpoints need to be specified. Analysis removes the data previous to the <initial skip>. Hence, the beggingin point of linearization can always be zero. For instance, if the initial skip is 100 in a run cotaining 1000 dat points, then the possible linearizable length is 900 datapoints.
 
 3. Data points to plot can include the number of recorded instances to be plotted. If data was recorded every 100 steps, then 10 points would be 10*100 steps. This can be used to reduce the number of points plotted. If the number is greater than the number of available points, then only the maximum number of points will be plotted.
 
 4. Located in the python folder. The python tool can be run via the commandline with the following command:
 
-	python3 -c 'from control import control; control.analyze(<initial skip>, <data points for linearization>); control.plot_analysis(<data points to plot>, <RDF point>); control.plot_system()'
-	python3 -c 'from control import control; control.analyze(1000, 3000); control.plot_analysis(180, 1000); control.plot_system()'
+	python3 -c 'from control import control; control.analyze(<initial skip>, <linearization start>, <linearization end>); control.plot_analysis(<data points to plot>, <RDF point>); control.plot_system(<initial skip>)'
+    python3 -c 'from control import control; control.analyze(1300, 0, 100); control.plot_analysis(180, 1000); control.plot_system(10)'
 
 2. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):
 
