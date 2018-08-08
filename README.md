@@ -25,8 +25,8 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
 
 2. Located in bash folder. To generate input files, the following could be used (if invoked multiple times the same number of runs should be used):
 
-	bash input_file_generator.sh <template file> <number of runs> <number of atoms> <melting temperature> <time steps at melt> <time steps of quench> <time steps final hold> <list of final temperatures without units>
-	bash input_file_generator.sh AlSm_template.in 10 100 2000 1000000 33000000 36000000 900
+	bash input_file_generator.sh <template file> <number of runs> <melting temperature> <time steps at melt> <time steps of quench> <time steps final hold> <list of final temperatures without units>
+	bash input_file_generator.sh AlSm_template.in 10 2000 1000000 33000000 36000000 900
 
 2. Located in bash folder. To run lamps through each input file generated, the following could be used:
 

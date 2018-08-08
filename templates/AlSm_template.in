@@ -11,9 +11,6 @@ boundary	                            p p p
 
 ###############################################################################
 
-# Atoms
-variable                                    number_of_atoms           equal  replace_atom_number
-
 # Temperature variables
 variable                                    temp_melt                 equal  replace_melt_temperature
 variable                                    temp_final                equal  replace_final_temperature
