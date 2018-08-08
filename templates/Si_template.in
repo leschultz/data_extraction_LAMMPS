@@ -5,7 +5,7 @@
 
 # Starting parameters
 units	        	                    metal
-atom_style                              atomic
+atom_style                                  atomic
 dimension   		                    3
 boundary	                            p p p
 
