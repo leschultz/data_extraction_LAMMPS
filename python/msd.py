@@ -77,7 +77,7 @@ def analyze(initial_skip):
                            header=None
                            )
 
-        # This is the orger of exported data
+        # This is the order of exported data
         data.columns = ([
                          'Step',
                          'Temperature [K]',
