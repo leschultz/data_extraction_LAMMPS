@@ -33,7 +33,7 @@ variable                                    data_rdf                  string ../
 ################################################################################
 
 # Simulation space
-lattice                                     fcc 5.431
+lattice                                     diamond 5.431
 region                                      my_box block 0 22 0 22 0 22
 create_box                                  1 my_box
 create_atoms                                1 box
