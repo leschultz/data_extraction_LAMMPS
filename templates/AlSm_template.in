@@ -1,13 +1,13 @@
-# A general input file that could be used for different scenarios
+#A general input file that could be used for different scenarios
 # Written by Lane Enrique Schultz
 
 ###############################################################################
 
 # Starting parameters
-units	        	                    metal
+units                                       metal
 atom_style                                  atomic
 dimension                                   3
-boundary	                            p p p
+boundary                                    p p p
 
 ###############################################################################
 

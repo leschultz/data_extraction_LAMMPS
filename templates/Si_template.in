@@ -4,10 +4,10 @@
 ###############################################################################
 
 # Starting parameters
-units	        	                    metal
+units	        	                        metal
 atom_style                                  atomic
-dimension   		                    3
-boundary	                            p p p
+dimension   		                        3
+boundary	                                p p p
 
 ###############################################################################
 
@@ -43,7 +43,7 @@ create_atoms                                1 box
 # Data
 pair_style                                  sw
 pair_coeff                                  * * ../potentials/Si.sw Si
-mass                                        1 12.0
+mass                                        1 28.085
 
 ################################################################################
 
