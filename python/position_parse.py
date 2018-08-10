@@ -47,4 +47,11 @@ def trj(name):
 	data.columns = ['atom', 'element', 'xu', 'yu', 'zu']
 	data.insert(loc=0, column='step', value=step)
 
-	return data
+	# change values to integers or floats
+	data.atom = data.atom.apply(int)
+	data.element = data.element.apply(int)
+	data.xu = data.xu.apply(float)
+	data.yu = data.yu.apply(float)
+	data.zu = data.zu.apply(float)
+
+	return frequency, data
