@@ -4,6 +4,7 @@ import numpy as np
 
 #pl.switch_backend('agg')
 
+
 def difference(i, j):
 	'''Subtracts the past value j from the future value i'''
 
@@ -34,13 +35,8 @@ class analize(object):
 		The start and end are inclusive.
 		'''
 
-		run = self.run  # The run used
-		numb = self.num  # Number of atoms
-		data = self.trj  # Trajectory data
-		freq = self.frq  # Acqusition rate
-
 		# The last recorded step
-		last_step = max(data.step)
+		last_step = max(self.trj.step)
 
 		# Raise errors before loaing data for efficienyc in the future
 		# Check to see if beyond data limmit
@@ -48,7 +44,7 @@ class analize(object):
 			raise NameError('Start is beyond data length')
 
 		# Check to see if the input is valid
-		if start % freq == 1:
+		if start % self.frq == 1:
 			raise NameError('Start is not a multiple of the data acquisition rate')
 
 		# Check if end goes beyond data range
@@ -56,7 +52,7 @@ class analize(object):
 			raise NameError('Cannot gather more data than specified')
 
 		# Check if end is valid point
-		if stop % freq == 1:
+		if stop % self.frq == 1:
 			raise NameError('End is not a multiple of the data acqusition rate')
 
 		# Find the displacements due to vibration between each timestep
@@ -64,12 +60,12 @@ class analize(object):
 		x = []
 		y = []
 		z = []
-		for i in range(start, stop+1, freq):
-			index = data.index[data.step == i].tolist()
+		for i in range(start, stop+1, self.frq):
+			index = self.trj.index[self.trj.step == i].tolist()
 			
-			x.append(data.xu[index].values.tolist())  # x positions
-			y.append(data.yu[index].values.tolist())  # y positions
-			z.append(data.zu[index].values.tolist())  # z positions
+			x.append(self.trj.xu[index].values.tolist())  # x positions
+			y.append(self.trj.yu[index].values.tolist())  # y positions
+			z.append(self.trj.zu[index].values.tolist())  # z positions
 
 			step_recorded.append(i)  # Time step
 
@@ -84,7 +80,7 @@ class analize(object):
 		# Take the distance from the mean position
 		vibrations = []
 		for i in range(0, len(x)):
-			for j in range(0, numb+1):
+			for j in range(0, self.num+1):
 				pos = displacement(x[i], y[i], z[i])
 				pos_diff = difference(pos, mean_positions)
 				pos_sqrd = [k**2 for k in pos_diff]
@@ -97,7 +93,7 @@ class analize(object):
 			pl.xlim([start, stop])
 			pl.xlabel('Step [-]')
 			pl.ylabel('Mean Squared Vibration [A^2]')
-			pl.legend([run])
+			pl.legend([self.run])
 			pl.grid(True)
 			pl.tight_layout()
 			pl.show()
