@@ -2,6 +2,8 @@ from matplotlib import pyplot as pl
 from position_parse import trj
 import numpy as np
 
+#pl.switch_backend('agg')
+
 def difference(i, j):
 	'''Subtracts the past value j from the future value i'''
 
@@ -22,15 +24,18 @@ class analize(object):
 
 		self.run = str(name).split('.')[0]  # The name of the run
 		self.tem = trj(name)  # Load
-		self.frq = self.tem[0]  # Acquistion Frequency (steps/acqusition)
-		self.trj = self.tem[1]  # Trajectories
+		self.num = self.tem[0]  # Number of atoms
+		self.frq = self.tem[1]  # Acquistion Frequency (steps/acqusition)
+		self.trj = self.tem[2]  # Trajectories
 
 	def vibration(self, start, stop, plot=True):
 		'''
 		This function calculates vibration displacements.
+		The start and end are inclusive.
 		'''
 
 		run = self.run  # The run used
+		numb = self.num  # Number of atoms
 		data = self.trj  # Trajectory data
 		freq = self.frq  # Acqusition rate
 
@@ -55,7 +60,6 @@ class analize(object):
 			raise NameError('End is not a multiple of the data acqusition rate')
 
 		# Find the displacements due to vibration between each timestep
-		disp_mean = []
 		step_recorded = []
 		x = []
 		y = []
@@ -81,20 +85,24 @@ class analize(object):
 		for item in mean_coordinates:
 			mean_positions.append((item[0]**2+item[1]**2+item[2]**2)**0.5)
 
-		for i in range(start, stop+1, freq):
-			index = data.index[data.step == i].tolist()
+		# Take the distance from mean positions each position
+		vibrations = []
+		for i in range(0, len(x)):
+			for j in range(0, numb+1):
+				pos = displacement(x[i], y[i], z[i])
+				pos_diff = difference(pos, mean_positions)
+				pos_sqrd = [k**2 for k in pos_diff]
+				pos_mean = np.mean(pos_sqrd)
 
-			x = data.xu[index].values  # x values for each atom
-			y = data.yu[index].values  # y values for each atom
-			z = data.zu[index].values  # z values for each atom
+			vibrations.append(pos_mean)
 
-		'''
+
 		if plot == True:
-			pl.plot(step_recorded, disp_mean)
+			pl.plot(step_recorded, vibrations)
 			pl.xlim([start, stop])
 			pl.xlabel('Step [-]')
 			pl.ylabel('Vibration [A]')
 			pl.legend([run])
 			pl.grid(True)
 			pl.tight_layout()
-			pl.show()'''
+			pl.show()

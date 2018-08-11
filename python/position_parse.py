@@ -54,4 +54,4 @@ def trj(name):
 	data.yu = data.yu.apply(float)
 	data.zu = data.zu.apply(float)
 
-	return frequency, data
+	return number, frequency, data
