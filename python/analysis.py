@@ -78,14 +78,10 @@ class analize(object):
 		y_mean = np.mean(y, axis=0)  # Average y values
 		z_mean = np.mean(z, axis=0)  # Average z values
 
-		mean_coordinates = zip(x_mean, y_mean, z_mean)
-
 		# Take displacement of the averages with respect to (0,0,0)
-		mean_positions = []
-		for item in mean_coordinates:
-			mean_positions.append((item[0]**2+item[1]**2+item[2]**2)**0.5)
+		mean_positions = displacement(x_mean, y_mean, z_mean)
 
-		# Take the distance from mean positions each position
+		# Take the distance from the mean position
 		vibrations = []
 		for i in range(0, len(x)):
 			for j in range(0, numb+1):
@@ -95,13 +91,12 @@ class analize(object):
 				pos_mean = np.mean(pos_sqrd)
 
 			vibrations.append(pos_mean)
-
-
+		
 		if plot == True:
 			pl.plot(step_recorded, vibrations)
 			pl.xlim([start, stop])
 			pl.xlabel('Step [-]')
-			pl.ylabel('Vibration [A]')
+			pl.ylabel('Mean Squared Vibration [A^2]')
 			pl.legend([run])
 			pl.grid(True)
 			pl.tight_layout()
