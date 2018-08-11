@@ -1,8 +1,9 @@
 from matplotlib import pyplot as pl
-from position_parse import trj
+
+import dataparse as da
 import numpy as np
 
-#pl.switch_backend('agg')
+pl.switch_backend('agg')
 
 
 def difference(i, j):
@@ -20,16 +21,41 @@ def displacement(dx, dy, dz):
 class analize(object):
 	'''Computation functions are defined here'''
 
-	def __init__(self, name):
+	def __init__(self, name, start, stop):
 		'''Load data'''
 
-		self.run = str(name).split('.')[0]  # The name of the run
-		self.tem = trj(name)  # Load
-		self.num = self.tem[0]  # Number of atoms
-		self.frq = self.tem[1]  # Acquistion Frequency (steps/acqusition)
-		self.trj = self.tem[2]  # Trajectories
+		self.run = name  # The name of the run
+		self.trjout = da.trj(self.run+'.lammpstrj')  # Load trajectories
+		self.num = self.trjout[0]  # Number of atoms
+		self.frq = self.trjout[1]  # Acquistion Frequency (steps/acqusition)
+		self.lst = self.trjout[2]  # Last recorded step
+		self.trj = self.trjout[3]  # Trajectories
 
-	def vibration(self, start, stop, plot=True):
+		self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
+		self.bins = self.rdfout[0]
+		self.rdfdata = self.rdfout[1]
+
+		# Inclusive start and stop conditions
+		self.start = start  # Start Step
+		self.stop = stop  # Stop step
+
+		# Check to see if beyond data limmit
+		if self.start > self.lst:
+			raise NameError('Start is beyond data length')
+
+		# Check to see if the input is valid
+		if self.start % self.frq == 1:
+			raise NameError('Start is not a multiple of the data acquisition rate')
+
+		# Check if end goes beyond data range
+		if self.stop > self.lst:
+			raise NameError('Cannot gather more data than specified')
+
+		# Check if end is valid point
+		if self.stop % self.frq == 1:
+			raise NameError('End is not a multiple of the data acqusition rate')
+
+	def vibration(self, plot=True):
 		'''
 		This function calculates vibration displacements.
 		The start and end are inclusive.
@@ -38,36 +64,19 @@ class analize(object):
 		# The last recorded step
 		last_step = max(self.trj.step)
 
-		# Raise errors before loaing data for efficienyc in the future
-		# Check to see if beyond data limmit
-		if start > last_step:
-			raise NameError('Start is beyond data length')
-
-		# Check to see if the input is valid
-		if start % self.frq == 1:
-			raise NameError('Start is not a multiple of the data acquisition rate')
-
-		# Check if end goes beyond data range
-		if stop > last_step:
-			raise NameError('Cannot gather more data than specified')
-
-		# Check if end is valid point
-		if stop % self.frq == 1:
-			raise NameError('End is not a multiple of the data acqusition rate')
-
 		# Find the displacements due to vibration between each timestep
-		step_recorded = []
+		self.steprecorded = []
 		x = []
 		y = []
 		z = []
-		for i in range(start, stop+1, self.frq):
+		for i in range(self.start, self.stop+1, self.frq):
 			index = self.trj.index[self.trj.step == i].tolist()
-			
+
 			x.append(self.trj.xu[index].values.tolist())  # x positions
 			y.append(self.trj.yu[index].values.tolist())  # y positions
 			z.append(self.trj.zu[index].values.tolist())  # z positions
 
-			step_recorded.append(i)  # Time step
+			self.steprecorded.append(i)  # Time step
 
 		# Averages between start and stop
 		x_mean = np.mean(x, axis=0)  # Average x values
@@ -87,13 +96,80 @@ class analize(object):
 				pos_mean = np.mean(pos_sqrd)
 
 			vibrations.append(pos_mean)
-		
-		if plot == True:
-			pl.plot(step_recorded, vibrations)
-			pl.xlim([start, stop])
+
+		if plot is True:
+			pl.plot(self.steprecorded, vibrations)
 			pl.xlabel('Step [-]')
 			pl.ylabel('Mean Squared Vibration [A^2]')
 			pl.legend([self.run])
 			pl.grid(True)
 			pl.tight_layout()
-			pl.show()
+			pl.savefig('../images/motion/'+self.run+'_vibration')
+			pl.clf()
+
+	def msd(self, plot=True):
+		'''
+		Calcualte the means squared displacement.
+		'''
+
+		# The initial position of each atom
+		index0 = self.trj.index[self.trj.step == self.start].tolist()
+		x0 = self.trj.xu[index0].values.tolist()
+		y0 = self.trj.yu[index0].values.tolist()
+		z0 = self.trj.zu[index0].values.tolist()
+
+		# Gather the distance from the start at each timestep
+		msd = []
+		for i in range(self.start, self.stop+1, self.frq):
+			index = self.trj.index[self.trj.step == i].tolist()
+
+			x = self.trj.xu[index].values.tolist()  # x trajectories
+			y = self.trj.yu[index].values.tolist()  # y trajectories
+			z = self.trj.zu[index].values.tolist()  # z trajectories
+
+			dx = difference(x, x0)  # Change from initial x
+			dy = difference(y, y0)  # Change from initial y
+			dz = difference(z, z0)  # Change from initial z
+
+			pos = displacement(dx, dy, dz)  # Absolute positions
+			pos_sqrd = [j**2 for j in pos]  # Squared positions
+			msd.append(np.mean(pos_sqrd))  # Mean of squared positions
+
+		if plot is True:
+			pl.plot(self.steprecorded, msd)
+			pl.xlabel('Step [-]')
+			pl.ylabel('Mean Squared Displacement [A^2]')
+			pl.legend([self.run])
+			pl.grid(True)
+			pl.tight_layout()
+			pl.savefig('../images/motion/'+self.run+'_msd')
+			pl.clf()
+
+	def rdf(self, step=None, plot=True):
+		'''
+		Plot the radial distribution at a point and throughout time.
+		'''
+
+		# Gather all the steps where data was recorded
+		allsteps = list(set(self.rdfdata.step.values.tolist()))
+		allsteps = sorted(allsteps, key=int)
+
+		# The center of bins
+		bincenters = list(set(self.rdfdata.center.values.tolist()))
+		bincenters = sorted(bincenters, key=float)
+
+		for i in list(range(1, self.bins+1)):
+			index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
+			binsdata = self.rdfdata.rdf[index].values.tolist()
+			pl.plot(
+                    allsteps,
+                    binsdata,
+                    label="Center [A] %1.2f" % (bincenters[i-1],))
+
+		pl.xlabel('Step [-]')
+		pl.ylabel('g(r)')
+		pl.legend(bbox_to_anchor=(1.05, 1), borderaxespad=0)
+		pl.grid(True)
+		pl.tight_layout()
+		pl.savefig('../images/rdf/'+self.run+'_allrdf')
+		pl.clf()

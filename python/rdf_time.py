@@ -7,7 +7,7 @@ import os
 #pl.switch_backend('agg')
 
 
-def plot(name, start, stop):
+def rdf_time(name, start, stop):
     '''
     This function averages the rdf peaks between a starting data point and a
     final data point for a specified file defined by name.

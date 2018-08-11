@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 
-def plot(start):
+def rdf(start):
     '''
     This function imports the radial distribution function (RDF) data that
     LAMMPS writes and plots it. The start were data is impored is defined as
