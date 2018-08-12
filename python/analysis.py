@@ -57,7 +57,7 @@ class analize(object):
 		if self.stop % self.frq == 1:
 			raise NameError('End is not a multiple of the data acqusition rate')
 
-	def vibration(self, plot=True):
+	def vibration(self):
 		'''
 		This function calculates vibration displacements.
 		The start and end are inclusive.
@@ -99,17 +99,16 @@ class analize(object):
 
 			vibrations.append(pos_mean)
 
-		if plot is True:
-			pl.plot(self.steprecorded, vibrations)
-			pl.xlabel('Step [-]')
-			pl.ylabel('Mean Squared Vibration [A^2]')
-			pl.legend([self.run])
-			pl.grid(True)
-			pl.tight_layout()
-			pl.savefig('../images/motion/'+self.run+'_vibration')
-			pl.clf()
+		pl.plot(self.steprecorded, vibrations)
+		pl.xlabel('Step [-]')
+		pl.ylabel('Mean Squared Vibration [A^2]')
+		pl.legend([self.run])
+		pl.grid(True)
+		pl.tight_layout()
+		pl.savefig('../images/motion/'+self.run+'_vibration')
+		pl.clf()
 
-	def msd(self, plot=True):
+	def msd(self):
 		'''
 		Calcualte the means squared displacement.
 		'''
@@ -137,16 +136,16 @@ class analize(object):
 			pos_sqrd = [j**2 for j in pos]  # Squared positions
 			msd.append(np.mean(pos_sqrd))  # Mean of squared positions
 
-		if plot is True:
-			pl.plot(self.steprecorded, msd)
-			pl.xlabel('Step [-]')
-			pl.ylabel('Mean Squared Displacement [A^2]')
-			pl.legend([self.run])
-			pl.grid(True)
-			pl.tight_layout()
-			pl.savefig('../images/motion/'+self.run+'_msd')
-			pl.clf()
+		pl.plot(self.steprecorded, msd)
+		pl.xlabel('Step [-]')
+		pl.ylabel('Mean Squared Displacement [A^2]')
+		pl.legend([self.run])
+		pl.grid(True)
+		pl.tight_layout()
+		pl.savefig('../images/motion/'+self.run+'_MSD')
+		pl.clf()
 
+		# Return the steps and the msd
 		return self.steprecorded, msd
 
 	def rdf(self, step=None):

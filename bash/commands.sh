@@ -22,5 +22,3 @@
 #cd ../python
 
 # -----Use the python scripts to analyze data-----
-#python3 -c 'from control import control; control.analyze(1300, 0, 100); control.plot_analysis(180, 1000); control.plot_system(10)'
-

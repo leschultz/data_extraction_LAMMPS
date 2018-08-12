@@ -1,4 +1,3 @@
-import glob
 import os
 
 # Getting the main data directory
@@ -40,21 +39,5 @@ def check(directory):
         os.makedirs(directory)
 
 
-def delete(directory):
-    filelist = glob.glob(os.path.join(directory, '*'))
-    for item in filelist:
-        os.remove(item)
-
-
-def setup():
-    '''The initial setup of needed directories'''
-
-    for item in directories:
-        check(item)
-
-
-def clean():
-    '''Clean data from previous runs'''
-
-    for item in directories:
-        delete(item)
+for item in directories:
+    check(item)

@@ -25,7 +25,7 @@ variable                                    seed                      equal  rep
 
 # Data output
 variable                                    data_file_characteristics string ../data/txt/replace_final_temperatureK_replace_run.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run_rate.lammpstrj
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_final_temperatureK_replace_run.dat
 variable                                    data_restart              string ../data/rest/replace_final_temperatureK_replace_run.rest
 variable                                    data_rdf                  string ../data/rdf/replace_final_temperatureK_replace_run.rdf

@@ -60,6 +60,8 @@ def trj(name):
 	# Change back to original directory
 	os.chdir(first_directory)
 
+	# Return the atoms, data acquisiton frequency, final step, and 
+	# trajectory data
 	return atoms, frequency, finalstep, data
 
 
@@ -107,6 +109,7 @@ def rdf(name):
 	# Return to the first directory
 	os.chdir(first_directory)
 
+	# Return the number of bins and RDF data
 	return bins, data
 
 
@@ -133,4 +136,5 @@ def response(name):
 	# Return to the first directory
 	os.chdir(first_directory)
 
+	# Return system data
 	return data
