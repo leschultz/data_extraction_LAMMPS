@@ -32,8 +32,10 @@ class analize(object):
 		self.trj = self.trjout[3]  # Trajectories
 
 		self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
-		self.bins = self.rdfout[0]
-		self.rdfdata = self.rdfout[1]
+		self.bins = self.rdfout[0]  # The number of bins
+		self.rdfdata = self.rdfout[1]  # Data for RDF
+
+		self.resout = da.response(self.run+'.txt')  # Load system data
 
 		# Inclusive start and stop conditions
 		self.start = start  # Start Step
@@ -190,4 +192,25 @@ class analize(object):
 			pl.grid(True)
 			pl.tight_layout()
 			pl.savefig('../images/rdf/'+self.run+'_'+str(step)+'_rdf')
+			pl.clf()
+
+	def response(self):
+		'''
+		Plots the response of the system throughout time.
+		'''
+
+		# Plot recorded data versus step
+		for item in self.resout.columns.values:
+			pl.plot(self.resout['Step [-]'], self.resout[item])
+			pl.xlabel('Step [-]')
+			pl.ylabel(item)
+			pl.legend([self.run])
+			pl.grid(True)
+			pl.tight_layout()
+			pl.savefig(
+                       '../images/system/' +
+                        self.run +
+                        '_' +
+                        item.split(' ')[0]
+                        )
 			pl.clf()

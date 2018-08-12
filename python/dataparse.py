@@ -2,18 +2,18 @@ import pandas as pd
 import numpy as np
 import os
 
+# Get Directories
+first_directory = os.getcwd()
+data_directory = first_directory+'/../data/'
+
 
 def trj(name):
 	'''
 	This function extracts the trajectories for each simulation atom.
 	'''
 
-	# Get directories
-	first_directory = os.getcwd()
-	data_directory = first_directory+'/../data/lammpstrj/'
-
 	# Change into the lammpstrj directory
-	os.chdir(data_directory)
+	os.chdir(data_directory+'lammpstrj/')
 
 	# Load data
 	mycolumns = [0, 1, 2, 3, 4, 5, 6]
@@ -68,12 +68,8 @@ def rdf(name):
 	Extract the radial distribution (RDF) data.
 	'''
 
-	# Grab relevant directories
-	first_directory = os.getcwd()
-	data_directory = first_directory+'/../data/rdf/'
-
 	# Change into the lammpstrj directory
-	os.chdir(data_directory)
+	os.chdir(data_directory+'rdf/')
 
 	# Load data
 	mycolumns = [0, 1, 2, 3]
@@ -112,3 +108,29 @@ def rdf(name):
 	os.chdir(first_directory)
 
 	return bins, data
+
+
+def response(name):
+	'''
+	Load the system properties throughout time.
+	'''
+
+	# Change into data directory
+	os.chdir(data_directory+'txt/')
+
+	# Load the data
+	mycolumns = [
+                 'Step [-]',
+                 'Temperature [K]',
+                 'Pressure [bar]',
+                 'Volumne [A^3]',
+                 'Potential Energy [eV]',
+                 'Kinetic Energy [eV]'
+                 ]
+
+	data = pd.read_csv(name, names=mycolumns, sep=' ', comment='#', header=None)
+
+	# Return to the first directory
+	os.chdir(first_directory)
+
+	return data
