@@ -12,5 +12,8 @@ bash lammps_looper.sh lmp_serial
 # -----Change the directory to where the python scripts are-----
 cd ../python
 
+# -----Create the directories needed-----
+python3 setup.py
+
 # -----Use the python scripts to analyze data-----
 python3 -c 'from averages import avg; value = avg("300K", 10000+34000, 10000+34000+10000, 10000)'
