@@ -3,7 +3,7 @@ from matplotlib import pyplot as pl
 import dataparse as da
 import numpy as np
 
-pl.switch_backend('agg')
+pl.switch_backend('agg')  # Added for plotting in cluster
 
 
 def difference(i, j):
@@ -145,7 +145,9 @@ class analize(object):
 			pl.savefig('../images/motion/'+self.run+'_msd')
 			pl.clf()
 
-	def rdf(self, step=None, plot=True):
+		return self.steprecorded, msd
+
+	def rdf(self, step=None):
 		'''
 		Plot the radial distribution at a point and throughout time.
 		'''
@@ -158,6 +160,7 @@ class analize(object):
 		bincenters = list(set(self.rdfdata.center.values.tolist()))
 		bincenters = sorted(bincenters, key=float)
 
+		# Plot the data for each bin throughout time
 		for i in list(range(1, self.bins+1)):
 			index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
 			binsdata = self.rdfdata.rdf[index].values.tolist()
@@ -173,3 +176,18 @@ class analize(object):
 		pl.tight_layout()
 		pl.savefig('../images/rdf/'+self.run+'_allrdf')
 		pl.clf()
+
+		# Plot the RDF for a specific timestep
+		if step is not None:
+			index = self.rdfdata.index[self.rdfdata.step == step].tolist()
+			pl.plot(
+					self.rdfdata.center[index],
+					self.rdfdata.rdf[index],
+					)
+			pl.legend([self.run+'_step_'+str(step)])
+			pl.xlabel('Step [-]')
+			pl.ylabel('g(r)')
+			pl.grid(True)
+			pl.tight_layout()
+			pl.savefig('../images/rdf/'+self.run+'_'+str(step)+'_rdf')
+			pl.clf()
