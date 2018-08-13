@@ -26,6 +26,8 @@ def avg(series, start, stop, step=None):
 	Do analysis for every run.
 	'''
 
+	print('Analyzing all '+series+' runs')
+
 	# Grab names that match the series input
 	newnames = []
 	for item in names:

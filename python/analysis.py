@@ -25,6 +25,9 @@ class analize(object):
 		'''Load data'''
 
 		self.run = name  # The name of the run
+
+		print('Crunching data for ' +self.run)
+
 		self.trjout = da.trj(self.run+'.lammpstrj')  # Load trajectories
 		self.num = self.trjout[0]  # Number of atoms
 		self.frq = self.trjout[1]  # Acquistion Frequency (steps/acqusition)
