@@ -4,6 +4,8 @@ from analysis import analize as an
 import pandas as pd
 import os
 
+pl.switch_backend('agg')  # Added for plotting in cluster
+
 # Directories
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
