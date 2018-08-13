@@ -7,212 +7,218 @@ pl.switch_backend('agg')  # Added for plotting in cluster
 
 
 def difference(i, j):
-	'''Subtracts the past value j from the future value i'''
+    '''Subtracts the past value j from the future value i'''
 
-	return [i-j for (i, j) in zip(i, j)]
+    return [i-j for (i, j) in zip(i, j)]
 
 
 def displacement(dx, dy, dz):
-	'''Takes the displacement in three dimensions.'''
+    '''Takes the displacement in three dimensions.'''
 
-	return [(dx**2+dy**2+dz**2)**0.5 for (dx, dy, dz) in zip(dx, dy, dz)]
+    return [(dx**2+dy**2+dz**2)**0.5 for (dx, dy, dz) in zip(dx, dy, dz)]
 
 
 class analize(object):
-	'''Computation functions are defined here'''
+    '''Computation functions are defined here'''
 
-	def __init__(self, name, start, stop):
-		'''Load data'''
+    def __init__(self, name, start, stop):
+        '''Load data'''
 
-		self.run = name  # The name of the run
+        self.run = name  # The name of the run
 
-		print('Crunching data for ' +self.run)
+        print('Crunching data for ' + self.run)
 
-		self.trjout = da.trj(self.run+'.lammpstrj')  # Load trajectories
-		self.num = self.trjout[0]  # Number of atoms
-		self.frq = self.trjout[1]  # Acquistion Frequency (steps/acqusition)
-		self.lst = self.trjout[2]  # Last recorded step
-		self.trj = self.trjout[3]  # Trajectories
+        self.trjout = da.trj(self.run+'.lammpstrj')  # Load trajectories
+        self.num = self.trjout[0]  # Number of atoms
+        self.frq = self.trjout[1]  # Acquistion Frequency (steps/acqusition)
+        self.lst = self.trjout[2]  # Last recorded step
+        self.trj = self.trjout[3]  # Trajectories
 
-		self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
-		self.bins = self.rdfout[0]  # The number of bins
-		self.rdfdata = self.rdfout[1]  # Data for RDF
+        self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
+        self.bins = self.rdfout[0]  # The number of bins
+        self.rdfdata = self.rdfout[1]  # Data for RDF
 
-		self.resout = da.response(self.run+'.txt')  # Load system data
+        self.resout = da.response(self.run+'.txt')  # Load system data
 
-		# Inclusive start and stop conditions
-		self.start = start  # Start Step
-		self.stop = stop  # Stop step
+        # Inclusive start and stop conditions
+        self.start = start  # Start Step
+        self.stop = stop  # Stop step
 
-		# Check to see if beyond data limmit
-		if self.start > self.lst:
-			raise NameError('Start is beyond data length')
+        # Check to see if beyond data limmit
+        if self.start > self.lst:
+            raise NameError('Start is beyond data length')
 
-		# Check to see if the input is valid
-		if self.start % self.frq == 1:
-			raise NameError('Start is not a multiple of the data acquisition rate')
+        # Check to see if the input is valid
+        if self.start % self.frq == 1:
+            raise NameError(
+                            'Start is not a multiple of ' +
+                            'the data acquisition rate'
+                            )
 
-		# Check if end goes beyond data range
-		if self.stop > self.lst:
-			raise NameError('Cannot gather more data than specified')
+        # Check if end goes beyond data range
+        if self.stop > self.lst:
+            raise NameError('Cannot gather more data than specified')
 
-		# Check if end is valid point
-		if self.stop % self.frq == 1:
-			raise NameError('End is not a multiple of the data acqusition rate')
+        # Check if end is valid point
+        if self.stop % self.frq == 1:
+            raise NameError(
+                            'End is not a multiple of ' +
+                            'the data acqusition rate'
+                            )
 
-	def vibration(self):
-		'''
-		This function calculates vibration displacements.
-		The start and end are inclusive.
-		'''
+    def vibration(self):
+        '''
+        This function calculates vibration displacements.
+        The start and end are inclusive.
+        '''
 
-		# The last recorded step
-		last_step = max(self.trj.step)
+        # The last recorded step
+        last_step = max(self.trj.step)
 
-		# Find the displacements due to vibration between each timestep
-		self.steprecorded = []
-		x = []
-		y = []
-		z = []
-		for i in range(self.start, self.stop+1, self.frq):
-			index = self.trj.index[self.trj.step == i].tolist()
+        # Find the displacements due to vibration between each timestep
+        self.steprecorded = []
+        x = []
+        y = []
+        z = []
+        for i in range(self.start, self.stop+1, self.frq):
+            index = self.trj.index[self.trj.step == i].tolist()
 
-			x.append(self.trj.xu[index].values.tolist())  # x positions
-			y.append(self.trj.yu[index].values.tolist())  # y positions
-			z.append(self.trj.zu[index].values.tolist())  # z positions
+            x.append(self.trj.xu[index].values.tolist())  # x positions
+            y.append(self.trj.yu[index].values.tolist())  # y positions
+            z.append(self.trj.zu[index].values.tolist())  # z positions
 
-			self.steprecorded.append(i)  # Time step
+            self.steprecorded.append(i)  # Time step
 
-		# Averages between start and stop
-		x_mean = np.mean(x, axis=0)  # Average x values
-		y_mean = np.mean(y, axis=0)  # Average y values
-		z_mean = np.mean(z, axis=0)  # Average z values
+        # Averages between start and stop
+        x_mean = np.mean(x, axis=0)  # Average x values
+        y_mean = np.mean(y, axis=0)  # Average y values
+        z_mean = np.mean(z, axis=0)  # Average z values
 
-		# Take displacement of the averages with respect to (0,0,0)
-		mean_positions = displacement(x_mean, y_mean, z_mean)
+        # Take displacement of the averages with respect to (0,0,0)
+        mean_positions = displacement(x_mean, y_mean, z_mean)
 
-		# Take the distance from the mean position
-		vibrations = []
-		for i in range(0, len(x)):
-			for j in range(0, self.num+1):
-				pos = displacement(x[i], y[i], z[i])
-				pos_diff = difference(pos, mean_positions)
-				pos_sqrd = [k**2 for k in pos_diff]
-				pos_mean = np.mean(pos_sqrd)
+        # Take the distance from the mean position
+        vibrations = []
+        for i in range(0, len(x)):
+            for j in range(0, self.num+1):
+                pos = displacement(x[i], y[i], z[i])
+                pos_diff = difference(pos, mean_positions)
+                pos_sqrd = [k**2 for k in pos_diff]
+                pos_mean = np.mean(pos_sqrd)
 
-			vibrations.append(pos_mean)
+            vibrations.append(pos_mean)
 
-		pl.plot(self.steprecorded, vibrations)
-		pl.xlabel('Step [-]')
-		pl.ylabel('Mean Squared Vibration [A^2]')
-		pl.legend([self.run])
-		pl.grid(True)
-		pl.tight_layout()
-		pl.savefig('../images/motion/'+self.run+'_vibration')
-		pl.clf()
+        pl.plot(self.steprecorded, vibrations)
+        pl.xlabel('Step [-]')
+        pl.ylabel('Mean Squared Vibration [A^2]')
+        pl.legend([self.run])
+        pl.grid(True)
+        pl.tight_layout()
+        pl.savefig('../images/motion/'+self.run+'_vibration')
+        pl.clf()
 
-	def msd(self):
-		'''
-		Calcualte the means squared displacement.
-		'''
+    def msd(self):
+        '''
+        Calcualte the means squared displacement.
+        '''
 
-		# The initial position of each atom
-		index0 = self.trj.index[self.trj.step == self.start].tolist()
-		x0 = self.trj.xu[index0].values.tolist()
-		y0 = self.trj.yu[index0].values.tolist()
-		z0 = self.trj.zu[index0].values.tolist()
+        # The initial position of each atom
+        index0 = self.trj.index[self.trj.step == self.start].tolist()
+        x0 = self.trj.xu[index0].values.tolist()
+        y0 = self.trj.yu[index0].values.tolist()
+        z0 = self.trj.zu[index0].values.tolist()
 
-		# Gather the distance from the start at each timestep
-		msd = []
-		for i in range(self.start, self.stop+1, self.frq):
-			index = self.trj.index[self.trj.step == i].tolist()
+        # Gather the distance from the start at each timestep
+        msd = []
+        for i in range(self.start, self.stop+1, self.frq):
+            index = self.trj.index[self.trj.step == i].tolist()
 
-			x = self.trj.xu[index].values.tolist()  # x trajectories
-			y = self.trj.yu[index].values.tolist()  # y trajectories
-			z = self.trj.zu[index].values.tolist()  # z trajectories
+            x = self.trj.xu[index].values.tolist()  # x trajectories
+            y = self.trj.yu[index].values.tolist()  # y trajectories
+            z = self.trj.zu[index].values.tolist()  # z trajectories
 
-			dx = difference(x, x0)  # Change from initial x
-			dy = difference(y, y0)  # Change from initial y
-			dz = difference(z, z0)  # Change from initial z
+            dx = difference(x, x0)  # Change from initial x
+            dy = difference(y, y0)  # Change from initial y
+            dz = difference(z, z0)  # Change from initial z
 
-			pos = displacement(dx, dy, dz)  # Absolute positions
-			pos_sqrd = [j**2 for j in pos]  # Squared positions
-			msd.append(np.mean(pos_sqrd))  # Mean of squared positions
+            pos = displacement(dx, dy, dz)  # Absolute positions
+            pos_sqrd = [j**2 for j in pos]  # Squared positions
+            msd.append(np.mean(pos_sqrd))  # Mean of squared positions
 
-		pl.plot(self.steprecorded, msd)
-		pl.xlabel('Step [-]')
-		pl.ylabel('Mean Squared Displacement [A^2]')
-		pl.legend([self.run])
-		pl.grid(True)
-		pl.tight_layout()
-		pl.savefig('../images/motion/'+self.run+'_MSD')
-		pl.clf()
+        pl.plot(self.steprecorded, msd)
+        pl.xlabel('Step [-]')
+        pl.ylabel('Mean Squared Displacement [A^2]')
+        pl.legend([self.run])
+        pl.grid(True)
+        pl.tight_layout()
+        pl.savefig('../images/motion/'+self.run+'_MSD')
+        pl.clf()
 
-		# Return the steps and the msd
-		return self.steprecorded, msd
+        # Return the steps and the msd
+        return self.steprecorded, msd
 
-	def rdf(self, step=None):
-		'''
-		Plot the radial distribution at a point and throughout time.
-		'''
+    def rdf(self, step=None):
+        '''
+        Plot the radial distribution at a point and throughout time.
+        '''
 
-		# Gather all the steps where data was recorded
-		allsteps = list(set(self.rdfdata.step.values.tolist()))
-		allsteps = sorted(allsteps, key=int)
+        # Gather all the steps where data was recorded
+        allsteps = list(set(self.rdfdata.step.values.tolist()))
+        allsteps = sorted(allsteps, key=int)
 
-		# The center of bins
-		bincenters = list(set(self.rdfdata.center.values.tolist()))
-		bincenters = sorted(bincenters, key=float)
+        # The center of bins
+        bincenters = list(set(self.rdfdata.center.values.tolist()))
+        bincenters = sorted(bincenters, key=float)
 
-		# Plot the data for each bin throughout time
-		for i in list(range(1, self.bins+1)):
-			index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
-			binsdata = self.rdfdata.rdf[index].values.tolist()
-			pl.plot(
+        # Plot the data for each bin throughout time
+        for i in list(range(1, self.bins+1)):
+            index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
+            binsdata = self.rdfdata.rdf[index].values.tolist()
+            pl.plot(
                     allsteps,
                     binsdata,
                     label="Center [A] %1.2f" % (bincenters[i-1],))
 
-		pl.xlabel('Step [-]')
-		pl.ylabel('g(r)')
-		pl.legend(bbox_to_anchor=(1.05, 1), borderaxespad=0)
-		pl.grid(True)
-		pl.tight_layout()
-		pl.savefig('../images/rdf/'+self.run+'_allrdf')
-		pl.clf()
+        pl.xlabel('Step [-]')
+        pl.ylabel('g(r)')
+        pl.legend(bbox_to_anchor=(1.05, 1), borderaxespad=0)
+        pl.grid(True)
+        pl.tight_layout()
+        pl.savefig('../images/rdf/'+self.run+'_allrdf')
+        pl.clf()
 
-		# Plot the RDF for a specific timestep
-		if step is not None:
-			index = self.rdfdata.index[self.rdfdata.step == step].tolist()
-			pl.plot(
-					self.rdfdata.center[index],
-					self.rdfdata.rdf[index],
-					)
-			pl.legend([self.run+'_step_'+str(step)])
-			pl.xlabel('Step [-]')
-			pl.ylabel('g(r)')
-			pl.grid(True)
-			pl.tight_layout()
-			pl.savefig('../images/rdf/'+self.run+'_'+str(step)+'_rdf')
-			pl.clf()
+        # Plot the RDF for a specific timestep
+        if step is not None:
+            index = self.rdfdata.index[self.rdfdata.step == step].tolist()
+            pl.plot(
+                    self.rdfdata.center[index],
+                    self.rdfdata.rdf[index],
+                    )
+            pl.legend([self.run+'_step_'+str(step)])
+            pl.xlabel('Step [-]')
+            pl.ylabel('g(r)')
+            pl.grid(True)
+            pl.tight_layout()
+            pl.savefig('../images/rdf/'+self.run+'_'+str(step)+'_rdf')
+            pl.clf()
 
-	def response(self):
-		'''
-		Plots the response of the system throughout time.
-		'''
+    def response(self):
+        '''
+        Plots the response of the system throughout time.
+        '''
 
-		# Plot recorded data versus step
-		for item in self.resout.columns.values:
-			pl.plot(self.resout['Step [-]'], self.resout[item])
-			pl.xlabel('Step [-]')
-			pl.ylabel(item)
-			pl.legend([self.run])
-			pl.grid(True)
-			pl.tight_layout()
-			pl.savefig(
+        # Plot recorded data versus step
+        for item in self.resout.columns.values:
+            pl.plot(self.resout['Step [-]'], self.resout[item])
+            pl.xlabel('Step [-]')
+            pl.ylabel(item)
+            pl.legend([self.run])
+            pl.grid(True)
+            pl.tight_layout()
+            pl.savefig(
                        '../images/system/' +
-                        self.run +
-                        '_' +
-                        item.split(' ')[0]
-                        )
-			pl.clf()
+                       self.run +
+                       '_' +
+                       item.split(' ')[0]
+                       )
+            pl.clf()
