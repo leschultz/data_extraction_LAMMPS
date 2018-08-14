@@ -36,24 +36,34 @@ def avg(series, start, stop, step=None):
         if series in item:
             newnames.append(item)
 
-    # Gather plots and MSD data for each run
-    data = {}
+    # Gather plots, vibration, and MSD data for each run
+    data_msd = {}
+    data_vib = {}
     for name in newnames:
         run = an(name, start, stop)
-        run.vibration()
         run.response()
-        value = run.msd()
-        data[name+'msd'] = value[1]
+        value_vib = run.vibration()
+        value_msd = run.msd()
+        data_vib[name+'vib'] = value_vib[1]
+        data_msd[name+'msd'] = value_msd[1]
 
+        # If the RDF at a specified step is wanted
         if step is not None:
             run.rdf(step)
+        else:
+            run.rdf()
 
-    # Step data
-    data['Step'] = value[0]
+    # Step data from last iteration on previous loop
+    data_vib['Step'] = value_vib[0]
+    data_msd['Step'] = value_msd[0]
 
-    # Make a dataframe from data
-    df = pd.DataFrame(data=data)
-    df.set_index('Step', inplace=True)
+    # Make a dataframe from MSD data
+    df_msd = pd.DataFrame(data=data_msd)
+    df_msd.set_index('Step', inplace=True)
+
+    # Make a dataframe from vibration data
+    df_vib = pd.DataFrame(data=data_vib)
+    df_vib.set_index('Step', inplace=True)
 
     # Grab the names to be averaged
     temps = []
@@ -64,9 +74,14 @@ def avg(series, start, stop, step=None):
     # Gather temperatures to be averaged
     runs = list(set(temps))
 
-    meandf = df.mean(axis=1)
+    # Take the mean row by row for each atom for MSD
+    meandf_msd = df_msd.mean(axis=1)
 
-    pl.plot(data['Step'], meandf)
+    # Take teh mean row by row for each atom for vibration
+    meandf_vib = df_vib.mean(axis=1)
+
+    # Plot the mean MSD
+    pl.plot(data_msd['Step'], meandf_msd)
     pl.xlabel('Step [-]')
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend([series])
@@ -75,8 +90,21 @@ def avg(series, start, stop, step=None):
     pl.savefig('../images/motion/'+series+'[K]_avgMSD')
     pl.clf()
 
-    steps = data['Step']
-    msd = meandf.tolist()  # Average MSD
+    msd = meandf_msd.tolist()  # Average MSD
+
+    # Plot the mean vibration
+    pl.plot(data_vib['Step'], meandf_vib)
+    pl.xlabel('Step [-]')
+    pl.ylabel('Vibration Averaged [A^2]')
+    pl.legend([series])
+    pl.grid(True)
+    pl.tight_layout()
+    pl.savefig('../images/motion/'+series+'[K]_avgvibration')
+    pl.clf()
+
+    vibration = meandf_vib.tolist()  # Average MSD
+
+    steps = data_vib['Step']  # Steps for Average MSD
 
     # Return the steps with their corresponding msd mean
-    return steps, msd
+    return steps, msd, vibration

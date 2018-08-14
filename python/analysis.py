@@ -117,6 +117,9 @@ class analize(object):
         pl.savefig('../images/motion/'+self.run+'_vibration')
         pl.clf()
 
+        # Return the step with the recorded vibration
+        return self.steprecorded, vibrations
+
     def msd(self):
         '''
         Calcualte the means squared displacement.
@@ -189,6 +192,18 @@ class analize(object):
 
         # Plot the RDF for a specific timestep
         if step is not None:
+
+            # Check if step goes beyond data range
+            if step > self.lst:
+                raise NameError('Point beyond data end')
+
+            # Check if step is valid point
+            if step % self.frq == 1:
+                raise NameError(
+                                'Step is not a multiple of ' +
+                                'the data acqusition rate'
+                                )
+
             index = self.rdfdata.index[self.rdfdata.step == step].tolist()
             pl.plot(
                     self.rdfdata.center[index],
