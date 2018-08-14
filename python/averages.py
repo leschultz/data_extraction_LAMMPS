@@ -74,6 +74,8 @@ def avg(series, start, stop, step=None):
     # Gather temperatures to be averaged
     runs = list(set(temps))
 
+    print('Taking the mean data for ' + series)
+
     # Take the mean row by row for each atom for MSD
     meandf_msd = df_msd.mean(axis=1)
 
