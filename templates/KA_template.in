@@ -44,9 +44,6 @@ mass                                        2 1.0
 
 set                                         group all type/fraction 2 0.1 87287
 
-# Gaussian distribution of velocities innitially
-velocity                                    all create ${temp_melt} ${seed} dist gaussian
-
 ################################################################################
 
 # Data
@@ -86,23 +83,29 @@ fix                                         data_saving all ave/time 1 1 100 c_m
 
 fix                                         rdf_saving all ave/time 1 1 100 c_myrdf[*] file ${data_rdf} mode vector
 
+# Gaussian distribution of velocities innitially
+velocity                                    all create ${temp_melt} ${seed} dist gaussian
+
+# Define ensemble
+fix                                         run0 all nve
+
 # Hold as melt
-fix                                         run0 all temp/berendsen ${temp_melt} ${temp_melt} 100.0
-fix                                         run1 all nve
+fix                                         run1 all temp/berendsen ${temp_melt} ${temp_melt} 10000.0
 
 run                                         ${hold_1}
 
-unfix                                       run0
 unfix                                       run1
 
 # Hold at final temperature
-fix                                         run0 all temp/berendsen ${temp_final} ${temp_final} 100.0
-fix                                         run1 all nve
+fix                                         run1 all temp/berendsen ${temp_final} ${temp_final} 10000.0
 
 run                                         ${hold_2}
 
-unfix                                       run0
 unfix                                       run1
+
+
+# Close ensemble
+unfix                                       run0
 
 # Close save data
 unfix                                       data_saving
