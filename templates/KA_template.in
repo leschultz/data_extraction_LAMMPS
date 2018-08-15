@@ -87,14 +87,22 @@ fix                                         data_saving all ave/time 1 1 100 c_m
 fix                                         rdf_saving all ave/time 1 1 100 c_myrdf[*] file ${data_rdf} mode vector
 
 # Hold as melt
-fix                                         run all temp/berendsen ${temp_melt} ${temp_melt} 100.0
+fix                                         run0 all temp/berendsen ${temp_melt} ${temp_melt} 100.0
+fix                                         run1 all nve
+
 run                                         ${hold_1}
-unfix                                       run
+
+unfix                                       run0
+unfix                                       run1
 
 # Hold at final temperature
-fix                                         run all temp/berendsen ${temp_final} ${temp_final} 100.0
+fix                                         run0 all temp/berendsen ${temp_final} ${temp_final} 100.0
+fix                                         run1 all nve
+
 run                                         ${hold_2}
-unfix                                       run
+
+unfix                                       run0
+unfix                                       run1
 
 # Close save data
 unfix                                       data_saving
