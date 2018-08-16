@@ -14,7 +14,7 @@ data_directory = first_directory + '/../data/analysis'
 class analize(object):
     '''Computation functions are defined here'''
 
-    def __init__(self, name, start, stop, frequency):
+    def __init__(self, name, start, stop, frequency, step=None):
         '''Load data'''
 
         self.run = name  # The name of the run
@@ -25,6 +25,7 @@ class analize(object):
         self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
         self.bins = self.rdfout[0]  # The number of bins
         self.rdfdata = self.rdfout[1]  # Data for RDF
+        self.rdfstep = step
 
         self.resout = da.response(self.run+'.txt')  # Load system data
 
@@ -120,7 +121,7 @@ class analize(object):
         pl.clf()
 
         # Plot the RDF for a specific timestep
-        if step is not None:
+        if self.rdfstep is not None:
 
             index = self.rdfdata.index[self.rdfdata.step == step].tolist()
             pl.plot(

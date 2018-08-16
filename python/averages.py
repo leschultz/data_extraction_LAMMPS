@@ -40,7 +40,7 @@ def avg(series, start, stop, frequency, step=None):
     # Gather plots, vibration, and MSD data for each run
     msd = []
     for name in newnames:
-        run = an(name, start, stop, frequency)
+        run = an(name, start, stop, frequency, step)
         run.response()
         value_msd = run.msd()
         msd.append(value_msd[1])
