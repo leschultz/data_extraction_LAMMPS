@@ -14,10 +14,11 @@ data_directory = first_directory + '/../data/analysis'
 class analize(object):
     '''Computation functions are defined here'''
 
-    def __init__(self, name, start, stop):
+    def __init__(self, name, start, stop, frequency):
         '''Load data'''
 
         self.run = name  # The name of the run
+        self.frq = frequency  # The rate of data acquisition
 
         print('Crunching data for ' + self.run)
 
@@ -43,6 +44,8 @@ class analize(object):
                    '"' +
                    self.run +
                    '"' +
+                   ', ' +
+                   str(int(self.start/self.frq)) +
                    ")'"
                    )
 
@@ -70,8 +73,11 @@ class analize(object):
         # Change back to the first directory
         os.chdir(first_directory)
 
+        # Truncate the axis by inputs
+        i = int(self.start/self.frq)
+        f = int(self.stop/self.frq)
 
-        pl.plot(step, msd)
+        pl.plot(step[i:f+1], msd[i:f+1])
         pl.xlabel('Step [-]')
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.legend([self.run])

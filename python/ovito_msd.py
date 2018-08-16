@@ -29,7 +29,7 @@ def modify(frame, input, output):
 
 
 # Load the data for trajectories
-def loadtrj(name):
+def loadtrj(name, start):
     '''
     Load the lammps trajectories.
     '''
@@ -47,6 +47,7 @@ def loadtrj(name):
     dmod = CalculateDisplacementsModifier()
     dmod.assume_unwrapped_coordinates = True
     dmod.reference.load(name+extension)
+    dmod.reference_frame = start 
     node.modifiers.append(dmod)
 
     # Change back to original directory
@@ -55,12 +56,12 @@ def loadtrj(name):
     return node
 
 
-def msdcalc(name):
+def msdcalc(name, start):
     '''
     Calculate the MSD for the loaded file
     '''
 
-    node = loadtrj(name)
+    node = loadtrj(name, start)
 
     # Insert custom modifier into the data pipeline.
     node.modifiers.append(PythonScriptModifier(function=modify))
@@ -73,31 +74,3 @@ def msdcalc(name):
                 columns=['Timestep', 'MSD'],
                 multiple_frames=True
                 )
-
-
-def plotmsd(name):
-    '''
-    Plot the MSD data.
-    '''
-
-    # Change directory to file export directory
-    os.chdir(dump_directory)
-
-    # File extension for import
-    extension = '_msd.txt'
-
-    step = []
-    msd = []
-    with open(name+extension) as inputfile:
-        iterlines = iter(inputfile)
-        next(iterlines)
-        for line in iterlines:
-            value = line.strip().split(' ')
-            step.append(value[0])
-            msd.append(value[1])
-
-    print(msd)
-
-    # Change back to the first directory
-    os.chdir(first_directory)
-
