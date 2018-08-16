@@ -11,14 +11,8 @@ pl.switch_backend('agg')  # Added for plotting in cluster
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
 
-# Change to txt directory
-os.chdir(data_directory+'txt/')
-
 # Grab file names from the txt directory
-names = os.listdir()
-
-# Change back to original directory
-os.chdir(first_directory)
+names = os.listdir(data_directory+'txt/')
 
 # Grab the run names
 count = 0

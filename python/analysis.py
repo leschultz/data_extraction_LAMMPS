@@ -20,17 +20,15 @@ class analize(object):
         self.run = name  # The name of the run
         self.frq = frequency  # The rate of data acquisition
 
-
         # A slice to ignore bizzare data outside the interval
         if interval is None:
             self.interval = (start, stop)
         else:
-            self.interval = interval 
+            self.interval = interval
 
         # Define the plotting truncation for RDF and system information
         self.initial = int(self.interval[0]/self.frq)
         self.final = int(self.interval[1]/self.frq)
-
 
         print('Crunching data for ' + self.run)
 
@@ -44,7 +42,6 @@ class analize(object):
         # Inclusive start and stop conditions
         self.start = start  # Start Step
         self.stop = stop  # Stop step
-
 
     def msd(self):
         '''
@@ -117,7 +114,7 @@ class analize(object):
         # Define the plotting truncation
         initial = int(self.interval[0]/self.frq)
         final = int(self.interval[1]/self.frq)
-        
+
         # Plot the data for each bin throughout time
         for i in list(range(1, self.bins+1)):
             index = self.rdfdata.index[self.rdfdata.bins == i].tolist()

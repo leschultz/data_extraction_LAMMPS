@@ -19,10 +19,10 @@ def modify(frame, input, output):
     data pipeline:
     '''
 
-    displacement_magnitudes = input.particle_properties.displacement_magnitude.array
+    dispmag = input.particle_properties.displacement_magnitude.array
 
     # Compute MSD:
-    msd = numpy.sum(displacement_magnitudes ** 2) / len(displacement_magnitudes)
+    msd = numpy.sum(dispmag ** 2) / len(dispmag)
 
     # Output MSD value as a global attribute:
     output.attributes["MSD"] = msd
@@ -43,11 +43,11 @@ def loadtrj(name, start):
     # Load input data and create an ObjectNode with a data pipeline.
     node = import_file(name+extension, multiple_frames=True)
 
-    # Calculate per-particle displacements with respect to initial simulation frame
+    # Calculate per-particle displacements with respect to a start
     dmod = CalculateDisplacementsModifier()
     dmod.assume_unwrapped_coordinates = True
     dmod.reference.load(name+extension)
-    dmod.reference_frame = start 
+    dmod.reference_frame = start
     node.modifiers.append(dmod)
 
     # Change back to original directory
