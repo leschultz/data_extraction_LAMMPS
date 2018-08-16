@@ -14,12 +14,23 @@ data_directory = first_directory + '/../data/analysis'
 class analize(object):
     '''Computation functions are defined here'''
 
-    def __init__(self, name, start, stop, frequency, step=None, skip=0):
+    def __init__(self, name, start, stop, frequency, step=None, interval=None):
         '''Load data'''
 
         self.run = name  # The name of the run
         self.frq = frequency  # The rate of data acquisition
-        self.skip = skip  # A skip to ignore bizzare innitial data
+
+
+        # A slice to ignore bizzare data outside the interval
+        if interval is None:
+            self.interval = (start, stop)
+        else:
+            self.interval = interval 
+
+        # Define the plotting truncation for RDF and system information
+        self.initial = int(self.interval[0]/self.frq)
+        self.final = int(self.interval[1]/self.frq)
+
 
         print('Crunching data for ' + self.run)
 
@@ -104,13 +115,17 @@ class analize(object):
         bincenters = list(set(self.rdfdata.center.values.tolist()))
         bincenters = sorted(bincenters, key=float)
 
+        # Define the plotting truncation
+        initial = int(self.interval[0]/self.frq)
+        final = int(self.interval[1]/self.frq)
+        
         # Plot the data for each bin throughout time
         for i in list(range(1, self.bins+1)):
             index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
             binsdata = self.rdfdata.rdf[index].values.tolist()
             pl.plot(
-                    allsteps[int(self.skip/self.frq):],
-                    binsdata[int(self.skip/self.frq):],
+                    allsteps[self.initial:self.final],
+                    binsdata[self.initial:self.final],
                     label="Center [A] %1.2f" % (bincenters[i-1],))
 
         pl.xlabel('Step [-]')
@@ -146,7 +161,10 @@ class analize(object):
 
         # Plot recorded data versus step
         for item in self.resout.columns.values:
-            pl.plot(self.resout['Step [-]'], self.resout[item])
+            pl.plot(
+                    self.resout['Step [-]'],
+                    self.resout[item]
+                    )
             pl.xlabel('Step [-]')
             pl.ylabel(item)
             pl.legend([self.run])

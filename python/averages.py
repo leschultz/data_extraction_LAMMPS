@@ -24,7 +24,7 @@ for item in names:
     count += 1
 
 
-def avg(series, start, stop, frequency, step=None, skip=0):
+def avg(series, start, stop, frequency, step=None, interval=None):
     '''
     Do analysis for every run.
     '''
@@ -40,7 +40,7 @@ def avg(series, start, stop, frequency, step=None, skip=0):
     # Gather plots, vibration, and MSD data for each run
     msd = []
     for name in newnames:
-        run = an(name, start, stop, frequency, step, skip)
+        run = an(name, start, stop, frequency, step, interval)
         run.response()
         value_msd = run.msd()
         msd.append(value_msd[1])
@@ -71,7 +71,7 @@ def avg(series, start, stop, frequency, step=None, skip=0):
     pl.legend([series])
     pl.grid(True)
     pl.tight_layout()
-    pl.savefig('../images/motion/'+series+'[K]_avgMSD')
+    pl.savefig('../images/motion/'+series+'_avgMSD')
     pl.clf()
 
     # Return the steps with their corresponding msd mean
