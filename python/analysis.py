@@ -14,18 +14,19 @@ data_directory = first_directory + '/../data/analysis'
 class analize(object):
     '''Computation functions are defined here'''
 
-    def __init__(self, name, start, stop, frequency, step=None):
+    def __init__(self, name, start, stop, frequency, step=None, skip=0):
         '''Load data'''
 
         self.run = name  # The name of the run
         self.frq = frequency  # The rate of data acquisition
+        self.skip = skip  # A skip to ignore bizzare innitial data
 
         print('Crunching data for ' + self.run)
 
         self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
         self.bins = self.rdfout[0]  # The number of bins
         self.rdfdata = self.rdfout[1]  # Data for RDF
-        self.rdfstep = step
+        self.rdfstep = step  # The step to plot RDF
 
         self.resout = da.response(self.run+'.txt')  # Load system data
 
@@ -108,8 +109,8 @@ class analize(object):
             index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
             binsdata = self.rdfdata.rdf[index].values.tolist()
             pl.plot(
-                    allsteps,
-                    binsdata,
+                    allsteps[int(self.skip/self.frq):],
+                    binsdata[int(self.skip/self.frq):],
                     label="Center [A] %1.2f" % (bincenters[i-1],))
 
         pl.xlabel('Step [-]')
@@ -123,18 +124,20 @@ class analize(object):
         # Plot the RDF for a specific timestep
         if self.rdfstep is not None:
 
-            index = self.rdfdata.index[self.rdfdata.step == step].tolist()
-            pl.plot(
-                    self.rdfdata.center[index],
-                    self.rdfdata.rdf[index],
-                    )
-            pl.legend([self.run+'_step_'+str(step)])
-            pl.xlabel('Step [-]')
-            pl.ylabel('g(r)')
-            pl.grid(True)
-            pl.tight_layout()
-            pl.savefig('../images/rdf/'+self.run+'_'+str(step)+'_rdf')
-            pl.clf()
+            # Plot for every step in user input list
+            for item in step:
+                index = self.rdfdata.index[self.rdfdata.step == item].tolist()
+                pl.plot(
+                        self.rdfdata.center[index],
+                        self.rdfdata.rdf[index],
+                        )
+                pl.legend([self.run+'_step_'+str(item)])
+                pl.xlabel('Step [-]')
+                pl.ylabel('g(r)')
+                pl.grid(True)
+                pl.tight_layout()
+                pl.savefig('../images/rdf/'+self.run+'_'+str(item)+'_rdf')
+                pl.clf()
 
     def response(self):
         '''
