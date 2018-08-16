@@ -73,8 +73,6 @@ def avg(series, start, stop, frequency, step=None, interval=None):
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend([series])
     pl.grid(b=True, which='both')
-    pl.xscale("log", nonposx='clip')
-    pl.yscale("log", nonposy='clip')
     pl.tight_layout()
     pl.savefig('../images/motion/'+series+'_avgMSD')
     pl.clf()

@@ -94,8 +94,6 @@ class analize(object):
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.legend([self.run])
         pl.grid(b=True, which='both')
-        pl.xscale("log", nonposx='clip')
-        pl.yscale("log", nonposy='clip')
         pl.tight_layout()
         pl.savefig('../images/motion/'+self.run+'_MSD')
         pl.clf()
