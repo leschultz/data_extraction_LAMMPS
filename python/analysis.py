@@ -62,7 +62,6 @@ class analize(object):
                    ")'"
                    )
 
-
         os.system(command)
 
         # Change directory to file export directory

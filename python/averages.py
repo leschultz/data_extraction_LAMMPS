@@ -17,6 +17,9 @@ os.chdir(data_directory+'txt/')
 # Grab file names from the txt directory
 names = os.listdir()
 
+# Change back to original directory
+os.chdir(first_directory)
+
 # Grab the run names
 count = 0
 for item in names:
@@ -34,7 +37,7 @@ def avg(series, start, stop, frequency, step=None, interval=None):
     # Grab names that match the series input
     newnames = []
     for item in names:
-        if series in item:
+        if series in item and series[0] == item[0]:
             newnames.append(item)
 
     # Gather plots, vibration, and MSD data for each run
