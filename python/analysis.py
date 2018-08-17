@@ -1,7 +1,10 @@
 from matplotlib import pyplot as pl
 
+import subprocess as sub
+import tempfile as temp
 import dataparse as da
 import numpy as np
+import shlex
 import os
 
 pl.switch_backend('agg')  # Added for plotting in cluster
@@ -48,18 +51,28 @@ class analize(object):
         Calcualte the means squared displacement.
         '''
 
-        # Compute the MSD with ovito
-        command = (
-                   "python3 -c 'import ovito_msd as ov; ov.msdcalc(" +
-                   '"' +
-                   self.run +
-                   '"' +
-                   ', ' +
-                   str(int(self.start/self.frq)) +
-                   ")'"
-                   )
+        ovitostring = (
+                       "'import ovito_msd as ov; ov.msdcalc(" +
+                       '"' +
+                       self.run +
+                       '"' +
+                       ', ' +
+                       str(int(self.start/self.frq)) +
+                       ")'"
+                       )
 
-        os.system(command)
+        ovitostring = shlex.split(ovitostring)
+
+        # Compute the MSD with ovito
+        cmd = ['python3', '-c']
+        cmd.insert(2, ovitostring[0])
+
+        with temp.TemporaryFile() as tempf:
+            proc = sub.Popen(cmd , stdout=tempf)
+            proc.wait()
+            tempf.seek(0)
+
+            print(tempf.read())
 
         # Change directory to file export directory
         os.chdir(data_directory)
