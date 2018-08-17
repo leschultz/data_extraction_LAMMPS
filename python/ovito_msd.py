@@ -1,8 +1,8 @@
 from ovito.modifiers import CalculateDisplacementsModifier
 from ovito.modifiers import PythonScriptModifier
-from ovito.io import import_file, export_file
+from ovito.io import import_file
 
-import numpy
+import numpy as np
 import os
 
 # List the directories used
@@ -22,16 +22,16 @@ def modify(frame, input, output):
     dispmag = input.particle_properties.displacement_magnitude.array
 
     # Compute MSD:
-    msd = numpy.sum(dispmag ** 2) / len(dispmag)
+    msd = np.sum(dispmag ** 2) / len(dispmag)
 
     # Output MSD value as a global attribute:
     output.attributes["MSD"] = msd
 
 
 # Load the data for trajectories
-def loadtrj(name, start):
+def msdcalc(name, start):
     '''
-    Load the lammps trajectories.
+    Load the lammps trajectories and calculate MSD.
     '''
 
     # Change to data directory
@@ -44,33 +44,24 @@ def loadtrj(name, start):
     node = import_file(name+extension, multiple_frames=True)
 
     # Calculate per-particle displacements with respect to a start
-    dmod = CalculateDisplacementsModifier()
-    dmod.assume_unwrapped_coordinates = True
-    dmod.reference.load(name+extension)
-    dmod.reference_frame = start
-    node.modifiers.append(dmod)
+    modifier = CalculateDisplacementsModifier()
+    modifier.assume_unwrapped_coordinates = True
+    modifier.reference.load(name+extension)
+    modifier.reference_frame = start
+    node.modifiers.append(modifier)
 
     # Change back to original directory
     os.chdir(first_directory)
 
-    return node
-
-
-def msdcalc(name, start):
-    '''
-    Calculate the MSD for the loaded file
-    '''
-
-    node = loadtrj(name, start)
-
     # Insert custom modifier into the data pipeline.
     node.modifiers.append(PythonScriptModifier(function=modify))
 
-    # Export calculated MSD value to txt:
-    export_file(
-                node,
-                '../data/analysis/'+name+'_msd.txt',
-                format='txt',
-                columns=['Timestep', 'MSD'],
-                multiple_frames=True
-                )
+    # Compute the msd for each frame of interest
+    msd = []
+    step = []
+    for frame in range(start, node.source.num_frames):
+        out = node.compute(frame)
+        msd.append(out.attributes['MSD'])
+        step.append(out.attributes['Timestep'])
+
+    return step, msd
