@@ -15,7 +15,6 @@ dat = data_directory+'dat/'
 lammpstrj = data_directory+'lammpstrj/'
 rest = data_directory+'rest/'
 txt = data_directory+'txt/'
-rdf = data_directory+'rdf/'
 
 # The directories were images will be saved
 motion = image_directory+'motion/'
@@ -30,7 +29,6 @@ directories = [
                lammpstrj,
                rest,
                txt,
-               rdf,
                motion,
                system,
                rdf_plots
