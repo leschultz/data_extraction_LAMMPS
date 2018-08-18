@@ -1,15 +1,18 @@
-#A general input file that could be used for different scenarios
+# A general input file that could be used for different scenarios
 # Written by Lane Enrique Schultz
 
 ###############################################################################
 
 # Starting parameters
 units                                       metal
-atom_style                                  atomic
-dimension                                   3
+atom_style                              atomic
+dimension                                       3
 boundary                                    p p p
 
 ###############################################################################
+
+# Atoms
+variable                                    number_of_atoms           equal  replace_atom_number
 
 # Temperature variables
 variable                                    temp_melt                 equal  replace_melt_temperature
@@ -25,7 +28,7 @@ variable                                    seed                      equal  rep
 
 # Data output
 variable                                    data_file_characteristics string ../data/txt/replace_final_temperatureK_replace_run.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run.lammpstrj
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_replace_run_rate.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_final_temperatureK_replace_run.dat
 variable                                    data_restart              string ../data/rest/replace_final_temperatureK_replace_run.rest
 variable                                    data_rdf                  string ../data/rdf/replace_final_temperatureK_replace_run.rdf
@@ -48,7 +51,7 @@ pair_coeff                                  * * ../potentials/Al_Sm.eam.fs Al Sm
 ################################################################################
 
 # Computed values by LAMMPS
-compute                                     myrdf       all   rdf 10
+compute                                     myrdf       all   rdf 100
 compute                                     mytemp      all   temp
 compute                                     mypress     all   pressure thermo_temp
 compute                                     PE          all   pe
@@ -79,17 +82,17 @@ fix                                         rdf_saving all ave/time 1 1 100 c_my
 velocity                                    all create ${temp_melt} ${seed} rot yes dist gaussian
 
 # Hold as melt
-fix                                         run all nvt temp ${temp_melt} ${temp_melt} 0.1
+fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
 run                                         ${hold_1}
 unfix                                       run
 
 # Quench
-fix                                         run all nvt temp ${temp_melt} ${temp_final} 0.1
+fix                                         run all npt temp ${temp_melt} ${temp_final} 0.1 iso 0 0 1
 run                                         ${hold_2}
 unfix                                       run
 
 # Hold at final temperature
-fix                                         run all nvt temp ${temp_final} ${temp_final} 0.1
+fix                                         run all npt temp ${temp_final} ${temp_final} 0.1 iso 0 0 1
 run                                         ${hold_3}
 unfix                                       run
 
