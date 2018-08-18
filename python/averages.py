@@ -21,7 +21,16 @@ for item in names:
     count += 1
 
 
-def avg(series, start, stop, frequency, step=None, cut=None, bins=100):
+def avg(
+        series,
+        start,
+        stop,
+        frequency,
+        stepsize,
+        step=None,
+        cut=None,
+        bins=100
+        ):
     '''
     Do analysis for every run.
     '''
@@ -37,14 +46,14 @@ def avg(series, start, stop, frequency, step=None, cut=None, bins=100):
     # Gather plots, vibration, and MSD data for each run
     msd = []
     for name in newnames:
-        run = an(name, start, stop, frequency, step, cut, bins)
+        run = an(name, start, stop, frequency, stepsize, step, cut, bins)
         run.response()
         run.rdf()
         value_msd = run.msd()
         msd.append(value_msd[1])
 
     # Step data from last iteration on previous loop
-    step = value_msd[0]
+    time = value_msd[0]
 
     print('Taking the mean data for ' + series)
 
@@ -53,8 +62,8 @@ def avg(series, start, stop, frequency, step=None, cut=None, bins=100):
     mean_msd = np.mean(msd, axis=0)
 
     # Plot the mean MSD
-    pl.plot(step, mean_msd)
-    pl.xlabel('Step [-]')
+    pl.plot(time, mean_msd)
+    pl.xlabel('Time [ps]')
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend([series])
     pl.grid(b=True, which='both')

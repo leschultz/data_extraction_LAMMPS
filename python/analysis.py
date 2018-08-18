@@ -25,6 +25,7 @@ class analize(object):
                  start,
                  stop,
                  frequency,
+                 stepsize,
                  step=None,
                  cut=None,
                  bins=100
@@ -34,6 +35,7 @@ class analize(object):
 
         self.run = name  # The name of the run
         self.frq = frequency  # The rate of data acquisition
+        self.stepsize = stepsize  # The step size used in LAMMPS
 
         print('Crunching data for ' + self.run)
 
@@ -77,20 +79,23 @@ class analize(object):
         extension = '_msd.txt'
 
         msd = []
-        step = []
+        time = []
 
         # Import the data from txt
         with open(self.run+extension) as inputfile:
             for line in inputfile:
                 value = line.strip().split(' ')
-                step.append(float(value[0]))
+                time.append(float(value[0])*self.stepsize)
                 msd.append(float(value[1]))
+
+        # Normalize the time
+        time = [i-time[0] for i in time]
 
         # Change back to the first directory
         os.chdir(first_directory)
 
-        pl.plot(step, msd)
-        pl.xlabel('Step [-]')
+        pl.plot(time, msd)
+        pl.xlabel('Time [ps]')
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.legend([self.run])
         pl.grid(b=True, which='both')
@@ -98,8 +103,8 @@ class analize(object):
         pl.savefig('../images/motion/'+self.run+'_MSD')
         pl.clf()
 
-        # Return the steps and the msd
-        return step, msd
+        # Return the time in pico seconds and the msd
+        return time, msd
 
     def rdf(self):
         '''
@@ -186,13 +191,12 @@ class analize(object):
         # Return to the first directory
         os.chdir(first_directory)
 
+        time = [i for i in data['Step [-]']*self.stepsize]
+
         # Plot recorded data versus step
         for item in mycolumns:
-            pl.plot(
-                    data['Step [-]'],
-                    data[item]
-                    )
-            pl.xlabel('Step [-]')
+            pl.plot(time, data[item])
+            pl.xlabel('Time [ps]')
             pl.ylabel(item)
             pl.legend([self.run])
             pl.grid(b=True, which='both')
