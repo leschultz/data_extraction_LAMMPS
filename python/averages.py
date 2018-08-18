@@ -3,6 +3,7 @@ from analysis import analize as an
 
 import pandas as pd
 import numpy as np
+import setup
 import os
 
 pl.switch_backend('agg')  # Added for plotting in cluster
