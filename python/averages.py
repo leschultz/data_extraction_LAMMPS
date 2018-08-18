@@ -57,12 +57,8 @@ def avg(series, start, stop, frequency, step=None, interval=None):
     msd = np.array(msd)
     mean_msd = np.mean(msd, axis=0)
 
-    # Truncate the axis by inputs
-    i = int(start/frequency)
-    f = int(stop/frequency)
-
     # Plot the mean MSD
-    pl.plot(step[i:f+1], mean_msd[i:f+1])
+    pl.plot(step, mean_msd)
     pl.xlabel('Step [-]')
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend([series])

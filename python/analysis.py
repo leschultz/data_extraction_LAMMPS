@@ -70,9 +70,6 @@ class analize(object):
         with temp.TemporaryFile() as tempf:
             proc = sub.Popen(cmd , stdout=tempf)
             proc.wait()
-            tempf.seek(0)
-
-            print(tempf.read())
 
         # Change directory to file export directory
         os.chdir(data_directory)
@@ -85,9 +82,7 @@ class analize(object):
 
         # Import the data from txt
         with open(self.run+extension) as inputfile:
-            iterlines = iter(inputfile)
-            next(iterlines)
-            for line in iterlines:
+            for line in inputfile:
                 value = line.strip().split(' ')
                 step.append(float(value[0]))
                 msd.append(float(value[1]))
@@ -95,11 +90,7 @@ class analize(object):
         # Change back to the first directory
         os.chdir(first_directory)
 
-        # Truncate the axis by inputs
-        i = int(self.start/self.frq)
-        f = int(self.stop/self.frq)
-
-        pl.plot(step[i:f+1], msd[i:f+1])
+        pl.plot(step, msd)
         pl.xlabel('Step [-]')
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.legend([self.run])
