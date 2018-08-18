@@ -2,7 +2,7 @@ from matplotlib import pyplot as pl
 
 import subprocess as sub
 import tempfile as temp
-import dataparse as da
+import pandas as pd
 import numpy as np
 import shlex
 import os
@@ -11,36 +11,35 @@ pl.switch_backend('agg')  # Added for plotting in cluster
 
 # Get relevant directories
 first_directory = os.getcwd()
-data_directory = first_directory + '/../data/analysis'
+data_directory = first_directory + '/../data/analysis/'
+msd_directory = data_directory + 'msd'
+rdf_directory = data_directory + 'rdf/'
 
 
 class analize(object):
     '''Computation functions are defined here'''
 
-    def __init__(self, name, start, stop, frequency, step=None, interval=None):
+    def __init__(
+                 self,
+                 name,
+                 start,
+                 stop,
+                 frequency,
+                 step=None,
+                 cut=None,
+                 bins=100
+                 ):
+
         '''Load data'''
 
         self.run = name  # The name of the run
         self.frq = frequency  # The rate of data acquisition
 
-        # A slice to ignore bizzare data outside the interval
-        if interval is None:
-            self.interval = (start, stop)
-        else:
-            self.interval = interval
-
-        # Define the plotting truncation for RDF and system information
-        self.initial = int(self.interval[0]/self.frq)
-        self.final = int(self.interval[1]/self.frq)
-
         print('Crunching data for ' + self.run)
 
-        self.rdfout = da.rdf(self.run+'.rdf')  # Load RDF data
-        self.bins = self.rdfout[0]  # The number of bins
-        self.rdfdata = self.rdfout[1]  # Data for RDF
-        self.rdfstep = step  # The step to plot RDF
-
-        self.resout = da.response(self.run+'.txt')  # Load system data
+        self.bins = bins  # The number of bins
+        self.cut = cut  # Data for RDF
+        self.step = step  # The step to plot RDF
 
         # Inclusive start and stop conditions
         self.start = start  # Start Step
@@ -68,11 +67,11 @@ class analize(object):
         cmd.insert(2, ovitostring[0])
 
         with temp.TemporaryFile() as tempf:
-            proc = sub.Popen(cmd , stdout=tempf)
+            proc = sub.Popen(cmd, stdout=tempf)
             proc.wait()
 
         # Change directory to file export directory
-        os.chdir(data_directory)
+        os.chdir(msd_directory)
 
         # File extension for import
         extension = '_msd.txt'
@@ -102,50 +101,54 @@ class analize(object):
         # Return the steps and the msd
         return step, msd
 
-    def rdf(self, step=None):
+    def rdf(self):
         '''
         Plot the radial distribution at a point and throughout time.
         '''
 
-        # Gather all the steps where data was recorded
-        allsteps = list(set(self.rdfdata.step.values.tolist()))
-        allsteps = sorted(allsteps, key=int)
-
-        # The center of bins
-        bincenters = list(set(self.rdfdata.center.values.tolist()))
-        bincenters = sorted(bincenters, key=float)
-
-        # Define the plotting truncation
-        initial = int(self.interval[0]/self.frq)
-        final = int(self.interval[1]/self.frq)
-
-        # Plot the data for each bin throughout time
-        for i in list(range(1, self.bins+1)):
-            index = self.rdfdata.index[self.rdfdata.bins == i].tolist()
-            binsdata = self.rdfdata.rdf[index].values.tolist()
-            pl.plot(
-                    allsteps[self.initial:self.final],
-                    binsdata[self.initial:self.final],
-                    label="Center [A] %1.2f" % (bincenters[i-1],))
-
-        pl.xlabel('Step [-]')
-        pl.ylabel('g(r)')
-        pl.legend(bbox_to_anchor=(1.05, 1), borderaxespad=0)
-        pl.grid(b=True, which='both')
-        pl.tight_layout()
-        pl.savefig('../images/rdf/'+self.run+'_allrdf')
-        pl.clf()
-
         # Plot the RDF for a specific timestep
-        if self.rdfstep is not None:
+        if self.step is not None:
 
             # Plot for every step in user input list
-            for item in step:
-                index = self.rdfdata.index[self.rdfdata.step == item].tolist()
-                pl.plot(
-                        self.rdfdata.center[index],
-                        self.rdfdata.rdf[index],
-                        )
+            for item in self.step:
+                ovitostring = (
+                               "'import ovito_rdf as ov; ov.rdfcalc(" +
+                               '"' +
+                               self.run +
+                               '"' +
+                               ', ' +
+                               str(int(item/self.frq)) +
+                               ', ' +
+                               str(self.cut) +
+                               ', ' +
+                               str(self.bins) +
+                               ")'"
+                               )
+
+                ovitostring = shlex.split(ovitostring)
+
+                # Compute the MSD with ovito
+                cmd = ['python3', '-c']
+                cmd.insert(2, ovitostring[0])
+
+                with temp.TemporaryFile() as tempf:
+                    proc = sub.Popen(cmd, stdout=tempf)
+                    proc.wait()
+
+                # File extension for import
+                rdffile = rdf_directory+self.run+'_step'+str(item)+'_rdf.txt'
+
+                bins = []
+                rdf = []
+
+                # Import the data from txt
+                with open(rdffile) as inputfile:
+                    for line in inputfile:
+                        value = line.strip().split(' ')
+                        bins.append(float(value[0]))
+                        rdf.append(float(value[1]))
+
+                pl.plot(bins, rdf)
                 pl.legend([self.run+'_step_'+str(item)])
                 pl.xlabel('Step [-]')
                 pl.ylabel('g(r)')
@@ -156,14 +159,38 @@ class analize(object):
 
     def response(self):
         '''
-        Plots the response of the system throughout time.
+        Load the system properties throughout time.
         '''
 
+        # Change into data directory
+        os.chdir(data_directory+'../txt/')
+
+        # Load the data
+        mycolumns = [
+                     'Step [-]',
+                     'Temperature [K]',
+                     'Pressure [bar]',
+                     'Volumne [A^3]',
+                     'Potential Energy [eV]',
+                     'Kinetic Energy [eV]'
+                     ]
+
+        data = pd.read_csv(
+                           self.run+'.txt',
+                           names=mycolumns,
+                           sep=' ',
+                           comment='#',
+                           header=None
+                           )
+
+        # Return to the first directory
+        os.chdir(first_directory)
+
         # Plot recorded data versus step
-        for item in self.resout.columns.values:
+        for item in mycolumns:
             pl.plot(
-                    self.resout['Step [-]'],
-                    self.resout[item]
+                    data['Step [-]'],
+                    data[item]
                     )
             pl.xlabel('Step [-]')
             pl.ylabel(item)

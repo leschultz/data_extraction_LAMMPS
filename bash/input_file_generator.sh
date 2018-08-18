@@ -23,6 +23,6 @@ do
 	       	s/replace_hold_1/$hold_1/g;
 	       	s/replace_hold_2/$hold_2/g;
 	       	s/replace_hold_3/$hold_3/g
-		" > "$var"'K_'"$i.in")
+		" > "$var"'T_run'"$i.in")
 	done
 done

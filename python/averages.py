@@ -21,7 +21,7 @@ for item in names:
     count += 1
 
 
-def avg(series, start, stop, frequency, step=None, interval=None):
+def avg(series, start, stop, frequency, step=None, cut=None, bins=100):
     '''
     Do analysis for every run.
     '''
@@ -37,16 +37,11 @@ def avg(series, start, stop, frequency, step=None, interval=None):
     # Gather plots, vibration, and MSD data for each run
     msd = []
     for name in newnames:
-        run = an(name, start, stop, frequency, step, interval)
+        run = an(name, start, stop, frequency, step, cut, bins)
         run.response()
+        run.rdf()
         value_msd = run.msd()
         msd.append(value_msd[1])
-
-        # If the RDF at a specified step is wanted
-        if step is not None:
-            run.rdf(step)
-        else:
-            run.rdf()
 
     # Step data from last iteration on previous loop
     step = value_msd[0]

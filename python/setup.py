@@ -9,6 +9,8 @@ image_directory = first_directory+'/../images/'
 
 # The directories were data will be saved
 analysis = data_directory+'analysis/'
+datamsd = analysis+'msd/'
+datardf = analysis+'rdf/'
 dat = data_directory+'dat/'
 lammpstrj = data_directory+'lammpstrj/'
 rest = data_directory+'rest/'
@@ -22,6 +24,8 @@ rdf_plots = image_directory+'rdf/'
 
 directories = [
                analysis,
+               datamsd,
+               datardf,
                dat,
                lammpstrj,
                rest,

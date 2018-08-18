@@ -1,3 +1,7 @@
+'''
+Modified from https://ovito.org/manual/python/modules/ovito_modifiers.html
+'''
+
 from ovito.modifiers import CalculateDisplacementsModifier
 from ovito.modifiers import PythonScriptModifier
 from ovito.io import import_file
@@ -7,8 +11,8 @@ import os
 
 # List the directories used
 first_directory = os.getcwd()
-data_directory = first_directory + '/../data/lammpstrj'
-dump_directory = first_directory + '/../data/analysis'
+data_directory = first_directory + '/../data/lammpstrj/'
+dump_directory = first_directory + '/../data/analysis/msd/'
 
 
 # Define the custom modifier function:
@@ -50,9 +54,6 @@ def msdcalc(name, start):
     modifier.reference_frame = start
     node.modifiers.append(modifier)
 
-    # Change to analysis directory
-    os.chdir(dump_directory)
-
     # Insert custom modifier into the data pipeline.
     node.modifiers.append(PythonScriptModifier(function=modify))
 
@@ -64,9 +65,14 @@ def msdcalc(name, start):
         msd.append(out.attributes['MSD'])
         step.append(out.attributes['Timestep'])
 
-    np.savetxt(name+'_msd.txt', np.c_[step, msd])
+    # Change to analysis directory
+    os.chdir(dump_directory)
+
+    # The output directory with the run name
+    output = dump_directory+name+'_msd.txt'
+
+    # Save data with a step column and an MSD column
+    np.savetxt(output, np.c_[step, msd])
 
     # Change back to original directory
     os.chdir(first_directory)
-
-    return step, msd
