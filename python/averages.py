@@ -62,8 +62,24 @@ def avg(
     msd = np.array(msd)
     mean_msd = np.mean(msd, axis=0)
 
+    # Save the number of columns and rows
+    rows, columns = msd.shape
+
+    # Subtract each MSD at every time from the average and square it
+    out = []
+    for i in range(rows):
+        value = np.subtract(msd[i], mean_msd)
+        value **= 2
+        out.append(value)
+
+    # Get STD for each timepoint
+    std_msd = (np.sum(out, axis=0)/rows)**0.5
+
+    # Get error in the mean for each timepoint
+    eim_msd = std_msd/(rows**0.5)
+
     # Plot the mean MSD
-    pl.plot(time, mean_msd)
+    pl.errorbar(time, mean_msd, eim_msd, errorevery=50)
     pl.xlabel('Time [ps]')
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend([series])
@@ -73,4 +89,4 @@ def avg(
     pl.clf()
 
     # Return the steps with their corresponding msd mean
-    return step, mean_msd
+    return step, mean_msd, eim_msd
