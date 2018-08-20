@@ -59,6 +59,8 @@ class analize(object):
                        '"' +
                        ', ' +
                        str(int(self.start/self.frq)) +
+                       ', ' +
+                       str(int(self.stop/self.frq)) +
                        ")'"
                        )
 
@@ -78,15 +80,26 @@ class analize(object):
         # File extension for import
         extension = '_msd.txt'
 
-        msd = []
-        time = []
+        # Variables to hold data
+        data = {}
 
         # Import the data from txt
         with open(self.run+extension) as inputfile:
             for line in inputfile:
                 value = line.strip().split(' ')
-                time.append(float(value[0])*self.stepsize)
-                msd.append(float(value[1]))
+
+                # For each particle type
+                for i in range(len(value)):
+                    if data.get(i) is None:
+                        data[i] = []
+                    else:
+                        data[i].append(float(value[i]))
+
+        time = [i*self.stepsize for i in data[0]]  # Time from steps
+        msd = data[1]  # Total MSD
+
+        data.pop(0)  # Remove time from data
+        data.pop(1)  # Remove total MSD from data 
 
         # Normalize the time
         time = [i-time[0] for i in time]
@@ -94,17 +107,22 @@ class analize(object):
         # Change back to the first directory
         os.chdir(first_directory)
 
-        pl.plot(time, msd)
+        for key in data:
+            element = key-1
+            data[element] = data.pop(key)
+            pl.plot(time, data[element], label='Element Type: %i' % element)
+
+        pl.plot(time, msd, label='Total MSD')
         pl.xlabel('Time [ps]')
         pl.ylabel('Mean Squared Displacement [A^2]')
-        pl.legend([self.run])
         pl.grid(b=True, which='both')
         pl.tight_layout()
+        pl.legend()
         pl.savefig('../images/motion/'+self.run+'_MSD')
         pl.clf()
 
         # Return the time in pico seconds and the msd
-        return time, msd
+        return time, msd, data
 
     def rdf(self):
         '''
