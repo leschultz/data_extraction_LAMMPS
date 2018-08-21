@@ -173,7 +173,7 @@ class analize(object):
 
                 pl.plot(bins, rdf)
                 pl.legend([self.run+'_step_'+str(item)])
-                pl.xlabel('Step [-]')
+                pl.xlabel('Bin Center [A]')
                 pl.ylabel('g(r)')
                 pl.grid(b=True, which='both')
                 pl.tight_layout()
