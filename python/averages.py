@@ -45,19 +45,12 @@ def eim(msd, mean_msd):
     return eim_msd
 
 
-def avg(
-        series,
-        start,
-        stop,
-        frequency,
-        stepsize,
-        step=None,
-        cut=None,
-        bins=100
-        ):
+def avg(*args, **kwargs):
     '''
     Do analysis for every run.
     '''
+
+    series = args[0]
 
     print('Analyzing all '+series+' runs')
 
@@ -71,7 +64,7 @@ def avg(
     msd = []
     data = {}
     for name in newnames:
-        run = an(name, start, stop, frequency, stepsize, step, cut, bins)
+        run = an(name, *args[1:], **kwargs)
         run.response()
         run.rdf()
         value_msd = run.msd()

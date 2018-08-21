@@ -30,10 +30,10 @@ def diffusion(*args, **kwargs):
     for key in msd_type:
         order.append(key)
         slope = polyfit(time, msd_type[key], 1)[1]
- 
+
         if diff_types.get(key) is None:
             diff_types[key] = []
-    
+
         # einstein relationship for diffusion
         diff_types[key].append(slope/6)
 
