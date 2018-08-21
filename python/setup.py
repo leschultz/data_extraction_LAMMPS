@@ -12,6 +12,7 @@ analysis = data_directory+'analysis/'
 datamsd = analysis+'msd/'
 datardf = analysis+'rdf/'
 diffusion = analysis+'diffusion/'
+coordination = analysis+'coordination/'
 dat = data_directory+'dat/'
 lammpstrj = data_directory+'lammpstrj/'
 rest = data_directory+'rest/'
@@ -27,6 +28,7 @@ directories = [
                datamsd,
                datardf,
                diffusion,
+               coordination,
                dat,
                lammpstrj,
                rest,
