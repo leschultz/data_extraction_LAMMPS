@@ -99,7 +99,7 @@ class analize(object):
         msd = data[1]  # Total MSD
 
         data.pop(0)  # Remove time from data
-        data.pop(1)  # Remove total MSD from data 
+        data.pop(1)  # Remove total MSD from data
 
         # Normalize the time
         time = [i-time[0] for i in time]

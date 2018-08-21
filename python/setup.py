@@ -11,6 +11,7 @@ image_directory = first_directory+'/../images/'
 analysis = data_directory+'analysis/'
 datamsd = analysis+'msd/'
 datardf = analysis+'rdf/'
+diffusion = analysis+'diffusion/'
 dat = data_directory+'dat/'
 lammpstrj = data_directory+'lammpstrj/'
 rest = data_directory+'rest/'
@@ -25,6 +26,7 @@ directories = [
                analysis,
                datamsd,
                datardf,
+               diffusion,
                dat,
                lammpstrj,
                rest,

@@ -109,8 +109,7 @@ def avg(
                     errorevery=50,
                     label='Element Type: %i' % key
                     )
-        
-    
+
     # Plot the mean MSD
     pl.errorbar(time, mean_msd, eim_msd, errorevery=50, label='Total MSD')
     pl.xlabel('Time [ps]')
@@ -122,4 +121,4 @@ def avg(
     pl.clf()
 
     # Return the steps with their corresponding msd mean
-    return step, mean_msd, eim_msd, data_mean, eim_data
+    return time, mean_msd, eim_msd, data_mean, eim_data
