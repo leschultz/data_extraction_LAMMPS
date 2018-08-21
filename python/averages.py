@@ -73,8 +73,7 @@ def avg(*args, **kwargs):
         for key in value_msd[2]:
             if data.get(key) is None:
                 data[key] = []
-            else:
-                data[key].append(value_msd[2][key])
+            data[key].append(value_msd[2][key])
 
     # Step data from last iteration on previous loop
     time = value_msd[0]
@@ -91,6 +90,10 @@ def avg(*args, **kwargs):
     # Get the mean MSD for atom types and EIM
     data_mean = {}
     eim_data = {}
+
+    # Control the frequency of errorbars
+    errorfreq = len(time)//10
+
     for key in data:
         data[key] = np.array(data[key])
         data_mean[key] = np.mean(data[key], axis=0)
@@ -99,12 +102,19 @@ def avg(*args, **kwargs):
                     time,
                     data_mean[key],
                     eim_data[key],
-                    errorevery=50,
+                    errorevery=errorfreq,
                     label='Element Type: %i' % key
                     )
 
     # Plot the mean MSD
-    pl.errorbar(time, mean_msd, eim_msd, errorevery=50, label='Total MSD')
+    pl.errorbar(
+                time,
+                mean_msd,
+                eim_msd,
+                errorevery=errorfreq,
+                label='Total MSD'
+                )
+
     pl.xlabel('Time [ps]')
     pl.ylabel('MSD Averaged [A^2]')
     pl.legend()
