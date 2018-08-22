@@ -92,8 +92,7 @@ class analize(object):
                 for i in range(len(value)):
                     if data.get(i) is None:
                         data[i] = []
-                    else:
-                        data[i].append(float(value[i]))
+                    data[i].append(float(value[i]))
 
         time = [i*self.stepsize for i in data[0]]  # Time from steps
         msd = data[1]  # Total MSD

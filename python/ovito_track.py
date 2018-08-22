@@ -30,7 +30,7 @@ def coordinated_particles(frame, input, output):
     output.attributes['coord'] = list(coord_number)
 
 
-def rdfcalc(name, frame, cut, coordination):
+def rdfcalc(name, start, stop, cut):
     '''
     Use ovito to calculate RDF
     '''
@@ -52,24 +52,34 @@ def rdfcalc(name, frame, cut, coordination):
     modifier = PythonScriptModifier(function=coordinated_particles)
     node.modifiers.append(modifier)
 
-    # Compute RDF of the current frame
-    out = node.compute(frame)
-
-    # Turn the stupid string output into a list
-    atom = np.array(ast.literal_eval(out.attributes['id']))
+    # Grab the atom types
+    out = node.compute(start)
     atomtype = np.array(ast.literal_eval(out.attributes['type']))
-    atomcoord = np.array(ast.literal_eval(out.attributes['coord']))
+    atomtypes = list(set(atomtype))
 
-    # Return a list of atoms with a coordination number
-    atoms_filtered = list(atom[atomcoord == coordination])
+    steps = []
+    for frame in range(start, stop+1):
 
+        # Compute RDF of the current frame
+        out = node.compute(frame)
+
+        # Grab the frame number
+        steps.append(out.attributes['Timestep'])
+
+        # Turn the stupid string output into a list
+        atom = np.array(ast.literal_eval(out.attributes['id']))
+        atomtype = np.array(ast.literal_eval(out.attributes['type']))
+        atomcoord = np.array(ast.literal_eval(out.attributes['coord']))
+
+        for item in atomtypes:
+            index = atomtype == item
+
+            # Return a list of coordination number for element type
+            atoms_filtered = list(atomcoord[index])
+
+    print(atom)
+    print(atomcoord)
     print(atoms_filtered)
-
-    # Accumulate RDF histograms
-    step = out.attributes['Timestep']
-
-    # The ouput directory with the run name
-    output = dump_directory+name+'_step'+str(step)+'_coord.txt'
 
     # Go back to original directory
     os.chdir(first_directory)
