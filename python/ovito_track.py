@@ -57,14 +57,20 @@ def rdfcalc(name, start, stop, cut):
     atomtype = np.array(ast.literal_eval(out.attributes['type']))
     atomtypes = list(set(atomtype))
 
+    # Create variable to store coordination numbers
+    coord_numbers = {}
+    for item in atomtypes:
+        coord_numbers[item] = []
+
     steps = []
     for frame in range(start, stop+1):
 
         # Compute RDF of the current frame
         out = node.compute(frame)
 
-        # Grab the frame number
-        steps.append(out.attributes['Timestep'])
+        # Grab the time step
+        step = out.attributes['Timestep']
+        steps.append(step)
 
         # Turn the stupid string output into a list
         atom = np.array(ast.literal_eval(out.attributes['id']))
@@ -76,10 +82,9 @@ def rdfcalc(name, start, stop, cut):
 
             # Return a list of coordination number for element type
             atoms_filtered = list(atomcoord[index])
+            coord_numbers[item].append(atoms_filtered)
 
-    print(atom)
-    print(atomcoord)
-    print(atoms_filtered)
+    print(coord_numbers[1][0].count(6, 7))
 
     # Go back to original directory
     os.chdir(first_directory)
