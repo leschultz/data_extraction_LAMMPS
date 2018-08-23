@@ -7,12 +7,10 @@ import numpy as np
 import shlex
 import os
 
-pl.switch_backend('agg')  # Added for plotting in cluster
-
 # Get relevant directories
 first_directory = os.getcwd()
 data_directory = first_directory + '/../data/analysis/'
-msd_directory = data_directory + 'msd'
+msd_directory = data_directory + 'msd/'
 rdf_directory = data_directory + 'rdf/'
 
 
@@ -52,6 +50,7 @@ class analize(object):
         Calcualte the means squared displacement.
         '''
 
+        # Scripts with ovito have to be run separately
         ovitostring = (
                        "'import ovito_msd as ov; ov.msdcalc(" +
                        '"' +
@@ -74,9 +73,6 @@ class analize(object):
             proc = sub.Popen(cmd, stdout=tempf)
             proc.wait()
 
-        # Change directory to file export directory
-        os.chdir(msd_directory)
-
         # File extension for import
         extension = '_msd.txt'
 
@@ -84,7 +80,7 @@ class analize(object):
         data = {}
 
         # Import the data from txt
-        with open(self.run+extension) as inputfile:
+        with open(msd_directory+self.run+extension) as inputfile:
             for line in inputfile:
                 value = line.strip().split(' ')
 
@@ -102,9 +98,6 @@ class analize(object):
 
         # Normalize the time
         time = [i-time[0] for i in time]
-
-        # Change back to the first directory
-        os.chdir(first_directory)
 
         for key in data:
             element = key-1
@@ -133,6 +126,8 @@ class analize(object):
 
             # Plot for every step in user input list
             for item in self.step:
+
+                # Scripts with ovito have to be run separately
                 ovitostring = (
                                "'import ovito_rdf as ov; ov.rdfcalc(" +
                                '"' +
@@ -184,9 +179,6 @@ class analize(object):
         Load the system properties throughout time.
         '''
 
-        # Change into data directory
-        os.chdir(data_directory+'../txt/')
-
         # Load the data
         mycolumns = [
                      'Step [-]',
@@ -198,16 +190,14 @@ class analize(object):
                      ]
 
         data = pd.read_csv(
-                           self.run+'.txt',
+                           data_directory+'../txt/'+self.run+'.txt',
                            names=mycolumns,
                            sep=' ',
                            comment='#',
                            header=None
                            )
 
-        # Return to the first directory
-        os.chdir(first_directory)
-
+        # Define time based on input stepsize
         time = [i for i in data['Step [-]']*self.stepsize]
 
         # Plot recorded data versus step

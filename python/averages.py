@@ -63,7 +63,6 @@ def avg(*args, **kwargs):
     data = {}
     for name in newnames:
         run = an(name, *args[1:], **kwargs)
-        run.response()
         run.rdf()
         value_msd = run.msd()
         msd.append(value_msd[1])
@@ -72,6 +71,12 @@ def avg(*args, **kwargs):
             if data.get(key) is None:
                 data[key] = []
             data[key].append(value_msd[2][key])
+
+        # Try to generate graphs from txt file if available
+        try:
+            run.response()
+        except Exception:
+            pass
 
     # Step data from last iteration on previous loop
     time = value_msd[0]
