@@ -9,6 +9,7 @@ import os
 # Directories
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
+dump_directory = data_directory+'analysis/msd/'
 
 # Grab file names from the lammpstrj directory
 names = os.listdir(data_directory+'lammpstrj/')
@@ -125,6 +126,20 @@ def avg(*args, **kwargs):
     pl.tight_layout()
     pl.savefig('../images/motion/'+series+'_avgMSD')
     pl.clf()
+
+    msdcolumns = [time, mean_msd, eim_msd]
+
+    order = list(data_mean.keys())
+    order.sort()
+
+    # Grab data for MSD and EIM
+    for item in order:
+        msdcolumns.append(data_mean[item])
+        msdcolumns.append(eim_data[item])
+
+    # Save data in alternating oder of MSD and EIM (first is time)
+    output = dump_directory+series+'_msd_average.txt'
+    np.savetxt(output, np.transpose(msdcolumns))
 
     # Return the steps with their corresponding msd mean
     return time, mean_msd, eim_msd, data_mean, eim_data

@@ -1,58 +1,50 @@
 from numpy.polynomial.polynomial import polyfit
 
-import averages as av
 import numpy as np
 import os
 
 
-def diffusion(*args, **kwargs):
-    '''Gather the diffusion values for atoms'''
+def diffusion(series, start, stop):
+    '''
+    Gather the diffusion values for atoms. To run, an average MSD data file is
+    needed.
+    '''
 
-    # Pass all agruments into averages.py
-    value = av.avg(*args, **kwargs)
+    # Directory for MSD data
+    first_directory = os.getcwd()
+    data_directory = first_directory+'/../data/analysis/msd/'
 
-    # Grab the name of the temperature runs used
-    series = args[0]+'_diffusion.txt'
+    # Name of file to be imported with absolute path
+    name = data_directory+series+'_msd_average.txt'
 
-    # Gather all the outputs from averages.py
-    time = value[0]
-    msd_all = value[1]
-    msd_all_eim = value[2]
-    msd_type = value[3]
-    msd_type_eim = value[4]
+    data = {}
+    with open(name) as inputfile:
+        for line in inputfile:
+            value = line.strip().split(' ')
+            value = [float(i) for i in value]
 
-    # Find a line of best fit for all diffusion
-    m = polyfit(time, msd_all, 1)[1]
+            for item in list(range(len(value))):
+                if data.get(item) is None:
+                    data[item] = []
+                data[item].append(value[item])
 
-    # Find the line of best fit for diffusion for each element type
-    diff_types = {}
-    order = []
-    for key in msd_type:
-        order.append(key)
-        slope = polyfit(time, msd_type[key], 1)[1]
+    time = data[0]
 
-        if diff_types.get(key) is None:
-            diff_types[key] = []
+    # Find the line of best fit for diffusion
+    diffusion = []
+    for item in list(range(1, len(data)-1, 2)):
+        slope = polyfit(time, data[item], 1)[1]
 
         # einstein relationship for diffusion
-        diff_types[key].append(slope/6)
-
-    diff_all = m/6  # Diffusion for all atoms
+        diffusion.append(slope/6)
 
     # The output name and location
     output = (
               os.getcwd() +
               '/../data/analysis/diffusion/' +
-              series
+              series +
+              '_diffusion.txt'
               )
 
-    # Data to be exported
-    columns = [diff_all]
-
-    # Grab the diffusion values for each type in columns
-    order.sort()  # Gather dictionary types in order of element type
-    for item in order:
-        columns.append(diff_types[item][0])
-
     # Save the diffusion data in a txt
-    np.savetxt(output, columns)
+    np.savetxt(output, np.transpose(diffusion))
