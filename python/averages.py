@@ -6,19 +6,17 @@ import numpy as np
 import setup
 import os
 
-pl.switch_backend('agg')  # Added for plotting in cluster
-
 # Directories
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
 
-# Grab file names from the txt directory
-names = os.listdir(data_directory+'txt/')
+# Grab file names from the lammpstrj directory
+names = os.listdir(data_directory+'lammpstrj/')
 
 # Grab the run names
 count = 0
 for item in names:
-    names[count] = item.split('.')[0]
+    names[count] = item.split('.lammpstrj')[0]
     count += 1
 
 
