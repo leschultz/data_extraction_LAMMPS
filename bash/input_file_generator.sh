@@ -10,7 +10,9 @@ hold_1=$5
 hold_2=$6
 hold_3=$7
 
-shift 7 
+shift 7
+
+system_name=${template_file%_template.in}
 
 for ((i=1;i<=$number_runs;i++))
 do
@@ -24,7 +26,8 @@ do
 	       	s/replace_melt_temperature/$temperature_melt/g;
 	       	s/replace_hold_1/$hold_1/g;
 	       	s/replace_hold_2/$hold_2/g;
-	       	s/replace_hold_3/$hold_3/g
+	       	s/replace_hold_3/$hold_3/g;
+                s/replace_system/$system_name/g
 		" > "$var"'K_run'"$i.in")
 	done
 done

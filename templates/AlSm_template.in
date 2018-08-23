@@ -30,10 +30,10 @@ variable                                    hold_3                    equal  rep
 variable                                    seed                      equal  replace_seed
 
 # Data output
-variable                                    data_file_characteristics string ../data/txt/replace_final_temperatureK_runreplace_run.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_final_temperatureK_runreplace_run.lammpstrj
-variable                                    data_positions_final      string ../data/dat/replace_final_temperatureK_runreplace_run.dat
-variable                                    data_restart              string ../data/rest/replace_final_temperatureK_runreplace_run.rest
+variable                                    data_file_characteristics string ../data/txt/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.txt
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.lammpstrj
+variable                                    data_positions_final      string ../data/dat/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.dat
+variable                                    data_restart              string ../data/rest/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.rest
 
 ################################################################################
 

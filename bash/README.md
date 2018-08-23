@@ -2,5 +2,3 @@
    direcotry.
 
 2. Use lammps_looper.sh to iterate over all input files using LAMMPS.
-
-3. Use commands.sh to execute the written commands in order.
