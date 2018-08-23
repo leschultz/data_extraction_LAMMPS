@@ -19,14 +19,11 @@ def rdfcalc(name, frame, cut, bins=100):
     Use ovito to calculate RDF
     '''
 
-    # Change directory to data location
-    os.chdir(data_directory)
-
     # The file extension
     extension = '.lammpstrj'
 
     # Load a particle dataset
-    node = import_file(name+extension, multiple_frames=True)
+    node = import_file(data_directory+name+extension, multiple_frames=True)
 
     # Apply modifier
     modifier = CoordinationNumberModifier(cutoff=cut, number_of_bins=bins)
@@ -47,6 +44,3 @@ def rdfcalc(name, frame, cut, bins=100):
 
     # Export the computed RDF data to a text file.
     np.savetxt(output, rdf)
-
-    # Go back to original directory
-    os.chdir(first_directory)

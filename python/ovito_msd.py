@@ -51,19 +51,16 @@ def msdcalc(name, start, stop):
     Load the lammps trajectories and calculate MSD.
     '''
 
-    # Change to data directory
-    os.chdir(data_directory)
-
     # The file extension
     extension = '.lammpstrj'
 
     # Load input data and create an ObjectNode with a data pipeline.
-    node = import_file(name+extension, multiple_frames=True)
+    node = import_file(data_directory+name+extension, multiple_frames=True)
 
     # Calculate per-particle displacements with respect to a start
     modifier = CalculateDisplacementsModifier()
     modifier.assume_unwrapped_coordinates = True
-    modifier.reference.load(name+extension)
+    modifier.reference.load(data_directory+name+extension)
     modifier.reference_frame = start
     node.modifiers.append(modifier)
 
@@ -89,9 +86,6 @@ def msdcalc(name, start, stop):
             attr_name = 'MSD_type'+str(type.id)
             msd_types[type.id].append(out.attributes[attr_name])
 
-    # Change to analysis directory
-    os.chdir(dump_directory)
-
     # The output directory with the run name
     output = dump_directory+name+'_msd.txt'
 
@@ -105,6 +99,3 @@ def msdcalc(name, start, stop):
 
     # Save data with a step column and an MSD column
     np.savetxt(output, np.transpose(columns))
-
-    # Change back to original directory
-    os.chdir(first_directory)
