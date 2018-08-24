@@ -1,5 +1,6 @@
 from matplotlib import pyplot as pl
 
+import parameters as par
 import subprocess as sub
 import tempfile as temp
 import pandas as pd
@@ -19,10 +20,9 @@ class analize(object):
 
     def __init__(
                  self,
-                 name,
+                 run,
                  start,
                  stop,
-                 frequency,
                  stepsize,
                  step=None,
                  cut=None,
@@ -31,9 +31,10 @@ class analize(object):
 
         '''Load data'''
 
-        self.run = name  # The name of the run
-        self.frq = frequency  # The rate of data acquisition
+        self.run = run  # The name of the run
         self.stepsize = stepsize  # The step size used in LAMMPS
+
+        self.frq = par.gather(self.run)  # Rate of data acquisition
 
         print('Crunching data for ' + self.run)
 
