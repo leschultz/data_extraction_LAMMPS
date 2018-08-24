@@ -9,7 +9,7 @@ import os
 # Directories
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
-dump_directory = data_directory+'analysis/msd/'
+dump_directory = data_directory+'analysis/'
 
 # Grab file names from the lammpstrj directory
 names = os.listdir(data_directory+'lammpstrj/')
@@ -150,7 +150,7 @@ def avg(*args, **kwargs):
         msdcolumns.append(eim_data[item])
 
     # Save data in alternating oder of MSD and EIM (first is time)
-    output = dump_directory+series+'_msd_average.txt'
+    output = dump_directory+'msd/'+series+'_msd_average.txt'
     np.savetxt(output, np.transpose(msdcolumns))
 
     # Average the number of clusters accross runs
@@ -186,5 +186,9 @@ def avg(*args, **kwargs):
     pl.savefig('../images/neighbor/'+series+'_avgneighbor')
     pl.clf()
 
+    # Save the data for cluster in the neighbor folder
+    output = dump_directory+'neighbor/'+series+'_neighbor_average.txt'
+    np.savetxt(output, clusters)
+
     # Return the steps with their corresponding msd mean
-    return time, mean_msd, eim_msd, data_mean, eim_data
+    return time, mean_msd, eim_msd, data_mean, eim_data, clusters
