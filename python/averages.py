@@ -62,9 +62,21 @@ def avg(*args, **kwargs):
     # Gather plots, vibration, and MSD data for each run
     msd = []
     data = {}
+    fcc = []
+    hcp = []
+    bcc = []
+    ico = []
     for name in newnames:
         run = an(name, *args[1:], **kwargs)
         run.rdf()
+
+        clusters = run.neighbor()
+        fcc.append(clusters['FCC'])
+        hcp.append(clusters['HCP'])
+        bcc.append(clusters['BCC'])
+        ico.append(clusters['ICO'])
+
+
         value_msd = run.msd()
         msd.append(value_msd[1])
 
@@ -140,6 +152,39 @@ def avg(*args, **kwargs):
     # Save data in alternating oder of MSD and EIM (first is time)
     output = dump_directory+series+'_msd_average.txt'
     np.savetxt(output, np.transpose(msdcolumns))
+
+    # Average the number of clusters accross runs
+    fccavg = np.mean(fcc)
+    hcpavg = np.mean(hcp)
+    bccavg = np.mean(bcc)
+    icoavg = np.mean(ico)
+
+    clusters = [fccavg, hcpavg, bccavg, icoavg]
+
+    # The labels for clusters in the xlabel
+    labels = ['FCC', 'HCP', 'BCC', 'ICO']
+    location = [1, 2, 3, 4]
+
+    count = 0
+    for v, i in enumerate(clusters):
+        pl.text(
+                v+1, i,
+                ' '+str(clusters[count]),
+                color='red',
+                ha='center',
+                fontweight='bold'
+                )
+
+        count += 1
+
+    pl.bar(location, clusters,  align='center')
+    pl.xticks(location, labels)
+    pl.xlabel('Cluster [-]')
+    pl.ylabel('[count/ps]')
+    pl.grid(b=True, which='both')
+    pl.tight_layout()
+    pl.savefig('../images/neighbor/'+series+'_avgneighbor')
+    pl.clf()
 
     # Return the steps with their corresponding msd mean
     return time, mean_msd, eim_msd, data_mean, eim_data

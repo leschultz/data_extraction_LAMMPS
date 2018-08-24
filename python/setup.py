@@ -12,7 +12,7 @@ analysis = data_directory+'analysis/'
 datamsd = analysis+'msd/'
 datardf = analysis+'rdf/'
 diffusion = analysis+'diffusion/'
-coordination = analysis+'coordination/'
+neighbor = analysis+'neighbor/'
 dat = data_directory+'dat/'
 lammpstrj = data_directory+'lammpstrj/'
 rest = data_directory+'rest/'
@@ -22,20 +22,22 @@ txt = data_directory+'txt/'
 motion = image_directory+'motion/'
 system = image_directory+'system/'
 rdf_plots = image_directory+'rdf/'
+neighbor_plots = image_directory+'neighbor/'
 
 directories = [
                analysis,
                datamsd,
                datardf,
                diffusion,
-               coordination,
+               neighbor,
                dat,
                lammpstrj,
                rest,
                txt,
                motion,
                system,
-               rdf_plots
+               rdf_plots,
+               neighbor_plots
                ]
 
 

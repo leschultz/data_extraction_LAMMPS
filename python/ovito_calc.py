@@ -3,6 +3,7 @@ Modified from https://ovito.org/manual/python/modules/ovito_modifiers.html
 '''
 
 from ovito.modifiers import CalculateDisplacementsModifier
+from ovito.modifiers import CommonNeighborAnalysisModifier
 from ovito.modifiers import PythonScriptModifier
 from ovito.io import import_file
 
@@ -12,11 +13,11 @@ import os
 # List the directories used
 first_directory = os.getcwd()
 data_directory = first_directory + '/../data/lammpstrj/'
-dump_directory = first_directory + '/../data/analysis/msd/'
+dump_directory = first_directory + '/../data/analysis/'
 
 
 # Define the custom modifier function:
-def modify(frame, input, output):
+def msdmodify(frame, input, output):
     '''
     Access the per-particle displacement magnitudes computed by an existing
     Displacement Vectors modifier that precedes this custom modifier in the
@@ -46,7 +47,7 @@ def modify(frame, input, output):
 
 
 # Load the data for trajectories
-def msdcalc(name, start, stop):
+def calc(name, start, stop):
     '''
     Load the lammps trajectories and calculate MSD.
     '''
@@ -65,7 +66,11 @@ def msdcalc(name, start, stop):
     node.modifiers.append(modifier)
 
     # Insert custom modifier into the data pipeline.
-    node.modifiers.append(PythonScriptModifier(function=modify))
+    node.modifiers.append(PythonScriptModifier(function=msdmodify))
+
+    # Apply the common neighbor modifier
+    modifier = CommonNeighborAnalysisModifier()
+    node.modifiers.append(modifier)
 
     # The variables where data will be held
     msd = []
@@ -76,6 +81,10 @@ def msdcalc(name, start, stop):
         msd_types[type.id] = []
         order.append(type.id)
 
+    fcc = []
+    hcp = []
+    bcc = []
+    ico = []
     # Compute the MSD for each frame of interest
     for frame in range(start, stop+1):
         out = node.compute(frame)
@@ -86,16 +95,24 @@ def msdcalc(name, start, stop):
             attr_name = 'MSD_type'+str(type.id)
             msd_types[type.id].append(out.attributes[attr_name])
 
+        fcc.append(out.attributes['CommonNeighborAnalysis.counts.FCC'])
+        hcp.append(out.attributes['CommonNeighborAnalysis.counts.HCP'])
+        bcc.append(out.attributes['CommonNeighborAnalysis.counts.BCC'])
+        ico.append(out.attributes['CommonNeighborAnalysis.counts.ICO'])
+
     # The output directory with the run name
-    output = dump_directory+name+'_msd.txt'
+    msdoutput = dump_directory+'msd/'+name+'_msd.txt'
+    neighboroutput = dump_directory+'neighbor/'+name+'_neighbor.txt'
 
     # Columns of data
-    columns = [step, msd]
+    msdcolumns = [step, msd]
+    neighborcolumns = [step, fcc, hcp, bcc, ico]
 
     # Create columns for each particle type and ensure type order
     order.sort()
     for item in order:
-        columns.append(msd_types[item])
+        msdcolumns.append(msd_types[item])
 
     # Save data with a step column and an MSD column
-    np.savetxt(output, np.transpose(columns))
+    np.savetxt(msdoutput, np.transpose(msdcolumns))
+    np.savetxt(neighboroutput, np.transpose(neighborcolumns), fmt='%i')

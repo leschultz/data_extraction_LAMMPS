@@ -13,6 +13,7 @@ first_directory = os.getcwd()
 data_directory = first_directory + '/../data/analysis/'
 msd_directory = data_directory + 'msd/'
 rdf_directory = data_directory + 'rdf/'
+nei_directory = data_directory + 'neighbor/'
 
 
 class analize(object):
@@ -46,14 +47,9 @@ class analize(object):
         self.start = start  # Start Step
         self.stop = stop  # Stop step
 
-    def msd(self):
-        '''
-        Calcualte the means squared displacement.
-        '''
-
-        # Scripts with ovito have to be run separately
+        # MSD and common neighbor calculations
         ovitostring = (
-                       "'import ovito_msd as ov; ov.msdcalc(" +
+                       "'import ovito_calc as ov; ov.calc(" +
                        '"' +
                        self.run +
                        '"' +
@@ -73,6 +69,11 @@ class analize(object):
         with temp.TemporaryFile() as tempf:
             proc = sub.Popen(cmd, stdout=tempf)
             proc.wait()
+
+    def msd(self):
+        '''
+        Plot mean squared displacement.
+        '''
 
         # File extension for import
         extension = '_msd.txt'
@@ -116,6 +117,79 @@ class analize(object):
 
         # Return the time in pico seconds and the msd
         return time, msd, data
+
+    def neighbor(self):
+        '''
+        Plot the common neighbor analysis.
+        '''
+
+        extension = '_neighbor.txt'
+        neifile = nei_directory+self.run+extension
+
+        step = []
+        fcc = []
+        hcp = []
+        bcc = []
+        ico = []
+        with open(neifile) as inputfile:
+            for line in inputfile:
+                value = line.strip().split(' ')
+                step.append(int(value[0]))
+                fcc.append(int(value[1]))
+                hcp.append(int(value[2]))
+                bcc.append(int(value[3]))
+                ico.append(int(value[4]))
+
+        time = [i*self.stepsize for i in step]  # Time from steps
+        time = [i-time[0] for i in time]  # Normalize the time
+
+        time = np.array(time)
+        fcc = np.array(fcc)
+        hcp = np.array(hcp)
+        bcc = np.array(bcc)
+        ico = np.array(ico)
+
+        # Count the number of clusters per time
+        fccavg = np.sum(fcc)/time[-1]
+        hcpavg = np.sum(hcp)/time[-1]
+        bccavg = np.sum(bcc)/time[-1]
+        icoavg = np.sum(ico)/time[-1]
+
+        clusters = [fccavg, hcpavg, bccavg, icoavg]
+
+        # The labels for clusters in the xlabel
+        labels = ['FCC', 'HCP', 'BCC', 'ICO']
+        location = [1, 2, 3, 4]
+
+        count = 0
+        for v, i in enumerate(clusters):
+            pl.text(
+                    v+1, i,
+                    ' '+str(clusters[count]),
+                    color='red',
+                    ha='center',
+                    fontweight='bold'
+                    )
+
+            count += 1
+
+        pl.bar(location, clusters,  align='center')
+        pl.xticks(location, labels)
+        pl.xlabel('Cluster [-]')
+        pl.ylabel('[count/ps]')
+        pl.grid(b=True, which='both')
+        pl.tight_layout()
+        pl.savefig('../images/neighbor/'+self.run+'_neighbor')
+        pl.clf()
+
+        # Data export
+        data = {}
+        data['FCC'] = fccavg
+        data['HCP'] = hcpavg
+        data['BCC'] = bccavg
+        data['ICO'] = icoavg
+
+        return data
 
     def rdf(self):
         '''
