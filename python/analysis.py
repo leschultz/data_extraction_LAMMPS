@@ -1,4 +1,7 @@
+from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
+from ovito_rdf import rdfcalc
+from ovito_calc import calc
 
 import parameters as par
 import subprocess as sub
@@ -26,18 +29,23 @@ class analize(object):
                  stop,
                  stepsize,
                  step=None,
-                 cut=None,
-                 bins=100
+                 cut=10,
+                 bins=50
                  ):
 
         '''Load data'''
 
         self.run = run  # The name of the run
+
+        # Relevant files (trajectories and other LAMMPS outputs)
+        self.trjfile = '../data/lammpstrj/'+self.run+'.lammpstrj'
+        self.sysfile = '../data/txt/'+self.run+'.txt'
+
         self.stepsize = stepsize  # The step size used in LAMMPS
 
         self.frq = par.gather(self.run)  # Rate of data acquisition
 
-        print('Crunching data for ' + self.run)
+        print('Crunching data for '+self.run)
 
         self.bins = bins  # The number of bins
         self.cut = cut  # Data for RDF
@@ -47,115 +55,77 @@ class analize(object):
         self.start = start  # Start Step
         self.stop = stop  # Stop step
 
-        # MSD and common neighbor calculations
-        ovitostring = (
-                       "'import ovito_calc as ov; ov.calc(" +
-                       '"' +
-                       self.run +
-                       '"' +
-                       ', ' +
-                       str(int(self.start/self.frq)) +
-                       ', ' +
-                       str(int(self.stop/self.frq)) +
-                       ")'"
-                       )
+        # The start and stopping frames
+        self.startframe = int(self.start/self.frq)
+        self.stopframe = int(self.stop/self.frq)
 
-        ovitostring = shlex.split(ovitostring)
+    def calculate(self):
+        '''
+        Gather data for steps, MSD, RDF, and common neighborhood analysis.
+        '''
 
-        # Compute the MSD with ovito
-        cmd = ['python3', '-c']
-        cmd.insert(2, ovitostring[0])
+        # Gather the MSD and common neighbor values
+        self.steps, self.msd, self.nei = calc(
+                                              self.trjfile,
+                                              self.startframe,
+                                              self.stopframe
+                                              )
 
-        with temp.TemporaryFile() as tempf:
-            proc = sub.Popen(cmd, stdout=tempf)
-            proc.wait()
+        # Gather the RDF for steps defined
+        self.rdf = []
+        for item in self.step:
+            self.rdf.append(rdfcalc(
+                                    self.trjfile,
+                                    int(item/self.frq),
+                                    self.cut,
+                                    self.bins
+                                    ))
 
-    def msd(self):
+        time = [i*self.stepsize for i in self.steps]  # Time from steps
+        self.time = [i-time[0] for i in time]  # Normalize time
+
+        self.fccavg = np.sum(self.nei['fcc'])/self.time[-1]
+        self.hcpavg = np.sum(self.nei['hcp'])/self.time[-1]
+        self.bccavg = np.sum(self.nei['bcc'])/self.time[-1]
+        self.icoavg = np.sum(self.nei['ico'])/self.time[-1]
+
+        data = {}
+        data['time'] = self.time
+        data['msd'] = self.msd
+        data['rdf'] = self.rdf
+        data['fccavg'] = self.fccavg
+        data['hcpavg'] = self.hcpavg
+        data['bccavg'] = self.bccavg
+        data['icoavg'] = self.icoavg
+
+        return data
+
+    def plotmsd(self):
         '''
         Plot mean squared displacement.
         '''
 
-        # File extension for import
-        extension = '_msd.txt'
+        for key in self.msd:
+            pl.plot(
+                    self.time,
+                    self.msd[key],
+                    label='Element Type: %s' % key
+                    )
 
-        # Variables to hold data
-        data = {}
-
-        # Import the data from txt
-        with open(msd_directory+self.run+extension) as inputfile:
-            for line in inputfile:
-                value = line.strip().split(' ')
-
-                # For each particle type
-                for i in range(len(value)):
-                    if data.get(i) is None:
-                        data[i] = []
-                    data[i].append(float(value[i]))
-
-        time = [i*self.stepsize for i in data[0]]  # Time from steps
-        msd = data[1]  # Total MSD
-
-        data.pop(0)  # Remove time from data
-        data.pop(1)  # Remove total MSD from data
-
-        # Normalize the time
-        time = [i-time[0] for i in time]
-
-        for key in data:
-            element = key-1
-            data[element] = data.pop(key)
-            pl.plot(time, data[element], label='Element Type: %i' % element)
-
-        pl.plot(time, msd, label='Total MSD')
         pl.xlabel('Time [ps]')
         pl.ylabel('Mean Squared Displacement [A^2]')
         pl.grid(b=True, which='both')
         pl.tight_layout()
-        pl.legend()
+        pl.legend(loc='upper left')
         pl.savefig('../images/motion/'+self.run+'_MSD')
         pl.clf()
 
-        # Return the time in pico seconds and the msd
-        return time, msd, data
-
-    def neighbor(self):
+    def plotclusters(self):
         '''
         Plot the common neighbor analysis.
         '''
 
-        extension = '_neighbor.txt'
-        neifile = nei_directory+self.run+extension
-
-        step = []
-        fcc = []
-        hcp = []
-        bcc = []
-        ico = []
-        with open(neifile) as inputfile:
-            for line in inputfile:
-                value = line.strip().split(' ')
-                step.append(int(value[0]))
-                fcc.append(int(value[1]))
-                hcp.append(int(value[2]))
-                bcc.append(int(value[3]))
-                ico.append(int(value[4]))
-
-        time = [i*self.stepsize for i in step]  # Time from steps
-        time = [i-time[0] for i in time]  # Normalize the time
-
-        time = np.array(time)
-        fcc = np.array(fcc)
-        hcp = np.array(hcp)
-        bcc = np.array(bcc)
-        ico = np.array(ico)
-
-        # Count the number of clusters per time
-        fccavg = np.sum(fcc)/time[-1]
-        hcpavg = np.sum(hcp)/time[-1]
-        bccavg = np.sum(bcc)/time[-1]
-        icoavg = np.sum(ico)/time[-1]
-
-        clusters = [fccavg, hcpavg, bccavg, icoavg]
+        clusters = [self.fccavg, self.hcpavg, self.bccavg, self.icoavg]
 
         # The labels for clusters in the xlabel
         labels = ['FCC', 'HCP', 'BCC', 'ICO']
@@ -182,16 +152,7 @@ class analize(object):
         pl.savefig('../images/neighbor/'+self.run+'_neighbor')
         pl.clf()
 
-        # Data export
-        data = {}
-        data['FCC'] = fccavg
-        data['HCP'] = hcpavg
-        data['BCC'] = bccavg
-        data['ICO'] = icoavg
-
-        return data
-
-    def rdf(self):
+    def plotrdf(self):
         '''
         Plot the radial distribution at a point and throughout time.
         '''
@@ -200,48 +161,10 @@ class analize(object):
         if self.step is not None:
 
             # Plot for every step in user input list
+            count = 0
             for item in self.step:
-
-                # Scripts with ovito have to be run separately
-                ovitostring = (
-                               "'import ovito_rdf as ov; ov.rdfcalc(" +
-                               '"' +
-                               self.run +
-                               '"' +
-                               ', ' +
-                               str(int(item/self.frq)) +
-                               ', ' +
-                               str(self.cut) +
-                               ', ' +
-                               str(self.bins) +
-                               ")'"
-                               )
-
-                ovitostring = shlex.split(ovitostring)
-
-                # Compute the MSD with ovito
-                cmd = ['python3', '-c']
-                cmd.insert(2, ovitostring[0])
-
-                with temp.TemporaryFile() as tempf:
-                    proc = sub.Popen(cmd, stdout=tempf)
-                    proc.wait()
-
-                # File extension for import
-                rdffile = rdf_directory+self.run+'_step'+str(item)+'_rdf.txt'
-
-                bins = []
-                rdf = []
-
-                # Import the data from txt
-                with open(rdffile) as inputfile:
-                    for line in inputfile:
-                        value = line.strip().split(' ')
-                        bins.append(float(value[0]))
-                        rdf.append(float(value[1]))
-
-                pl.plot(bins, rdf)
-                pl.legend([self.run+'_step_'+str(item)])
+                pl.plot(self.rdf[count][0], self.rdf[count][1])
+                pl.legend([self.run+'_step_'+str(item)], loc='best')
                 pl.xlabel('Bin Center [A]')
                 pl.ylabel('g(r)')
                 pl.grid(b=True, which='both')
@@ -249,7 +172,9 @@ class analize(object):
                 pl.savefig('../images/rdf/'+self.run+'_'+str(item)+'_rdf')
                 pl.clf()
 
-    def response(self):
+                count += 1
+
+    def plotresponse(self):
         '''
         Load the system properties throughout time.
         '''
@@ -265,7 +190,7 @@ class analize(object):
                      ]
 
         data = pd.read_csv(
-                           data_directory+'../txt/'+self.run+'.txt',
+                           self.sysfile,
                            names=mycolumns,
                            sep=' ',
                            comment='#',
@@ -280,7 +205,7 @@ class analize(object):
             pl.plot(time, data[item])
             pl.xlabel('Time [ps]')
             pl.ylabel(item)
-            pl.legend([self.run])
+            pl.legend([self.run], loc='best')
             pl.grid(b=True, which='both')
             pl.tight_layout()
             pl.savefig(

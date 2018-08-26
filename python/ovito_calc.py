@@ -10,11 +10,6 @@ from ovito.io import import_file
 import numpy as np
 import os
 
-# List the directories used
-first_directory = os.getcwd()
-data_directory = first_directory + '/../data/lammpstrj/'
-dump_directory = first_directory + '/../data/analysis/'
-
 
 # Define the custom modifier function:
 def msdmodify(frame, input, output):
@@ -47,21 +42,18 @@ def msdmodify(frame, input, output):
 
 
 # Load the data for trajectories
-def calc(name, start, stop):
+def calc(name, start, stop, unwrap=True):
     '''
     Load the lammps trajectories and calculate MSD.
     '''
 
-    # The file extension
-    extension = '.lammpstrj'
-
     # Load input data and create an ObjectNode with a data pipeline.
-    node = import_file(data_directory+name+extension, multiple_frames=True)
+    node = import_file(name, multiple_frames=True)
 
     # Calculate per-particle displacements with respect to a start
     modifier = CalculateDisplacementsModifier()
-    modifier.assume_unwrapped_coordinates = True
-    modifier.reference.load(data_directory+name+extension)
+    modifier.assume_unwrapped_coordinates = unwrap
+    modifier.reference.load(name)
     modifier.reference_frame = start
     node.modifiers.append(modifier)
 
@@ -100,19 +92,19 @@ def calc(name, start, stop):
         bcc.append(out.attributes['CommonNeighborAnalysis.counts.BCC'])
         ico.append(out.attributes['CommonNeighborAnalysis.counts.ICO'])
 
-    # The output directory with the run name
-    msdoutput = dump_directory+'msd/'+name+'_msd.txt'
-    neighboroutput = dump_directory+'neighbor/'+name+'_neighbor.txt'
+    # Cluster data
+    cluster = {}
+    cluster['fcc'] = np.array(fcc)
+    cluster['hcp'] = np.array(hcp)
+    cluster['bcc'] = np.array(bcc)
+    cluster['ico'] = np.array(ico)
 
-    # Columns of data
-    msdcolumns = [step, msd]
-    neighborcolumns = [step, fcc, hcp, bcc, ico]
+    # MSD data
+    msdall = {}
+    msdall['all'] = msd
 
     # Create columns for each particle type and ensure type order
-    order.sort()
-    for item in order:
-        msdcolumns.append(msd_types[item])
+    for key in msd_types:
+        msdall[str(key)] = msd_types[key]
 
-    # Save data with a step column and an MSD column
-    np.savetxt(msdoutput, np.transpose(msdcolumns))
-    np.savetxt(neighboroutput, np.transpose(neighborcolumns), fmt='%i')
+    return step, msdall, cluster

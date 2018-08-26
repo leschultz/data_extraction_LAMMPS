@@ -1,3 +1,4 @@
+from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
 from analysis import analize as an
 
@@ -25,20 +26,20 @@ def eim(msd, mean_msd):
     ''' Take the error in the mean.'''
 
     # Save the number of columns and rows
-    rows, columns = msd.shape
+    samples = len(msd)
 
     # Subtract each MSD at every time from the average and square it
     out = []
-    for i in range(rows):
+    for i in range(samples):
         value = np.subtract(msd[i], mean_msd)
         value **= 2
         out.append(value)
 
     # Get STD for each timepoint
-    std_msd = (np.sum(out, axis=0)/rows)**0.5
+    std_msd = (np.sum(out, axis=0)/samples)**0.5
 
     # Get error in the mean for each timepoint
-    eim_msd = std_msd/(rows**0.5)
+    eim_msd = std_msd/(samples**0.5)
 
     # Return the error in the mean
     return eim_msd
@@ -60,48 +61,42 @@ def avg(*args, **kwargs):
             newnames.append(item)
 
     # Gather plots, vibration, and MSD data for each run
-    msd = []
-    data = {}
+    dataall = {}
     fcc = []
     hcp = []
     bcc = []
     ico = []
     for name in newnames:
         run = an(name, *args[1:], **kwargs)
-        run.rdf()
 
-        clusters = run.neighbor()
-        fcc.append(clusters['FCC'])
-        hcp.append(clusters['HCP'])
-        bcc.append(clusters['BCC'])
-        ico.append(clusters['ICO'])
+        data = run.calculate()  # Data calculated by ovito
 
+        # Cluster Data
+        fcc.append(data['fccavg'])
+        hcp.append(data['hcpavg'])
+        bcc.append(data['bccavg'])
+        ico.append(data['icoavg'])
 
-        value_msd = run.msd()
-        msd.append(value_msd[1])
+        run.plotrdf()  # Plot RDF
+        run.plotmsd()  # Plot MSD
+        run.plotclusters()  # Plot cluster time averages
 
-        for key in value_msd[2]:
-            if data.get(key) is None:
-                data[key] = []
-            data[key].append(value_msd[2][key])
+        # Grab MSD data for all runs
+        for key in data['msd']:
+            if dataall.get(key) is None:
+                dataall[key] = []
+            dataall[key].append(np.array(data['msd'][key]))
 
         # Try to generate graphs from txt file if available
         try:
-            run.response()
+            run.plotresponse()
         except Exception:
             pass
 
     # Step data from last iteration on previous loop
-    time = value_msd[0]
+    time = data['time']
 
-    print('Taking the mean data for ' + series)
-
-    # Take the mean row by row for each atom for MSD
-    msd = np.array(msd)
-    mean_msd = np.mean(msd, axis=0)
-
-    # Get error in the mean for each timepoint
-    eim_msd = eim(msd, mean_msd)
+    print('Taking the mean data for '+series)
 
     # Get the mean MSD for atom types and EIM
     data_mean = {}
@@ -110,36 +105,26 @@ def avg(*args, **kwargs):
     # Control the frequency of errorbars
     errorfreq = len(time)//10
 
-    for key in data:
-        data[key] = np.array(data[key])
-        data_mean[key] = np.mean(data[key], axis=0)
-        eim_data[key] = eim(data[key], data_mean[key])
+    for key in dataall:
+        data_mean[key] = np.mean(dataall[key], axis=0)
+        eim_data[key] = eim(dataall[key], data_mean[key])
         pl.errorbar(
                     time,
                     data_mean[key],
                     eim_data[key],
                     errorevery=errorfreq,
-                    label='Element Type: %i' % key
+                    label='Element Type: %s' % key
                     )
-
-    # Plot the mean MSD
-    pl.errorbar(
-                time,
-                mean_msd,
-                eim_msd,
-                errorevery=errorfreq,
-                label='Total MSD'
-                )
 
     pl.xlabel('Time [ps]')
     pl.ylabel('MSD Averaged [A^2]')
-    pl.legend()
+    pl.legend(loc='upper left')
     pl.grid(b=True, which='both')
     pl.tight_layout()
     pl.savefig('../images/motion/'+series+'_avgMSD')
     pl.clf()
 
-    msdcolumns = [time, mean_msd, eim_msd]
+    msdcolumns = [time]
 
     order = list(data_mean.keys())
     order.sort()
@@ -189,6 +174,3 @@ def avg(*args, **kwargs):
     # Save the data for cluster in the neighbor folder
     output = dump_directory+'neighbor/'+series+'_neighbor_average.txt'
     np.savetxt(output, clusters)
-
-    # Return the steps with their corresponding msd mean
-    return time, mean_msd, eim_msd, data_mean, eim_data, clusters
