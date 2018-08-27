@@ -95,7 +95,6 @@ class analize(object):
         self.bccavg = np.sum(self.clu['bcc'])/self.time[-1]
         self.icoavg = np.sum(self.clu['ico'])/self.time[-1]
 
-        data = {}
         data['time'] = self.time
         data['msd'] = self.msd
         data['fccavg'] = self.fccavg
