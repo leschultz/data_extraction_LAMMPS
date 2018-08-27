@@ -1,11 +1,5 @@
 from itertools import islice as it
 
-import os
-
-# Gather the relevant directories
-first_directory = os.getcwd()
-data_directory = first_directory+'/../data/lammpstrj/'
-
 
 def parser(name, start):
     '''
@@ -33,6 +27,7 @@ def parser(name, start):
             if count >= 4:
                 break
 
+    # Save relevant system properties
     out = {}
     out['step'] = int(data[1][0])
     out['atom'] = int(data[3][0])
@@ -59,12 +54,9 @@ def gather(name):
     rate: The data acquisition rate from the lammpstrj file
     '''
 
-    extension = '.lammpstrj'
-    filename = data_directory + name + extension
+    first = parser(name, 0)
 
-    first = parser(filename, 0)
-
-    second = parser(filename, first['atom']+len(first)+1)
+    second = parser(name, first['atom']+len(first)+1)
 
     rate = second['step'] - first['step']
 

@@ -1,7 +1,6 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
-from ovito_rdf import rdfcalc
-from ovito_calc import calc
+from ovito_calc import calc, rdfcalc
 
 import parameters as par
 import subprocess as sub
@@ -16,7 +15,7 @@ first_directory = os.getcwd()
 data_directory = first_directory + '/../data/analysis/'
 msd_directory = data_directory + 'msd/'
 rdf_directory = data_directory + 'rdf/'
-nei_directory = data_directory + 'neighbor/'
+nei_directory = data_directory + 'cluster/'
 
 
 class analize(object):
@@ -43,7 +42,7 @@ class analize(object):
 
         self.stepsize = stepsize  # The step size used in LAMMPS
 
-        self.frq = par.gather(self.run)  # Rate of data acquisition
+        self.frq = par.gather(self.trjfile)  # Rate of data acquisition
 
         print('Crunching data for '+self.run)
 
@@ -64,6 +63,9 @@ class analize(object):
         Gather data for steps, MSD, RDF, and common neighborhood analysis.
         '''
 
+        # All data to be returned
+        data ={}
+
         # Gather the MSD and common neighbor values
         self.steps, self.msd, self.nei = calc(
                                               self.trjfile,
@@ -72,14 +74,18 @@ class analize(object):
                                               )
 
         # Gather the RDF for steps defined
-        self.rdf = []
-        for item in self.step:
-            self.rdf.append(rdfcalc(
-                                    self.trjfile,
-                                    int(item/self.frq),
-                                    self.cut,
-                                    self.bins
-                                    ))
+        if self.step is not None:
+            self.rdf = []
+            for item in self.step:
+                self.rdf.append(rdfcalc(
+                                        self.trjfile,
+                                        int(item/self.frq),
+                                        self.cut,
+                                        self.bins
+                                        ))
+
+            # The RDF data if the acquisition steps are defined
+            data['rdf'] = self.rdf
 
         time = [i*self.stepsize for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
@@ -92,7 +98,6 @@ class analize(object):
         data = {}
         data['time'] = self.time
         data['msd'] = self.msd
-        data['rdf'] = self.rdf
         data['fccavg'] = self.fccavg
         data['hcpavg'] = self.hcpavg
         data['bccavg'] = self.bccavg
@@ -149,7 +154,7 @@ class analize(object):
         pl.ylabel('[count/ps]')
         pl.grid(b=True, which='both')
         pl.tight_layout()
-        pl.savefig('../images/neighbor/'+self.run+'_neighbor')
+        pl.savefig('../images/cluster/'+self.run+'_cluster')
         pl.clf()
 
     def plotrdf(self):

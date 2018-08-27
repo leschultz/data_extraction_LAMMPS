@@ -6,10 +6,6 @@ folder the following paths:
                          <path to ovito>
                          /ovito/lib/ovito/plugins/python:$PYTHONPATH
 
-    2) export QT_PLUGIN_PATH=
-                              <path to ovito>
-                              /ovito/lib/ovito/plugins_qt:$QT_PLUGIN_PATH
-
 averages.py can be used to attain the averages between MSDs and it executes
 analysis.py for all runs specifed in series. The variable value stores the
 return value for steps and mean MSD.

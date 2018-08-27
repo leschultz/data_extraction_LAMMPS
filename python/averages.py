@@ -124,19 +124,30 @@ def avg(*args, **kwargs):
     pl.savefig('../images/motion/'+series+'_avgMSD')
     pl.clf()
 
+    # The starting column for MSD data
     msdcolumns = [time]
 
-    order = list(data_mean.keys())
-    order.sort()
+    # The header for exported MSD data
+    msdheader = 'time[ps] '
+    msdfmt = '%f, '
 
     # Grab data for MSD and EIM
-    for item in order:
-        msdcolumns.append(data_mean[item])
-        msdcolumns.append(eim_data[item])
+    for key in data_mean:
+        msdcolumns.append(data_mean[key])
+        msdheader += key+'MSD[A^2] '
+        msdfmt += '%f, '
+        msdcolumns.append(eim_data[key])
+        msdheader += key+'EIM[A^2] '
+        msdfmt += '%f, '
 
     # Save data in alternating oder of MSD and EIM (first is time)
-    output = dump_directory+'msd/'+series+'_msd_average.txt'
-    np.savetxt(output, np.transpose(msdcolumns))
+    msdoutput = dump_directory+'msd/'+series+'_msd_average.txt'
+    np.savetxt(
+               msdoutput,
+               np.transpose(msdcolumns),
+               fmt=msdfmt,
+               header=msdheader
+               )
 
     # Average the number of clusters accross runs
     fccavg = np.mean(fcc)
@@ -168,9 +179,17 @@ def avg(*args, **kwargs):
     pl.ylabel('[count/ps]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.savefig('../images/neighbor/'+series+'_avgneighbor')
+    pl.savefig('../images/cluster/'+series+'_avgneighbor')
     pl.clf()
 
+    clusterheader = 'FCC HCP BCC ICO'
+    clusterfmt = '%f, %f, %f, %f'
+
     # Save the data for cluster in the neighbor folder
-    output = dump_directory+'neighbor/'+series+'_neighbor_average.txt'
-    np.savetxt(output, clusters)
+    clusteroutput = dump_directory+'cluster/'+series+'_cluster_average.txt'
+    np.savetxt(
+               clusteroutput,
+               np.column_stack(clusters),
+               header=clusterheader,
+               fmt=clusterfmt
+               )
