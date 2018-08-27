@@ -15,7 +15,7 @@ first_directory = os.getcwd()
 data_directory = first_directory + '/../data/analysis/'
 msd_directory = data_directory + 'msd/'
 rdf_directory = data_directory + 'rdf/'
-nei_directory = data_directory + 'cluster/'
+clu_directory = data_directory + 'cluster/'
 
 
 class analize(object):
@@ -67,7 +67,7 @@ class analize(object):
         data ={}
 
         # Gather the MSD and common neighbor values
-        self.steps, self.msd, self.nei = calc(
+        self.steps, self.msd, self.clu = calc(
                                               self.trjfile,
                                               self.startframe,
                                               self.stopframe
@@ -90,10 +90,10 @@ class analize(object):
         time = [i*self.stepsize for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
 
-        self.fccavg = np.sum(self.nei['fcc'])/self.time[-1]
-        self.hcpavg = np.sum(self.nei['hcp'])/self.time[-1]
-        self.bccavg = np.sum(self.nei['bcc'])/self.time[-1]
-        self.icoavg = np.sum(self.nei['ico'])/self.time[-1]
+        self.fccavg = np.sum(self.clu['fcc'])/self.time[-1]
+        self.hcpavg = np.sum(self.clu['hcp'])/self.time[-1]
+        self.bccavg = np.sum(self.clu['bcc'])/self.time[-1]
+        self.icoavg = np.sum(self.clu['ico'])/self.time[-1]
 
         data = {}
         data['time'] = self.time
