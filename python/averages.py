@@ -104,6 +104,8 @@ def avg(*args, **kwargs):
 
     # Control the frequency of errorbars
     errorfreq = len(time)//10
+    if errorfreq == 0:
+        errorfreq = 1
 
     for key in dataall:
         data_mean[key] = np.mean(dataall[key], axis=0)
