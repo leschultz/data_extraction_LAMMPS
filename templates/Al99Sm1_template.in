@@ -1,5 +1,11 @@
-# A general input file that could be used for different scenarios
-# Written by Lane Enrique Schultz
+# Written by Lane enrique Schultz
+
+# An input file for 99% Al and 1% Sm system.
+# This input file can be used to hold at a beginning temperature, then
+# ascend or descend into a final tempeerature for a number of steps, then
+# hold at a final temperature.
+
+# Specifics regarding definable parameters are covered by the READMEs
 
 ###############################################################################
 
@@ -41,7 +47,7 @@ lattice                                     fcc 4.04092655671750
 region                                      my_box block 0 ${side} 0 ${side} 0 ${side}
 create_box                                  2 my_box
 create_atoms                                1 box
-set                                         group all type/fraction 2 0.1 100
+set                                         group all type/fraction 2 0.01 5088
 
 ################################################################################
 

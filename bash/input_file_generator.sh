@@ -22,14 +22,17 @@ name3="$name2"'hold2-'"$hold_2"'_'
 name4="$name3"'hold3-'"$hold_3"'_'
 name5="$name4"'timestep-'"$timestep"'_'
 name6="$name5"'dumprate-'"$dumprate"'_'
-namefinal="$name6""$temperature0"'K-'
-inputfilename="$system_name""$namefinal"
+name7="$name6""$temperature0"'K-'
+name8="$system_name""$name7"
+
+# Replace any periods in the name with the letter p
+filename=$(echo ${name8/./p})
 
 for ((i=1;i<=$number_runs;i++))
 do
 	for var in "$@"
 	do
-                name="$inputfilename""$var"'K_run'"$i"
+                name="$filename""$var"'K_run'"$i"
 		replaced=$(
                            grep -l "replace_final_temperature" ../templates/$template_file | xargs sed "
 		s/replace_final_temperature/$var/g;

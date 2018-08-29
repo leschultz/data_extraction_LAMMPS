@@ -67,7 +67,7 @@ class analize(object):
         '''
 
         # All data to be returned
-        data ={}
+        data = {}
 
         # Gather the MSD and common neighbor values
         self.steps, self.msd, self.clu = calc(
