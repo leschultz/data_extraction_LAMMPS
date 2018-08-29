@@ -60,4 +60,9 @@ def gather(name):
 
     rate = second['step'] - first['step']
 
-    return rate
+    # Export the data desired
+    data = {}
+    data['rate'] = rate
+    data['size'] = second['atom']  # Taken from the second frame
+
+    return data

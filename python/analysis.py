@@ -42,7 +42,10 @@ class analize(object):
 
         self.stepsize = stepsize  # The step size used in LAMMPS
 
-        self.frq = par.gather(self.trjfile)  # Rate of data acquisition
+        # The rate of data acqusition and number of atoms
+        param = par.gather(self.trjfile)
+        self.frq = param['rate']
+        self.size = param['size']
 
         print('Crunching data for '+self.run)
 
@@ -90,10 +93,17 @@ class analize(object):
         time = [i*self.stepsize for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
 
+        # Average the count of clusters over time
         self.fccavg = np.sum(self.clu['fcc'])/self.time[-1]
         self.hcpavg = np.sum(self.clu['hcp'])/self.time[-1]
         self.bccavg = np.sum(self.clu['bcc'])/self.time[-1]
         self.icoavg = np.sum(self.clu['ico'])/self.time[-1]
+
+        # Normalize cluster count by system size
+        self.fccavg = self.fccavg/self.size
+        self.hcpavg = self.hcpavg/self.size
+        self.bccavg = self.bccavg/self.size
+        self.icoavg = self.icoavg/self.size
 
         data['time'] = self.time
         data['msd'] = self.msd
@@ -150,7 +160,7 @@ class analize(object):
         pl.bar(location, clusters,  align='center')
         pl.xticks(location, labels)
         pl.xlabel('Cluster [-]')
-        pl.ylabel('[count/ps]')
+        pl.ylabel('[count/(ps*size)]')
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.savefig('../images/cluster/'+self.run+'_cluster')

@@ -178,7 +178,7 @@ def avg(*args, **kwargs):
     pl.bar(location, clusters,  align='center')
     pl.xticks(location, labels)
     pl.xlabel('Cluster [-]')
-    pl.ylabel('[count/ps]')
+    pl.ylabel('[count/(ps*size)]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
     pl.savefig('../images/cluster/'+series+'_avgneighbor')
