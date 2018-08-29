@@ -47,7 +47,7 @@ class analize(object):
         self.frq = param['rate']
         self.size = param['size']
 
-        print('Crunching data for '+self.run)
+        print('Crunching data for: '+self.run.split('K_')[1])
 
         self.bins = bins  # The number of bins
         self.cut = cut  # Data for RDF

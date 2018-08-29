@@ -1,6 +1,6 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
-from analysis import analize as an
+from single import analize as an
 
 import pandas as pd
 import numpy as np
@@ -52,7 +52,9 @@ def avg(*args, **kwargs):
 
     series = args[0]
 
-    print('Analyzing all '+series+' runs')
+    print('Analyzing all runs for the following:')
+    print(series)
+    print('-'*len(series))
 
     # Grab names that match the series input
     newnames = []
@@ -96,7 +98,7 @@ def avg(*args, **kwargs):
     # Step data from last iteration on previous loop
     time = data['time']
 
-    print('Taking the mean data for '+series)
+    print('Taking the mean data')
 
     # Get the mean MSD for atom types and EIM
     data_mean = {}
@@ -195,3 +197,5 @@ def avg(*args, **kwargs):
                header=clusterheader,
                fmt=clusterfmt
                )
+
+    print('\n')
