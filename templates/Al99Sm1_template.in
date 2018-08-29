@@ -19,6 +19,7 @@ variable                                    temp_initial              equal  rep
 variable                                    temp_final                equal  replace_final_temperature
 
 # Time variables
+variable                                    mytimestep                equal  replace_timestep
 variable                                    hold_1                    equal  replace_hold_1
 variable                                    hold_2                    equal  replace_hold_2
 variable                                    hold_3                    equal  replace_hold_3
@@ -27,6 +28,7 @@ variable                                    hold_3                    equal  rep
 variable                                    seed                      equal  replace_seed
 
 # Data output
+variable                                    mydumprate                equal  replace_dumprate
 variable                                    data_file_characteristics string ../data/txt/replace_filename.txt
 variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_filename.lammpstrj
 variable                                    data_positions_final      string ../data/dat/replace_filename.dat
@@ -61,18 +63,18 @@ variable                                    myvol       equal vol
 ################################################################################
 
 # Time step
-timestep                                    0.001
+timestep                                    ${mytimestep}
 
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump_rate all custom 100 ${data_file_dump_rate} id type xu yu zu
+dump                                        my_dump_rate all custom ${mydumprate} ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate sort id
 
 ################################################################################
 
 # Open save data
-fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
+fix                                         data_saving all ave/time 1 1 ${mydumprate} c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 # Define the initial velocities
 velocity                                    all create ${temp_initial} ${seed} rot yes dist gaussian

@@ -12,8 +12,10 @@ All calulations depend on the units used in LAMMPS. Ignore default units.
    (if invoked multiple times the same number of runs should be used):
 
 	- bash input_file_generator.sh <template file> <number of runs>
-          <melting temperature> <time steps at melt> <time steps of quench>
-          <time steps final hold> <list of final temperatures without units>
+          <time steps at initial temperature> <time steps of quench>
+          <time steps final hold> <timestep> <dump rate>
+          <initial temperature>
+          <list of final temperatures without units>
 
 	- bash input_file_generator.sh AlSm_template.in 10 2000 1000 33000 36000 900
 
