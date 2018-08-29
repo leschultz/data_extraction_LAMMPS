@@ -1,4 +1,6 @@
 from numpy.polynomial.polynomial import polyfit
+from itertools import islice as it
+
 
 import numpy as np
 import os
@@ -17,24 +19,32 @@ def diffusion(series, start, stop):
     # Name of file to be imported with absolute path
     name = data_directory+series+'_msd_average.txt'
 
-    data = {}
+    # Grab the header from the MSD file and count the comments
+    count = 0
     with open(name) as inputfile:
         for line in inputfile:
             if line.startswith('#'):
                 header = line.strip().split(' ')
                 header.pop(0)
-                #newheader = '' 
-                #for item in header:
-                    #newheader += item+' '
+                count += 1
             else:
-                value = line.strip().split(',')
-                value.pop()
-                value = [float(i) for i in value]
+                break
 
-                for item in list(range(len(value))):
-                    if data.get(item) is None:
-                        data[item] = []
-                    data[item].append(value[item])
+    # Set the start of data after comment
+    newstart = start+count
+    newstop = stop+count
+
+    data = {}
+    with open(name) as inputfile:
+        for line in it(inputfile, start, stop):
+            value = line.strip().split(',')
+            value.pop()
+            value = [float(i) for i in value]
+
+            for item in list(range(len(value))):
+                if data.get(item) is None:
+                    data[item] = []
+                data[item].append(value[item])
 
     time = data[0]
 
@@ -52,7 +62,9 @@ def diffusion(series, start, stop):
               '/../data/analysis/diffusion/' +
               series +
               '_diffusion' +
-              '_interval(' +
+              '_numberofpoints' +
+              str(len(time)) +
+              '_slicepoints(' +
               str(start) +
               '-' +
               str(stop) +
