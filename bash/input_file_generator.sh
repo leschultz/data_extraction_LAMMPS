@@ -17,7 +17,7 @@ system_name=${template_file%_template.in}
 name1='_boxside'"$side_length"'_'
 name2="$name1"'hold1-'"$hold_1"'_'
 name3="$name2"'hold2-'"$hold_2"'_'
-name4="$name3"'hold2-'"$hold_3"'_'
+name4="$name3"'hold3-'"$hold_3"'_'
 namefinal="$name4""$temperature0"'K-'
 inputfilename="$system_name""$namefinal"
 
