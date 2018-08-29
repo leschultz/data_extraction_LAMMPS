@@ -14,11 +14,8 @@ boundary                                    p p p
 # Geometric
 variable                                    side                      equal  replace_side
 
-# Atoms
-variable                                    number_of_atoms           equal  replace_atom_number
-
 # Temperature variables
-variable                                    temp_melt                 equal  replace_melt_temperature
+variable                                    temp_initial              equal  replace_initial_temperature
 variable                                    temp_final                equal  replace_final_temperature
 
 # Time variables
@@ -30,10 +27,10 @@ variable                                    hold_3                    equal  rep
 variable                                    seed                      equal  replace_seed
 
 # Data output
-variable                                    data_file_characteristics string ../data/txt/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.txt
-variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.lammpstrj
-variable                                    data_positions_final      string ../data/dat/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.dat
-variable                                    data_restart              string ../data/rest/replace_system_boxsidereplace_side_replace_final_temperatureK_runreplace_run.rest
+variable                                    data_file_characteristics string ../data/txt/replace_filename.txt
+variable                                    data_file_dump_rate       string ../data/lammpstrj/replace_filename.lammpstrj
+variable                                    data_positions_final      string ../data/dat/replace_filename.dat
+variable                                    data_restart              string ../data/rest/replace_filename.rest
 
 ################################################################################
 
@@ -78,15 +75,15 @@ dump_modify                                 my_dump_rate sort id
 fix                                         data_saving all ave/time 1 1 100 c_mytemp c_mypress v_myvol c_PE c_KE file ${data_file_characteristics}
 
 # Define the initial velocities
-velocity                                    all create ${temp_melt} ${seed} rot yes dist gaussian
+velocity                                    all create ${temp_initial} ${seed} rot yes dist gaussian
 
 # Hold as melt
-fix                                         run all npt temp ${temp_melt} ${temp_melt} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_initial} ${temp_initial} 0.1 iso 0 0 1
 run                                         ${hold_1}
 unfix                                       run
 
 # Quench
-fix                                         run all npt temp ${temp_melt} ${temp_final} 0.1 iso 0 0 1
+fix                                         run all npt temp ${temp_initial} ${temp_final} 0.1 iso 0 0 1
 run                                         ${hold_2}
 unfix                                       run
 
