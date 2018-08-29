@@ -52,6 +52,7 @@ def avg(*args, **kwargs):
 
     series = args[0]
 
+    print('_'*len(series))
     print('Analyzing all runs for the following:')
     print(series)
     print('-'*len(series))
@@ -98,7 +99,7 @@ def avg(*args, **kwargs):
     # Step data from last iteration on previous loop
     time = data['time']
 
-    print('Taking the mean data')
+    print('Taking mean data')
 
     # Get the mean MSD for atom types and EIM
     data_mean = {}

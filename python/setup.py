@@ -13,10 +13,6 @@ datamsd = analysis+'msd/'
 datardf = analysis+'rdf/'
 diffusion = analysis+'diffusion/'
 cluster = analysis+'cluster/'
-dat = data_directory+'dat/'
-lammpstrj = data_directory+'lammpstrj/'
-rest = data_directory+'rest/'
-txt = data_directory+'txt/'
 
 # The directories were images will be saved
 motion = image_directory+'motion/'
@@ -30,10 +26,6 @@ directories = [
                datardf,
                diffusion,
                cluster,
-               dat,
-               lammpstrj,
-               rest,
-               txt,
                motion,
                system,
                rdf_plots,
