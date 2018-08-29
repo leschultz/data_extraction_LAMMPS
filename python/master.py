@@ -47,6 +47,7 @@ for item in runs:
         hold1+hold2,
         hold1+hold2+hold3,
         timestep,
+        dumprate,
         [hold1, hold1+hold2, hold1+hold2+hold3],
         10,
         50,

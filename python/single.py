@@ -27,6 +27,7 @@ class analize(object):
                  start,
                  stop,
                  stepsize,
+                 dumprate,
                  step=None,
                  cut=10,
                  bins=50
@@ -44,8 +45,8 @@ class analize(object):
 
         # The rate of data acqusition and number of atoms
         param = par.gather(self.trjfile)
-        self.frq = param['rate']
         self.size = param['size']
+        self.frq = dumprate
 
         print('Crunching data for: '+self.run.split('K_')[1])
 

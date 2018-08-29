@@ -51,18 +51,13 @@ def gather(name):
 
     Outputs
     -------
-    rate: The data acquisition rate from the lammpstrj file
+    data
     '''
 
     first = parser(name, 0)
 
-    second = parser(name, first['atom']+len(first)+1)
-
-    rate = second['step'] - first['step']
-
     # Export the data desired
     data = {}
-    data['rate'] = rate
-    data['size'] = second['atom']  # Taken from the second frame
+    data['size'] = first['atom']  # Taken from the second frame
 
     return data
