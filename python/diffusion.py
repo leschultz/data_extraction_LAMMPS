@@ -14,7 +14,7 @@ def diffusion(series, start, stop):
 
     # Directory for MSD data
     first_directory = os.getcwd()
-    data_directory = first_directory+'/../data/analysis/msd/'
+    data_directory = first_directory+'/../datacalculated/msd/'
 
     # Name of file to be imported with absolute path
     name = data_directory+series+'_msd_average.txt'
@@ -59,7 +59,7 @@ def diffusion(series, start, stop):
     # The output name and location
     output = (
               os.getcwd() +
-              '/../data/analysis/diffusion/' +
+              '/../datacalculated/diffusion/' +
               series +
               '_diffusion' +
               '_numberofpoints' +

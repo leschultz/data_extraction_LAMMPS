@@ -1,4 +1,5 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
+from diffusion import diffusion
 from averages import avg
 
 import os
@@ -42,6 +43,7 @@ for item in runs:
 
     timestep = float(timestep)
 
+    # Do averaging for files
     avg(
         item,
         hold1+hold2,
@@ -52,3 +54,6 @@ for item in runs:
         10,
         50,
         )
+
+    # Grab diffusion with maximum number of points
+    diffusion(item, 0, int(hold3/dumprate)+1)

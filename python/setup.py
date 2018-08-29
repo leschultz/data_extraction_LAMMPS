@@ -8,9 +8,8 @@ data_directory = first_directory+'/../data/'
 image_directory = first_directory+'/../images/'
 
 # The directories were data will be saved
-analysis = data_directory+'analysis/'
+analysis = first_directory+'/../datacalculated/'
 datamsd = analysis+'msd/'
-datardf = analysis+'rdf/'
 diffusion = analysis+'diffusion/'
 cluster = analysis+'cluster/'
 
@@ -23,7 +22,6 @@ cluster_plots = image_directory+'cluster/'
 directories = [
                analysis,
                datamsd,
-               datardf,
                diffusion,
                cluster,
                motion,

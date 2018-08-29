@@ -10,7 +10,7 @@ import os
 # Directories
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
-dump_directory = data_directory+'analysis/'
+dump_directory = first_directory+'/../datacalculated/'
 
 # Grab file names from the lammpstrj directory
 names = os.listdir(data_directory+'lammpstrj/')
