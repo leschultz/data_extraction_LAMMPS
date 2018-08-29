@@ -51,7 +51,12 @@ def diffusion(series, start, stop):
               os.getcwd() +
               '/../data/analysis/diffusion/' +
               series +
-              '_diffusion.txt'
+              '_diffusion' +
+              '_interval(' +
+              str(start) +
+              '-' +
+              str(stop) +
+              ').txt'
               )
 
     fmt = ''
