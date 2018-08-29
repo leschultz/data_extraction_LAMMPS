@@ -178,7 +178,7 @@ class analize(object):
             count = 0
             for item in self.step:
                 pl.plot(self.rdf[count][0], self.rdf[count][1])
-                pl.legend([self.run+'_step_'+str(item)], loc='best')
+                pl.legend(['Step '+str(item)], loc='best')
                 pl.xlabel('Bin Center [A]')
                 pl.ylabel('g(r)')
                 pl.grid(b=True, which='both')
@@ -219,7 +219,6 @@ class analize(object):
             pl.plot(time, data[item])
             pl.xlabel('Time [ps]')
             pl.ylabel(item)
-            pl.legend([self.run], loc='best')
             pl.grid(b=True, which='both')
             pl.tight_layout()
             pl.savefig(
