@@ -32,7 +32,7 @@ for item in runs:
     hold3 = int(value[4].split('-')[1])
     dumprate = int(value[6].split('-')[1])
     inittemp = int(value[7].split('K-')[0])
-    finaltemp  = int(value[7].split('K-')[1][:-1])
+    finaltemp = int(value[7].split('K-')[1][:-1])
 
     timestep = ''
     ptimestep = value[5].split('-')[1]

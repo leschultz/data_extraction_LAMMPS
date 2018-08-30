@@ -13,21 +13,31 @@ datamsd = analysis+'msd/'
 diffusion = analysis+'diffusion/'
 cluster = analysis+'cluster/'
 
-# The directories were images will be saved
-motion = image_directory+'motion/'
-system = image_directory+'system/'
-rdf_plots = image_directory+'rdf/'
-cluster_plots = image_directory+'cluster/'
+# The directories were images will be saved for single runs
+singleimage = image_directory+'single/'
+motionsingle = singleimage+'motion/'
+systemsingle = singleimage+'system/'
+rdfplotssingle = singleimage+'rdf/'
+clusterplotssingle = singleimage+'cluster/'
+
+# The directories were images will be saved for averaged runs
+avgimage = image_directory+'averaged/'
+motionavg = avgimage+'motion/'
+clusteravg = avgimage+'cluster/'
 
 directories = [
                analysis,
                datamsd,
                diffusion,
                cluster,
-               motion,
-               system,
-               rdf_plots,
-               cluster_plots
+               singleimage,
+               motionsingle,
+               systemsingle,
+               rdfplotssingle,
+               clusterplotssingle,
+               avgimage,
+               motionavg,
+               clusteravg
                ]
 
 

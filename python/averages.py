@@ -126,7 +126,7 @@ def avg(*args, **kwargs):
     pl.legend(loc='upper left')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.savefig('../images/motion/'+series+'_avgMSD')
+    pl.savefig('../images/averaged/motion/'+series+'_avgMSD')
     pl.clf()
 
     # The starting column for MSD data
@@ -184,7 +184,7 @@ def avg(*args, **kwargs):
     pl.ylabel('[count/(ps*size)]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.savefig('../images/cluster/'+series+'_avgneighbor')
+    pl.savefig('../images/averaged/cluster/'+series+'_avgneighbor')
     pl.clf()
 
     clusterheader = 'FCC HCP BCC ICO'

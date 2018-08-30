@@ -8,14 +8,6 @@ import tempfile as temp
 import pandas as pd
 import numpy as np
 import shlex
-import os
-
-# Get relevant directories
-first_directory = os.getcwd()
-data_directory = first_directory + '/../data/analysis/'
-msd_directory = data_directory + 'msd/'
-rdf_directory = data_directory + 'rdf/'
-clu_directory = data_directory + 'cluster/'
 
 
 class analize(object):
@@ -132,7 +124,7 @@ class analize(object):
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.legend(loc='upper left')
-        pl.savefig('../images/motion/'+self.run+'_MSD')
+        pl.savefig('../images/single/motion/'+self.run+'_MSD')
         pl.clf()
 
     def plotclusters(self):
@@ -164,7 +156,7 @@ class analize(object):
         pl.ylabel('[count/(ps*size)]')
         pl.grid(b=True, which='both')
         pl.tight_layout()
-        pl.savefig('../images/cluster/'+self.run+'_cluster')
+        pl.savefig('../images/single/cluster/'+self.run+'_cluster')
         pl.clf()
 
     def plotrdf(self):
@@ -184,7 +176,13 @@ class analize(object):
                 pl.ylabel('g(r)')
                 pl.grid(b=True, which='both')
                 pl.tight_layout()
-                pl.savefig('../images/rdf/'+self.run+'_'+str(item)+'_rdf')
+                pl.savefig(
+                           '../images/single/rdf/' +
+                           self.run +
+                           '_' +
+                           str(item) +
+                           '_rdf'
+                           )
                 pl.clf()
 
                 count += 1
@@ -223,7 +221,7 @@ class analize(object):
             pl.grid(b=True, which='both')
             pl.tight_layout()
             pl.savefig(
-                       '../images/system/' +
+                       '../images/single/system/' +
                        self.run +
                        '_' +
                        item.split(' ')[0]

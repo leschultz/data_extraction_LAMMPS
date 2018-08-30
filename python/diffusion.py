@@ -62,13 +62,7 @@ def diffusion(series, start, stop):
               '/../datacalculated/diffusion/' +
               series +
               '_diffusion' +
-              '_numberofpoints' +
-              str(len(time)) +
-              '_slicepoints(' +
-              str(start) +
-              '-' +
-              str(stop) +
-              ').txt'
+              '.txt'
               )
 
     fmt = ''
