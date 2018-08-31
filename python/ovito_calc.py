@@ -43,7 +43,7 @@ def msdmodify(frame, input, output):
 
 
 # Load the data for trajectories
-def calc(name, start, stop, unwrap=True):
+def calc(name, start, stop, unwrap=False):
     '''
     Load the lammps trajectories and calculate MSD.
     '''

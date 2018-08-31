@@ -47,7 +47,6 @@ lattice                                     fcc 4.04092655671750
 region                                      my_box block 0 ${side} 0 ${side} 0 ${side}
 create_box                                  2 my_box
 create_atoms                                1 box
-set                                         group all type/fraction 2 0.01 5088
 
 ################################################################################
 
