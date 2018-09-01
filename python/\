@@ -1,9 +1,7 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
-from matplotlib import pyplot as pl
 from diffusion import diffusion
 from averages import avg
 
-import numpy as np
 import os
 import re
 
@@ -53,7 +51,6 @@ for item in runs:
 
     # Gather the MSD data for different time lengths
     timediff = []
-    time = []
     for hold in newhold3:
 
         # Do averaging for files
@@ -69,29 +66,8 @@ for item in runs:
                   )
 
         # Grab diffusion with maximum number of points
-        labels, diff, nh, fmt = diffusion(item, 0, int(hold/dumprate)+1)
+        diff = diffusion(item, 0, int(hold/dumprate)+1)
 
-        diff.insert(0, hold*timestep)
-        timediff.append(diff)
-        fmt += '%f '
-        nh = 'Time[ps] '+nh
+        diff.append(diff)
 
-
-    timediff = np.transpose(np.array(timediff))
-
-    count = 0
-    for i in timediff[1:]:
-        pl.plot(timediff[0], i, '.', label=labels[count])
-        count += 1
-
-    pl.xlabel('Time [ps]')
-    pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
-    pl.grid(b=True, which='both')
-    pl.tight_layout()
-    pl.legend(loc='best')
-    pl.savefig('../images/averaged/diffusion/'+item) 
-    pl.clf()
-
-    output = '../datacalculated/diffusion/'+item
-
-    np.savetxt(output, np.column_stack(timediff), header=nh, fmt=fmt)
+    print(diff)

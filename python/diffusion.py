@@ -57,19 +57,13 @@ def diffusion(series, start, stop):
         diffusion.append(slope/6)
 
     # The output name and location
-    output = (
-              os.getcwd() +
-              '/../datacalculated/diffusion/' +
-              series +
-              '_diffusion' +
-              '.txt'
-              )
 
     fmt = ''
     newheader = ''
+    columns = []
     for item in header[1::2]:
         fmt += '%f, '
         newheader += item[:-8]+'[*10^-4 cm^2 s^-1]'+' '
+        columns.append(item[:-8])
 
-    # Save the diffusion data in a txt
-    np.savetxt(output, np.column_stack(diffusion), header=newheader, fmt=fmt)
+    return columns, diffusion, newheader, fmt

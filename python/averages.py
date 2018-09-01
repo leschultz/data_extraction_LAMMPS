@@ -200,3 +200,5 @@ def avg(*args, **kwargs):
                )
 
     print('\n')
+
+    return msdcolumns

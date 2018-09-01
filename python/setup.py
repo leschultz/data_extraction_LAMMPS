@@ -24,6 +24,7 @@ clusterplotssingle = singleimage+'cluster/'
 avgimage = image_directory+'averaged/'
 motionavg = avgimage+'motion/'
 clusteravg = avgimage+'cluster/'
+diffusion = avgimage+'diffusion/'
 
 directories = [
                analysis,
@@ -37,7 +38,8 @@ directories = [
                clusterplotssingle,
                avgimage,
                motionavg,
-               clusteravg
+               clusteravg,
+               diffusion
                ]
 
 
