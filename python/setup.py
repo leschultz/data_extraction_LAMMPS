@@ -24,7 +24,7 @@ clusterplotssingle = singleimage+'cluster/'
 avgimage = image_directory+'averaged/'
 motionavg = avgimage+'motion/'
 clusteravg = avgimage+'cluster/'
-diffusion = avgimage+'diffusion/'
+diffusionavg = avgimage+'diffusion/'
 
 directories = [
                analysis,
@@ -39,15 +39,10 @@ directories = [
                avgimage,
                motionavg,
                clusteravg,
-               diffusion
+               diffusionavg
                ]
 
-
-def check(directory):
+for directory in directories:
     if not os.path.exists(directory):
         print('Creating directory: '+directory)
         os.makedirs(directory)
-
-
-for item in directories:
-    check(item)
