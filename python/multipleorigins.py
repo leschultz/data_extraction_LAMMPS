@@ -52,7 +52,7 @@ for item in runs:
     timediff = {}
     diffusiontime = []
     count = 0
-    while count < newhold3:
+    while count <= newhold3:
 
         points = [hold1, hold1+hold2+count, hold1+hold2+newhold3+count]
 
