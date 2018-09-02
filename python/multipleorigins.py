@@ -44,23 +44,26 @@ for item in runs:
 
     timestep = float(timestep)
 
-    # Grab the MSD for N points
-    N = 10
-    newhold3 = []
-    for i in range(hold3//N, hold3+1, hold3//N):
-        newhold3.append(i)
+    # Split the relevant region in half
+    N = 2
+    newhold3 = hold3//N
 
     # Gather the MSD data for different time lengths
     timediff = {}
     diffusiontime = []
-    for hold in newhold3:
+    count = 0
+    while count < newhold3:
 
-        printtext = 'Time used for diffusion: '+str(hold*timestep)+' [ps]'
+        points = [hold1, hold1+hold2+count, hold1+hold2+newhold3+count]
+
+        printtext = 'Start and end points: '
+        printtext += str((points[1]*timestep, points[2]*timestep))
+        printtext += ' [ps]'
         print('='*len(printtext))
         print(printtext)
         print('='*len(printtext))
 
-        points = [hold1, hold1+hold2, hold1+hold2+hold]
+        points = [hold1, hold1+hold2+count, hold1+hold2+count+1]
 
         # Do averaging for files
         time, msd, diffusion, clusters = avg(
@@ -74,13 +77,15 @@ for item in runs:
                                              50
                                              )
 
-        diffusiontime.append(hold*timestep)
+        diffusiontime.append(count*timestep)
 
         # Grab diffusion values for each averaged for different times
         for key in diffusion:
             if timediff.get(key) is None:
                 timediff[key] = []
             timediff[key].append(diffusion[key])
+
+        count += 1
 
     fmt = ''
     nh = ''

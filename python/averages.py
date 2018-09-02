@@ -75,7 +75,7 @@ def avg(*args, **kwargs):
                 datadif[key] = []
 
             slope = polyfit(data['time'], data['msd'][key], 1)[1]
-            
+
             datadif[key].append(slope/6)
 
         # Try to generate graphs from txt file if available
@@ -119,7 +119,7 @@ def avg(*args, **kwargs):
     meandatadif = {}
     for key in datadif:
         meandatadif[key] = np.mean(datadif[key])
-        meandatadif[key+'_EIM'] =st.sem(datadif[key])
+        meandatadif[key+'_EIM'] = st.sem(datadif[key])
 
     # Average the number of clusters accross runs
     clusters = {}
