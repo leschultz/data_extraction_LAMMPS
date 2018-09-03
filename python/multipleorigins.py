@@ -24,6 +24,12 @@ runs = list(set(names))
 
 for item in runs:
 
+
+    string = 'Starting multiple origins method'
+    print('+'*len(string))
+    print(string)
+    print('+'*len(string))
+
     # Parameters from the naming convention
     value = item.split('_')
     system = value[0]
@@ -63,8 +69,6 @@ for item in runs:
         print(printtext)
         print('='*len(printtext))
 
-        points = [hold1, hold1+hold2+count, hold1+hold2+count+1]
-
         # Do averaging for files
         time, msd, diffusion, clusters = avg(
                                              item,
@@ -77,14 +81,17 @@ for item in runs:
                                              50
                                              )
 
+        # The beggining time for a diffusion calculation
         diffusiontime.append(count*timestep)
 
         # Grab diffusion values for each averaged for different times
         for key in diffusion:
+
             if timediff.get(key) is None:
                 timediff[key] = []
-            timediff[key].append(diffusion[key])
 
+            timediff[key].append(diffusion[key])
+ 
         count += 1
 
     fmt = ''
@@ -108,10 +115,10 @@ for item in runs:
     pl.grid(b=True, which='both')
     pl.tight_layout()
     pl.legend(loc='best')
-    pl.savefig('../images/averaged/diffusion/'+item+'_multi')
+    pl.savefig('../images/averaged/diffusion/'+item+'_origins')
     pl.clf()
 
-    output = '../datacalculated/diffusion/'+item+'_multi'
+    output = '../datacalculated/diffusion/'+item+'_origins'
 
     df = pd.DataFrame(data=timediff)
     df.insert(0, 'time', diffusiontime)

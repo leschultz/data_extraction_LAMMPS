@@ -24,6 +24,11 @@ runs = list(set(names))
 
 for item in runs:
 
+    string = 'Starting multiple time lengths for diffusion'
+    print('+'*len(string))
+    print(string)
+    print('+'*len(string))
+
     # Parameters from the naming convention
     value = item.split('_')
     system = value[0]
@@ -74,12 +79,15 @@ for item in runs:
                                              50
                                              )
 
+        # The length of time used for diffusion
         diffusiontime.append(hold*timestep)
 
         # Grab diffusion values for each averaged for different times
         for key in diffusion:
+
             if timediff.get(key) is None:
                 timediff[key] = []
+
             timediff[key].append(diffusion[key])
 
     fmt = ''
