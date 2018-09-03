@@ -58,7 +58,7 @@ for item in runs:
     timediff = {}
     diffusiontime = []
     count = 0
-    while count <= newhold3:
+    while count < newhold3:
 
         points = [hold1, hold1+hold2+count, hold1+hold2+newhold3+count]
 
@@ -94,6 +94,11 @@ for item in runs:
  
         count += 1
 
+    # Define the frequency of errorbars
+    errorfreq = newhold3//10
+    if errorfreq == 0:
+        errorfreq = 1
+
     fmt = ''
     nh = ''
     for key in timediff:
@@ -107,6 +112,7 @@ for item in runs:
                         timediff[key],
                         yerr=timediff[key+'_EIM'],
                         linestyle='dotted',
+                        errorevery=errorfreq,
                         label=key
                         )
 
