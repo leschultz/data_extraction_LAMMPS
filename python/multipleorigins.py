@@ -56,6 +56,7 @@ for item in runs:
 
     # Gather the MSD data for different time lengths
     msdmulti = {}
+    diffmulti = {}
     timemulti = {}
     startpoints = []
     count = 0
@@ -90,9 +91,11 @@ for item in runs:
 
             if msdmulti.get(key) is None:
                 msdmulti[key] = []
+                diffmulti[key] = []
                 timemulti[key] = []
 
             msdmulti[key].append(msd[key])
+            diffmulti[key].append(diffusion[key])
             timemulti[key].append(time)
 
         count += dumprate
@@ -102,15 +105,11 @@ for item in runs:
     if errorfreq == 0:
         errorfreq = 1
 
-    fmt = ''
-    nh = ''
     for key in msdmulti:
-
-        fmt += '%f '
-        nh += key+' '
 
         if 'EIM' not in key:
             for i in list(range(0, len(msdmulti[key]))):
+                lab = key+' at ' +str(startpoints[i])+' [ps]'
                 pl.errorbar(
                             timemulti[key][i],
                             msdmulti[key][i],
@@ -118,7 +117,35 @@ for item in runs:
                             linestyle='dotted',
                             marker='.',
                             errorevery=errorfreq,
-                            label='Start '+str(startpoints[0])+' [ps]'
+                            label=lab
+                            )
+
+    pl.xlabel('Time [ps]')
+    pl.ylabel('MSD [A^2]')
+    pl.grid(b=True, which='both')
+    pl.tight_layout()
+    pl.legend(loc='best')
+    pl.savefig('../images/averaged/motion/'+item+'_origins')
+    pl.clf()
+
+    fmt = ''
+    nh = ''
+    for key in diffmulti:
+
+        fmt += '%f '
+        nh += key+' '
+
+        if 'EIM' not in key:
+            for i in list(range(0, len(diffmulti[key]))):
+                lab = key+' at ' +str(startpoints[i])+' [ps]'
+                pl.errorbar(
+                            startpoints[i],
+                            diffmulti[key][i],
+                            yerr=diffmulti[key+'_EIM'][i],
+                            linestyle='dotted',
+                            marker='.',
+                            errorevery=errorfreq,
+                            label=lab
                             )
 
     pl.xlabel('Time [ps]')
@@ -129,9 +156,10 @@ for item in runs:
     pl.savefig('../images/averaged/diffusion/'+item+'_origins')
     pl.clf()
 
+
     output = '../datacalculated/diffusion/'+item+'_origins'
 
-    df = pd.DataFrame(data=msdmulti)
+    df = pd.DataFrame(data=diffmulti)
     df.insert(0, 'time', startpoints)
 
     df.to_csv(output, sep=' ', index=False)
