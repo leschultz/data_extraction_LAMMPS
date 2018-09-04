@@ -102,7 +102,7 @@ for item in runs:
                         diffusiontime,
                         timediff[key],
                         yerr=timediff[key+'_EIM'],
-                        linestyle='dotted',
+                        linestyle='None',
                         label=key
                         )
 
