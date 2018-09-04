@@ -55,8 +55,9 @@ for item in runs:
     newhold3 = hold3//N
 
     # Gather the MSD data for different time lengths
-    timediff = {}
-    diffusiontime = []
+    msdmulti = {}
+    timemulti = {}
+    startpoints = []
     count = 0
     while count <= newhold3:
 
@@ -82,17 +83,19 @@ for item in runs:
                                              )
 
         # The beggining time for a diffusion calculation
-        diffusiontime.append(count*timestep)
+        startpoints.append(count*timestep)
 
         # Grab diffusion values for each averaged for different times
-        for key in diffusion:
+        for key in msd:
 
-            if timediff.get(key) is None:
-                timediff[key] = []
+            if msdmulti.get(key) is None:
+                msdmulti[key] = []
+                timemulti[key] = []
 
-            timediff[key].append(diffusion[key])
+            msdmulti[key].append(msd[key])
+            timemulti[key].append(time)
 
-        count += 1
+        count += dumprate
 
     # Define the frequency of errorbars
     errorfreq = newhold3//10
@@ -101,23 +104,25 @@ for item in runs:
 
     fmt = ''
     nh = ''
-    for key in timediff:
+    for key in msdmulti:
 
         fmt += '%f '
         nh += key+' '
 
         if 'EIM' not in key:
-            pl.errorbar(
-                        diffusiontime,
-                        timediff[key],
-                        yerr=timediff[key+'_EIM'],
-                        linestyle='None',
-                        errorevery=errorfreq,
-                        label=key
-                        )
+            for i in list(range(0, len(msdmulti[key]))):
+                pl.errorbar(
+                            timemulti[key][i],
+                            msdmulti[key][i],
+                            yerr=msdmulti[key+'_EIM'][i],
+                            linestyle='dotted',
+                            marker='.',
+                            errorevery=errorfreq,
+                            label='Start '+str(startpoints[0])+' [ps]'
+                            )
 
     pl.xlabel('Time [ps]')
-    pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
+    pl.ylabel('MSD [A^2]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
     pl.legend(loc='best')
@@ -126,7 +131,7 @@ for item in runs:
 
     output = '../datacalculated/diffusion/'+item+'_origins'
 
-    df = pd.DataFrame(data=timediff)
-    df.insert(0, 'time', diffusiontime)
+    df = pd.DataFrame(data=msdmulti)
+    df.insert(0, 'time', startpoints)
 
     df.to_csv(output, sep=' ', index=False)
