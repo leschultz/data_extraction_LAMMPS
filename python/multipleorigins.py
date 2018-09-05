@@ -24,7 +24,6 @@ runs = list(set(names))
 
 for item in runs:
 
-
     string = 'Starting multiple origins method'
     print('+'*len(string))
     print(string)
@@ -65,7 +64,7 @@ for item in runs:
         points = [hold1, hold1+hold2+count, hold1+hold2+newhold3+count]
 
         printtext = 'Start and end points: '
-        printtext += str((points[1]*timestep, points[2]*timestep))
+        printtext += str((count*timestep, (newhold3+count)*timestep))
         printtext += ' [ps]'
         print('='*len(printtext))
         print(printtext)
@@ -109,7 +108,7 @@ for item in runs:
 
         if 'EIM' not in key:
             for i in list(range(0, len(msdmulti[key]))):
-                lab = key+' at ' +str(startpoints[i])+' [ps]'
+                lab = key+' at '+str(startpoints[i])+' [ps]'
                 pl.errorbar(
                             timemulti[key][i],
                             msdmulti[key][i],
@@ -137,7 +136,7 @@ for item in runs:
 
         if 'EIM' not in key:
             for i in list(range(0, len(diffmulti[key]))):
-                lab = key+' at ' +str(startpoints[i])+' [ps]'
+                lab = key+' at '+str(startpoints[i])+' [ps]'
                 pl.errorbar(
                             startpoints[i],
                             diffmulti[key][i],
@@ -155,7 +154,6 @@ for item in runs:
     pl.legend(loc='best')
     pl.savefig('../images/averaged/diffusion/'+item+'_origins')
     pl.clf()
-
 
     output = '../datacalculated/diffusion/'+item+'_origins'
 
