@@ -116,7 +116,6 @@ for item in runs:
                             msdmulti[key][i],
                             yerr=msdmulti[key+'_EIM'][i],
                             linestyle='dotted',
-                            marker='.',
                             errorevery=errorfreq,
                             label=lab
                             )
@@ -142,7 +141,6 @@ for item in runs:
                             diffmulti[key][i],
                             yerr=diffmulti[key+'_EIM'][i],
                             linestyle='dotted',
-                            marker='.',
                             errorevery=errorfreq,
                             )
 
@@ -170,7 +168,6 @@ for item in runs:
                             diffmulti[key][i],
                             yerr=st.sem(diffmulti[key][i]),
                             linestyle='dotted',
-                            marker='.',
                             errorevery=errorfreq,
                             )
 
