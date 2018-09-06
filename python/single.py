@@ -1,4 +1,5 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
+from numpy.polynomial.polynomial import polyfit
 from matplotlib import pyplot as pl
 from ovito_calc import calc, rdfcalc
 
@@ -98,8 +99,15 @@ class analize(object):
         self.bccavg = self.bccavg/self.size
         self.icoavg = self.icoavg/self.size
 
+        # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
+        self.diffusion = {}
+        for key in self.msd:
+            slope = polyfit(self.time, self.msd[key], 1)[1]
+            self.diffusion[key] = slope/6
+
         data['time'] = self.time
         data['msd'] = self.msd
+        data['diffusion'] = self.diffusion
         data['fccavg'] = self.fccavg
         data['hcpavg'] = self.hcpavg
         data['bccavg'] = self.bccavg

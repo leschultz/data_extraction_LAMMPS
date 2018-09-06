@@ -70,13 +70,11 @@ def avg(*args, **kwargs):
                 datamsd[key] = []
             datamsd[key].append(np.array(data['msd'][key]))
 
-            # Calculate the diffusion values [*10^-4 cm^2 s^-1]
+        # Grag the diffusion values [*10^-4 cm^2 s^-1]
+        for key in data['diffusion']:
             if datadif.get(key) is None:
                 datadif[key] = []
-
-            slope = polyfit(data['time'], data['msd'][key], 1)[1]
-
-            datadif[key].append(slope/6)
+            datadif[key].append(data['diffusion'][key])
 
         # Try to generate graphs from txt file if available
         try:
