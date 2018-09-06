@@ -66,15 +66,21 @@ def avg(*args, **kwargs):
 
         # Grab MSD data for all runs
         for key in data['msd']:
-            if datamsd.get(key) is None:
-                datamsd[key] = []
-            datamsd[key].append(np.array(data['msd'][key]))
+
+            if '_EIM' not in key:
+
+                if datamsd.get(key) is None:
+                    datamsd[key] = []
+                datamsd[key].append(np.array(data['msd'][key]))
 
         # Grag the diffusion values [*10^-4 cm^2 s^-1]
         for key in data['diffusion']:
-            if datadif.get(key) is None:
-                datadif[key] = []
-            datadif[key].append(data['diffusion'][key])
+
+            if '_EIM' not in key:
+
+                if datadif.get(key) is None:
+                    datadif[key] = []
+                datadif[key].append(data['diffusion'][key])
 
         # Try to generate graphs from txt file if available
         try:

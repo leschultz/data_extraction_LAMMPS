@@ -121,11 +121,13 @@ class analize(object):
         '''
 
         for key in self.msd:
-            pl.plot(
-                    self.time,
-                    self.msd[key],
-                    label='Element Type: %s' % key
-                    )
+            if '_EIM' not in key:
+                pl.errorbar(
+                            self.time,
+                            self.msd[key],
+                            self.msd[key+'_EIM'],
+                            label='Element Type: %s' % key
+                            )
 
         pl.xlabel('Time [ps]')
         pl.ylabel('Mean Squared Displacement [A^2]')

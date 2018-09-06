@@ -142,7 +142,7 @@ for item in runs:
                             diffmulti[key][i],
                             yerr=diffmulti[key+'_EIM'][i],
                             linestyle='dotted',
-                            marker='b.',
+                            marker='.',
                             errorevery=errorfreq,
                             )
 
@@ -170,7 +170,7 @@ for item in runs:
                             diffmulti[key][i],
                             yerr=st.sem(diffmulti[key][i]),
                             linestyle='dotted',
-                            marker='b.',
+                            marker='.',
                             errorevery=errorfreq,
                             )
 

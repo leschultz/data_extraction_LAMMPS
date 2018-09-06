@@ -7,6 +7,7 @@ from ovito.modifiers import CommonNeighborAnalysisModifier
 from ovito.modifiers import CoordinationNumberModifier
 from ovito.modifiers import PythonScriptModifier
 from ovito.io import import_file
+from scipy import stats as st
 
 import numpy as np
 import os
@@ -32,14 +33,19 @@ def msdmodify(frame, input, output):
 
         # Compute MSD for a type of atom
         msd = np.sum(dispmag[index] ** 2) / len(dispmag[index])
+        msdeim = st.sem(dispmag[index] ** 2)
 
         # Output MSD value as a global attribute:
         attr_name = 'MSD_type'+str(item)
         output.attributes[attr_name] = msd
+        attr_name_EIM = 'MSD_type_EIM'+str(item)
+        output.attributes[attr_name_EIM] = msdeim
 
     # Compute MSD for all atoms
     msd = np.sum(dispmag ** 2) / len(dispmag)
+    msdeim = st.sem(dispmag **2)
     output.attributes['MSD'] = msd
+    output.attributes['MSD_EIM'] = msd
 
 
 # Load the data for trajectories
@@ -67,11 +73,14 @@ def calc(name, start, stop, unwrap=False):
 
     # The variables where data will be held
     msd = []
+    msdeim = []
     step = []
     msd_types = {}
+    msd_types_eim = {}
     order = []
     for type in node.compute().particles['Particle Type'].types:
         msd_types[type.id] = []
+        msd_types_eim[type.id] = []
         order.append(type.id)
 
     fcc = []
@@ -82,11 +91,13 @@ def calc(name, start, stop, unwrap=False):
     for frame in range(start, stop+1):
         out = node.compute(frame)
         msd.append(out.attributes['MSD'])
+        msdeim.append(out.attributes['MSD_EIM'])
         step.append(out.attributes['Timestep'])
 
         for type in out.particles['Particle Type'].types:
             attr_name = 'MSD_type'+str(type.id)
             msd_types[type.id].append(out.attributes[attr_name])
+            msd_types_eim[type.id].append(out.attributes[attr_name])
 
         fcc.append(out.attributes['CommonNeighborAnalysis.counts.FCC'])
         hcp.append(out.attributes['CommonNeighborAnalysis.counts.HCP'])
@@ -103,10 +114,12 @@ def calc(name, start, stop, unwrap=False):
     # MSD data
     msdall = {}
     msdall['all'] = msd
+    msdall['all_EIM'] = msdeim
 
     # Create columns for each particle type and ensure type order
     for key in msd_types:
         msdall[str(key)] = msd_types[key]
+        msdall[str(key)+'_EIM'] = msd_types_eim[key]
 
     return step, msdall, cluster
 
