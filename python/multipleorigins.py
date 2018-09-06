@@ -53,7 +53,6 @@ for item in runs:
     # Split the relevant region in half
     N = 2
     newhold3 = hold3//N
-    newhold3 = 10000  # Delete this
 
     # Gather the MSD data for different time lengths
     msdmulti = {}
