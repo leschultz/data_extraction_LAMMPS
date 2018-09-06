@@ -44,6 +44,7 @@ def avg(*args, **kwargs):
 
     # Gather plots, vibration, and MSD data for each run
     datamsd = {}
+    datamsdeim = {}
     datadif = {}
     fcc = []
     hcp = []
@@ -71,7 +72,10 @@ def avg(*args, **kwargs):
 
                 if datamsd.get(key) is None:
                     datamsd[key] = []
+                    datamsdeim[key] = []
+
                 datamsd[key].append(np.array(data['msd'][key]))
+                datamsdeim[key].append(np.array(data['msd'][key+'_EIM']))
 
         # Grag the diffusion values [*10^-4 cm^2 s^-1]
         for key in data['diffusion']:
@@ -87,6 +91,18 @@ def avg(*args, **kwargs):
             run.plotresponse()
         except Exception:
             pass
+
+    # Plot the runs in one graph for each group
+    for key in datamsd:
+        for i in list(range(0, len(datamsd[key]))):
+            pl.errorbar(data['time'], datamsd[key][i], datamsdeim[key][i])
+
+    pl.xlabel('Time [ps]')
+    pl.ylabel('MSD Averaged [A^2]')
+    pl.grid(b=True, which='both')
+    pl.tight_layout()
+    pl.savefig('../images/averaged/motion/'+series+'_MSD')
+    pl.clf()
 
     # Step data from last iteration on previous loop
     time = data['time']

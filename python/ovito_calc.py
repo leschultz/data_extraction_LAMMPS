@@ -45,7 +45,7 @@ def msdmodify(frame, input, output):
     msd = np.sum(dispmag ** 2) / len(dispmag)
     msdeim = st.sem(dispmag **2)
     output.attributes['MSD'] = msd
-    output.attributes['MSD_EIM'] = msd
+    output.attributes['MSD_EIM'] = msdeim
 
 
 # Load the data for trajectories
@@ -96,8 +96,9 @@ def calc(name, start, stop, unwrap=False):
 
         for type in out.particles['Particle Type'].types:
             attr_name = 'MSD_type'+str(type.id)
+            attr_name_eim = 'MSD_type_EIM'+str(type.id)
             msd_types[type.id].append(out.attributes[attr_name])
-            msd_types_eim[type.id].append(out.attributes[attr_name])
+            msd_types_eim[type.id].append(out.attributes[attr_name_eim])
 
         fcc.append(out.attributes['CommonNeighborAnalysis.counts.FCC'])
         hcp.append(out.attributes['CommonNeighborAnalysis.counts.HCP'])
