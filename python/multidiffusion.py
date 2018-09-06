@@ -1,5 +1,6 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
+from scipy import stats as st
 from averages import avg
 
 import pandas as pd
@@ -121,3 +122,23 @@ for item in runs:
     df.insert(0, 'time', diffusiontime)
 
     df.to_csv(output, sep=' ', index=False)
+
+    for key in timediff:
+
+        if 'EIM' not in key:
+            pl.errorbar(
+                        diffusiontime,
+                        timediff[key],
+                        yerr=st.sem(timediff[key]),
+                        linestyle='dotted',
+                        marker='.',
+                        label=key
+                        )
+
+    pl.xlabel('Time [ps]')
+    pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
+    pl.grid(b=True, which='both')
+    pl.tight_layout()
+    pl.legend(loc='best')
+    pl.savefig('../images/averaged/diffusion/'+item+'_EIMmulti')
+    pl.clf()
