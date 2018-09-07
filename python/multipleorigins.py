@@ -109,16 +109,12 @@ for item in runs:
 
         if 'EIM' not in key:
             for i in list(range(0, len(msdmulti[key]))):
-                lab = key+' at '+str(startpoints[i])+' [ps]'
                 pl.errorbar(
                             timemulti[key][i],
                             msdmulti[key][i],
                             yerr=msdmulti[key+'_EIM'][i],
-                            linestyle='dotted',
-                            errorevery=errorfreq,
-                            color='b',
                             ecolor='r',
-                            label=lab
+                            errorevery=errorfreq,
                             )
 
     pl.xlabel('Time [ps]')
@@ -144,6 +140,7 @@ for item in runs:
                             linestyle='dotted',
                             color='b',
                             ecolor='r',
+                            marker='.',
                             errorevery=errorfreq,
                             )
 
@@ -171,6 +168,7 @@ for item in runs:
                             yerr=st.sem(diffmulti[key]),
                             linestyle='dotted',
                             ecolor='r',
+                            marker='.',
                             errorevery=errorfreq,
                             )
 
