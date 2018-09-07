@@ -116,6 +116,8 @@ for item in runs:
                             yerr=msdmulti[key+'_EIM'][i],
                             linestyle='dotted',
                             errorevery=errorfreq,
+                            color='b',
+                            ecolor='r',
                             label=lab
                             )
 
@@ -140,6 +142,8 @@ for item in runs:
                             diffmulti[key][i],
                             yerr=diffmulti[key+'_EIM'][i],
                             linestyle='dotted',
+                            color='b',
+                            ecolor='r',
                             errorevery=errorfreq,
                             )
 
@@ -147,7 +151,6 @@ for item in runs:
     pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.legend('EIM from multiple runs', loc='best')
     pl.savefig('../images/averaged/diffusion/'+item+'_origins')
     pl.clf()
 
@@ -165,8 +168,9 @@ for item in runs:
                 pl.errorbar(
                             startpoints[i],
                             diffmulti[key][i],
-                            yerr=st.sem(diffmulti[key][i]),
+                            yerr=st.sem(diffmulti[key]),
                             linestyle='dotted',
+                            ecolor='r',
                             errorevery=errorfreq,
                             )
 
