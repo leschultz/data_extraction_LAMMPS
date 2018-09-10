@@ -4,9 +4,6 @@ import os
 first_directory = os.getcwd()
 data_directory = first_directory+'/../data/'
 
-# Getting the image directory
-image_directory = first_directory+'/../images/'
-
 # The directories were data will be saved
 analysis = first_directory+'/../datacalculated/'
 datamsd = analysis+'msd/'
@@ -14,8 +11,10 @@ datadiffusion = analysis+'diffusion/'
 datardf = analysis+'rdf/'
 
 # The directories were images will be saved for single runs
-msd = image_directory+'msd/'
+image_directory = first_directory+'/../images/'
+msdplots = image_directory+'msd/'
 rdfplots = image_directory+'rdf/'
+diffusionplots = image_directory+'diffusion/'
 
 directories = [
                analysis,
@@ -23,8 +22,9 @@ directories = [
                datadiffusion,
                datardf,
                image_directory,
-               msd,
+               msdplots,
                rdfplots,
+               diffusionplots,
                ]
 
 for directory in directories:

@@ -1,7 +1,7 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
 from scipy import stats as st
-from averages import avg
+from single import analize
 
 import pandas as pd
 import os
@@ -17,13 +17,10 @@ names = os.listdir(lammpstrjdir)
 # Grab the names of runs to be averaged
 count = 0
 for name in names:
-    names[count] = name.split('_run')[0]
+    names[count] = name.split('.lammpstrj')[0]
     count += 1
 
-# Remove repeated items
-runs = list(set(names))
-
-for item in runs:
+for item in names:
 
     string = 'Starting multiple origins method'
     print('+'*len(string))
@@ -72,16 +69,21 @@ for item in runs:
         print('='*len(printtext))
 
         # Do averaging for files
-        time, msd, diffusion = avg(
-                                   item,
-                                   points[1],
-                                   points[2],
-                                   timestep,
-                                   dumprate,
-                                   [points[0], points[1], points[2]],
-                                   10,
-                                   50
-                                   )
+        value = analize(
+                       item,
+                       points[1],
+                       points[2],
+                       timestep,
+                       dumprate,
+                       [points[0], points[1], points[2]],
+                       10,
+                       50
+                       )
+
+        data = value.calculate()
+        msd = data['msd']
+        diffusion = data['diffusion']
+        time = data['time']
 
         # The beggining time for a diffusion calculation
         startpoints.append(count*timestep)
@@ -91,12 +93,16 @@ for item in runs:
 
             if msdmulti.get(key) is None:
                 msdmulti[key] = []
-                diffmulti[key] = []
                 timemulti[key] = []
 
             msdmulti[key].append(msd[key])
-            diffmulti[key].append(diffusion[key])
             timemulti[key].append(time)
+
+        for key in diffusion:
+            if diffmulti.get(key) is None:
+                diffmulti[key] = []
+
+            diffmulti[key].append(diffusion[key])
 
         count += dumprate
 
@@ -107,7 +113,7 @@ for item in runs:
 
     for key in msdmulti:
 
-        if 'EIM' not in key:
+        if '_EIM' not in key:
             for i in list(range(0, len(msdmulti[key]))):
                 pl.errorbar(
                             timemulti[key][i],
@@ -121,7 +127,7 @@ for item in runs:
     pl.ylabel('MSD [A^2]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.savefig('../images/averaged/motion/'+item+'_origins')
+    pl.savefig('../images/msd/'+item+'_origins')
     pl.clf()
 
     fmt = ''
@@ -131,12 +137,12 @@ for item in runs:
         fmt += '%f '
         nh += key+' '
 
-        if 'EIM' not in key:
+        if '_Err' not in key:
             for i in list(range(0, len(diffmulti[key]))):
                 pl.errorbar(
                             startpoints[i],
                             diffmulti[key][i],
-                            yerr=diffmulti[key+'_EIM'][i],
+                            yerr=diffmulti[key+'_Err'][i],
                             linestyle='dotted',
                             color='b',
                             ecolor='r',
@@ -148,7 +154,7 @@ for item in runs:
     pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
     pl.grid(b=True, which='both')
     pl.tight_layout()
-    pl.savefig('../images/averaged/diffusion/'+item+'_origins')
+    pl.savefig('../images/diffusion/'+item+'_origins')
     pl.clf()
 
     output = '../datacalculated/diffusion/'+item+'_origins'
@@ -158,24 +164,4 @@ for item in runs:
 
     df.to_csv(output, sep=' ', index=False)
 
-    for key in diffmulti:
-
-        if 'EIM' not in key:
-            for i in list(range(0, len(diffmulti[key]))):
-                pl.errorbar(
-                            startpoints[i],
-                            diffmulti[key][i],
-                            yerr=st.sem(diffmulti[key]),
-                            linestyle='dotted',
-                            ecolor='r',
-                            marker='.',
-                            errorevery=errorfreq,
-                            )
-
-    pl.xlabel('Time [ps]')
-    pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
-    pl.grid(b=True, which='both')
-    pl.tight_layout()
-    pl.savefig('../images/averaged/diffusion/'+item+'_EIMorigins')
-    pl.clf()
-
+    print('\n')
