@@ -78,10 +78,6 @@ def calc(name, start, stop, unwrap=False):
         msd_types_eim[type.id] = []
         order.append(type.id)
 
-    fcc = []
-    hcp = []
-    bcc = []
-    ico = []
     # Compute the MSD for each frame of interest
     for frame in range(start, stop+1):
         out = node.compute(frame)

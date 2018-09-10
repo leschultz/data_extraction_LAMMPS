@@ -1,5 +1,5 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
-from averages import avg
+from single import analize
 
 import os
 
@@ -13,13 +13,10 @@ names = os.listdir(lammpstrjdir)
 # Grab the names of runs to be averaged
 count = 0
 for name in names:
-    names[count] = name.split('_run')[0]
+    names[count] = name.split('.lammpstrj')[0]
     count += 1
 
-# Remove repeated items
-runs = list(set(names))
-
-for item in runs:
+for item in names:
 
     # Parameters from the naming convention
     value = item.split('_')
@@ -44,13 +41,20 @@ for item in runs:
     points = [hold1, hold1+hold2, hold1+hold2+hold3]
 
     # Do averaging for files
-    time, msd, diffusion = avg(
-                               item,
-                               points[1],
-                               points[2],
-                               timestep,
-                               dumprate,
-                               [points[0], points[1], points[2]],
-                               10,
-                               50
-                               )
+    value = analize(
+                    item,
+                    points[1],
+                    points[2],
+                    timestep,
+                    dumprate,
+                    [points[0], points[1], points[2]],
+                    10,
+                    50
+                    )
+
+    data = value.calculate()
+    value.plotmsd()
+    value.plotrdf()
+    value.msdsave()
+    value.rdfsave()
+    value.diffusionsave()

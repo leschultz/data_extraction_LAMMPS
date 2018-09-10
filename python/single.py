@@ -6,6 +6,7 @@ from scipy.stats import linregress
 import parameters as par
 import pandas as pd
 import numpy as np
+import setup
 
 
 class analize(object):
@@ -38,7 +39,9 @@ class analize(object):
         self.size = param['size']
         self.frq = dumprate
 
-        print('Crunching data for: '+self.run.split('K_')[1])
+        print('_'*79)
+        print('Crunching data for: ')
+        print(self.run)
 
         self.bins = bins  # The number of bins
         self.cut = cut  # Data for RDF
@@ -69,14 +72,17 @@ class analize(object):
 
         # Gather the RDF for steps defined
         if self.step is not None:
-            self.rdf = []
+            self.rdf = {}
             for item in self.step:
-                self.rdf.append(rdfcalc(
-                                        self.trjfile,
-                                        int(item/self.frq),
-                                        self.cut,
-                                        self.bins
-                                        ))
+                if self.rdf.get(item) is None:
+                    self.rdf[item] = []
+                
+                self.rdf[item] =(rdfcalc(
+                                         self.trjfile,
+                                         int(item/self.frq),
+                                         self.cut,
+                                         self.bins
+                                         ))
 
             # The RDF data if the acquisition steps are defined
             data['rdf'] = self.rdf
@@ -87,17 +93,55 @@ class analize(object):
         # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
         self.diffusion = {}
         for key in self.msd:
-            p = linregress(self.time, self.msd[key])
-            slope = p[0]
-            stderr = p[-1]
-            self.diffusion[key] = slope/6
-            self.diffusion[key+'_Err'] = stderr/6
+            if '_EIM' not in key:
+                p = linregress(self.time, self.msd[key])
+                slope = p[0]
+                stderr = p[-1]
+                self.diffusion[key] = slope/6
+                self.diffusion[key+'_Err'] = stderr/6
 
         data['time'] = self.time
         data['msd'] = self.msd
         data['diffusion'] = self.diffusion
+        self.data = data
 
-        return data
+        return self.data
+
+    def msdsave(self):
+        '''
+        Method for saving MSD data
+        '''
+
+        df = pd.DataFrame(data=self.data['msd'])
+        df.insert(loc=0, value=self.data['time'], column='time')
+
+        export = '../datacalculated/msd/'+self.run
+        df.to_csv(export, index=False)
+
+    def rdfsave(self):
+        '''
+        Method for saving the RDF data
+        '''
+
+        data = {}
+        for key in self.data['rdf']:
+            data['step_'+str(key)+'_coord'] = self.data['rdf'][key][0]
+            data['step_'+str(key)+'_rdf'] = self.data['rdf'][key][1]
+
+        df = pd.DataFrame(data=data)
+
+        export = '../datacalculated/rdf/'+self.run
+        df.to_csv(export, index=False)
+
+    def diffusionsave(self):
+        '''
+        Method for saving the diffusion data
+        '''
+
+        df = pd.DataFrame(data=self.data['diffusion'], index=[0])
+
+        export = '../datacalculated/diffusion/'+self.run
+        df.to_csv(export, index=False)
 
     def plotmsd(self):
         '''
@@ -124,7 +168,7 @@ class analize(object):
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.legend(loc='upper left')
-        pl.savefig('../images/single/motion/'+self.run+'_MSD')
+        pl.savefig('../images/msd/'+self.run+'_MSD')
         pl.clf()
 
     def plotrdf(self):
@@ -136,62 +180,18 @@ class analize(object):
         if self.step is not None:
 
             # Plot for every step in user input list
-            count = 0
-            for item in self.step:
-                pl.plot(self.rdf[count][0], self.rdf[count][1])
-                pl.legend(['Step '+str(item)], loc='best')
+            for key in self.rdf:
+                pl.plot(self.rdf[key][0], self.rdf[key][1])
+                pl.legend(['Step '+str(key)], loc='best')
                 pl.xlabel('Bin Center [A]')
                 pl.ylabel('g(r)')
                 pl.grid(b=True, which='both')
                 pl.tight_layout()
                 pl.savefig(
-                           '../images/single/rdf/' +
+                           '../images/rdf/' +
                            self.run +
-                           '_' +
-                           str(item) +
+                           '_step' +
+                           str(key) +
                            '_rdf'
                            )
                 pl.clf()
-
-                count += 1
-
-    def plotresponse(self):
-        '''
-        Load the system properties throughout time.
-        '''
-
-        # Load the data
-        mycolumns = [
-                     'Step [-]',
-                     'Temperature [K]',
-                     'Pressure [bar]',
-                     'Volumne [A^3]',
-                     'Potential Energy [eV]',
-                     'Kinetic Energy [eV]'
-                     ]
-
-        data = pd.read_csv(
-                           self.sysfile,
-                           names=mycolumns,
-                           sep=' ',
-                           comment='#',
-                           header=None
-                           )
-
-        # Define time based on input stepsize
-        time = [i for i in data['Step [-]']*self.stepsize]
-
-        # Plot recorded data versus step
-        for item in mycolumns:
-            pl.plot(time, data[item])
-            pl.xlabel('Time [ps]')
-            pl.ylabel(item)
-            pl.grid(b=True, which='both')
-            pl.tight_layout()
-            pl.savefig(
-                       '../images/single/system/' +
-                       self.run +
-                       '_' +
-                       item.split(' ')[0]
-                       )
-            pl.clf()

@@ -10,36 +10,21 @@ image_directory = first_directory+'/../images/'
 # The directories were data will be saved
 analysis = first_directory+'/../datacalculated/'
 datamsd = analysis+'msd/'
-diffusion = analysis+'diffusion/'
-cluster = analysis+'cluster/'
+datadiffusion = analysis+'diffusion/'
+datardf = analysis+'rdf/'
 
 # The directories were images will be saved for single runs
-singleimage = image_directory+'single/'
-motionsingle = singleimage+'motion/'
-systemsingle = singleimage+'system/'
-rdfplotssingle = singleimage+'rdf/'
-clusterplotssingle = singleimage+'cluster/'
-
-# The directories were images will be saved for averaged runs
-avgimage = image_directory+'averaged/'
-motionavg = avgimage+'motion/'
-clusteravg = avgimage+'cluster/'
-diffusionavg = avgimage+'diffusion/'
+msd = image_directory+'msd/'
+rdfplots = image_directory+'rdf/'
 
 directories = [
                analysis,
                datamsd,
-               diffusion,
-               cluster,
-               singleimage,
-               motionsingle,
-               systemsingle,
-               rdfplotssingle,
-               clusterplotssingle,
-               avgimage,
-               motionavg,
-               clusteravg,
-               diffusionavg
+               datadiffusion,
+               datardf,
+               image_directory,
+               msd,
+               rdfplots,
                ]
 
 for directory in directories:
