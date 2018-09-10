@@ -69,16 +69,16 @@ for item in runs:
         points = [hold1, hold1+hold2, hold1+hold2+hold]
 
         # Do averaging for files
-        time, msd, diffusion, clusters = avg(
-                                             item,
-                                             points[1],
-                                             points[2],
-                                             timestep,
-                                             dumprate,
-                                             [points[0], points[1], points[2]],
-                                             10,
-                                             50
-                                             )
+        time, msd, diffusion = avg(
+                                   item,
+                                   points[1],
+                                   points[2],
+                                   timestep,
+                                   dumprate,
+                                   [points[0], points[1], points[2]],
+                                   10,
+                                   50
+                                   )
 
         # The length of time used for diffusion
         diffusiontime.append(hold*timestep)

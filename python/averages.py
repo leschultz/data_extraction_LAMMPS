@@ -46,24 +46,13 @@ def avg(*args, **kwargs):
     datamsd = {}
     datamsdeim = {}
     datadif = {}
-    fcc = []
-    hcp = []
-    bcc = []
-    ico = []
     for name in newnames:
         run = an(name, *args[1:], **kwargs)
 
         data = run.calculate()  # Data calculated by ovito
 
-        # Cluster Data
-        fcc.append(data['fccavg'])
-        hcp.append(data['hcpavg'])
-        bcc.append(data['bccavg'])
-        ico.append(data['icoavg'])
-
         run.plotrdf()  # Plot RDF
         run.plotmsd()  # Plot MSD
-        run.plotclusters()  # Plot cluster time averages
 
         # Grab MSD data for all runs
         for key in data['msd']:
@@ -77,14 +66,17 @@ def avg(*args, **kwargs):
                 datamsd[key].append(np.array(data['msd'][key]))
                 datamsdeim[key].append(np.array(data['msd'][key+'_EIM']))
 
-        # Grag the diffusion values [*10^-4 cm^2 s^-1]
+        # Grab the diffusion values [*10^-4 cm^2 s^-1]
         for key in data['diffusion']:
 
-            if '_EIM' not in key:
+            if '_Err' not in key:
 
                 if datadif.get(key) is None:
                     datadif[key] = []
+                    datadif[key+'_Err'] = []
+
                 datadif[key].append(data['diffusion'][key])
+                datadif[key+'_Err'].append(data['diffusion'][key+'_Err'])
 
         # Try to generate graphs from txt file if available
         try:
@@ -141,13 +133,6 @@ def avg(*args, **kwargs):
         meandatadif[key] = np.mean(datadif[key])
         meandatadif[key+'_EIM'] = st.sem(datadif[key])
 
-    # Average the number of clusters accross runs
-    clusters = {}
-    clusters['fcc'] = np.mean(fcc)
-    clusters['hcp'] = np.mean(hcp)
-    clusters['bcc'] = np.mean(bcc)
-    clusters['ico'] = np.mean(ico)
-
     print('\n')
 
-    return time, meandatamsd, meandatadif, clusters
+    return time, meandatamsd, meandatadif

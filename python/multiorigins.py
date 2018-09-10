@@ -72,16 +72,16 @@ for item in runs:
         print('='*len(printtext))
 
         # Do averaging for files
-        time, msd, diffusion, clusters = avg(
-                                             item,
-                                             points[1],
-                                             points[2],
-                                             timestep,
-                                             dumprate,
-                                             [points[0], points[1], points[2]],
-                                             10,
-                                             50
-                                             )
+        time, msd, diffusion = avg(
+                                   item,
+                                   points[1],
+                                   points[2],
+                                   timestep,
+                                   dumprate,
+                                   [points[0], points[1], points[2]],
+                                   10,
+                                   50
+                                   )
 
         # The beggining time for a diffusion calculation
         startpoints.append(count*timestep)

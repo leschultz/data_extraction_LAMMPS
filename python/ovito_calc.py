@@ -3,7 +3,6 @@ Modified from https://ovito.org/manual/python/modules/ovito_modifiers.html
 '''
 
 from ovito.modifiers import CalculateDisplacementsModifier
-from ovito.modifiers import CommonNeighborAnalysisModifier
 from ovito.modifiers import CoordinationNumberModifier
 from ovito.modifiers import PythonScriptModifier
 from ovito.io import import_file
@@ -67,10 +66,6 @@ def calc(name, start, stop, unwrap=False):
     # Insert custom modifier into the data pipeline.
     node.modifiers.append(PythonScriptModifier(function=msdmodify))
 
-    # Apply the common neighbor modifier
-    modifier = CommonNeighborAnalysisModifier()
-    node.modifiers.append(modifier)
-
     # The variables where data will be held
     msd = []
     msdeim = []
@@ -100,18 +95,6 @@ def calc(name, start, stop, unwrap=False):
             msd_types[type.id].append(out.attributes[attr_name])
             msd_types_eim[type.id].append(out.attributes[attr_name_eim])
 
-        fcc.append(out.attributes['CommonNeighborAnalysis.counts.FCC'])
-        hcp.append(out.attributes['CommonNeighborAnalysis.counts.HCP'])
-        bcc.append(out.attributes['CommonNeighborAnalysis.counts.BCC'])
-        ico.append(out.attributes['CommonNeighborAnalysis.counts.ICO'])
-
-    # Cluster data
-    cluster = {}
-    cluster['fcc'] = np.array(fcc)
-    cluster['hcp'] = np.array(hcp)
-    cluster['bcc'] = np.array(bcc)
-    cluster['ico'] = np.array(ico)
-
     # MSD data
     msdall = {}
     msdall['all'] = msd
@@ -122,7 +105,7 @@ def calc(name, start, stop, unwrap=False):
         msdall[str(key)] = msd_types[key]
         msdall[str(key)+'_EIM'] = msd_types_eim[key]
 
-    return step, msdall, cluster
+    return step, msdall
 
 
 def rdfcalc(name, frame, cut, bins):

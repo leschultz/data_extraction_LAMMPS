@@ -1,14 +1,11 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
-from numpy.polynomial.polynomial import polyfit
 from matplotlib import pyplot as pl
 from ovito_calc import calc, rdfcalc
+from scipy.stats import linregress
 
 import parameters as par
-import subprocess as sub
-import tempfile as temp
 import pandas as pd
 import numpy as np
-import shlex
 
 
 class analize(object):
@@ -64,11 +61,11 @@ class analize(object):
         data = {}
 
         # Gather the MSD and common neighbor values
-        self.steps, self.msd, self.clu = calc(
-                                              self.trjfile,
-                                              self.startframe,
-                                              self.stopframe
-                                              )
+        self.steps, self.msd = calc(
+                                    self.trjfile,
+                                    self.startframe,
+                                    self.stopframe
+                                    )
 
         # Gather the RDF for steps defined
         if self.step is not None:
@@ -87,31 +84,18 @@ class analize(object):
         time = [i*self.stepsize for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
 
-        # Average the count of clusters over time
-        self.fccavg = np.sum(self.clu['fcc'])/self.time[-1]
-        self.hcpavg = np.sum(self.clu['hcp'])/self.time[-1]
-        self.bccavg = np.sum(self.clu['bcc'])/self.time[-1]
-        self.icoavg = np.sum(self.clu['ico'])/self.time[-1]
-
-        # Normalize cluster count by system size
-        self.fccavg = self.fccavg/self.size
-        self.hcpavg = self.hcpavg/self.size
-        self.bccavg = self.bccavg/self.size
-        self.icoavg = self.icoavg/self.size
-
         # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
         self.diffusion = {}
         for key in self.msd:
-            slope = polyfit(self.time, self.msd[key], 1)[1]
+            p = linregress(self.time, self.msd[key])
+            slope = p[0]
+            stderr = p[-1]
             self.diffusion[key] = slope/6
+            self.diffusion[key+'_Err'] = stderr/6
 
         data['time'] = self.time
         data['msd'] = self.msd
         data['diffusion'] = self.diffusion
-        data['fccavg'] = self.fccavg
-        data['hcpavg'] = self.hcpavg
-        data['bccavg'] = self.bccavg
-        data['icoavg'] = self.icoavg
 
         return data
 
@@ -120,13 +104,19 @@ class analize(object):
         Plot mean squared displacement.
         '''
 
+        # Control the frequency of errorbars
+        errorfreq = len(self.time)//10
+        if errorfreq == 0:
+            errorfreq = 1
+
         for key in self.msd:
             if '_EIM' not in key:
                 pl.errorbar(
                             self.time,
                             self.msd[key],
                             self.msd[key+'_EIM'],
-                            label='Element Type: %s' % key
+                            label='Element Type: %s' % key,
+                            errorevery=errorfreq
                             )
 
         pl.xlabel('Time [ps]')
@@ -135,38 +125,6 @@ class analize(object):
         pl.tight_layout()
         pl.legend(loc='upper left')
         pl.savefig('../images/single/motion/'+self.run+'_MSD')
-        pl.clf()
-
-    def plotclusters(self):
-        '''
-        Plot the common neighbor analysis.
-        '''
-
-        clusters = [self.fccavg, self.hcpavg, self.bccavg, self.icoavg]
-
-        # The labels for clusters in the xlabel
-        labels = ['FCC', 'HCP', 'BCC', 'ICO']
-        location = [1, 2, 3, 4]
-
-        count = 0
-        for v, i in enumerate(clusters):
-            pl.text(
-                    v+1, i,
-                    ' '+str(clusters[count]),
-                    color='red',
-                    ha='center',
-                    fontweight='bold'
-                    )
-
-            count += 1
-
-        pl.bar(location, clusters,  align='center')
-        pl.xticks(location, labels)
-        pl.xlabel('Cluster [-]')
-        pl.ylabel('[count/(ps*size)]')
-        pl.grid(b=True, which='both')
-        pl.tight_layout()
-        pl.savefig('../images/single/cluster/'+self.run+'_cluster')
         pl.clf()
 
     def plotrdf(self):
