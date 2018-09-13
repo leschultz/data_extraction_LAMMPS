@@ -42,7 +42,7 @@ def msdmodify(frame, input, output):
 
     # Compute MSD for all atoms
     msd = np.sum(dispmag ** 2) / len(dispmag)
-    msdeim = st.sem(dispmag **2)
+    msdeim = st.sem(dispmag ** 2)
     output.attributes['MSD'] = msd
     output.attributes['MSD_EIM'] = msdeim
 

@@ -76,13 +76,13 @@ class analize(object):
             for item in self.step:
                 if self.rdf.get(item) is None:
                     self.rdf[item] = []
-                
-                self.rdf[item] =(rdfcalc(
-                                         self.trjfile,
-                                         int(item/self.frq),
-                                         self.cut,
-                                         self.bins
-                                         ))
+
+                self.rdf[item] = (rdfcalc(
+                                          self.trjfile,
+                                          int(item/self.frq),
+                                          self.cut,
+                                          self.bins
+                                          ))
 
             # The RDF data if the acquisition steps are defined
             data['rdf'] = self.rdf
