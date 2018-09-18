@@ -73,7 +73,7 @@ timestep                                    ${mytimestep}
 ################################################################################
 
 # Save atom positions at an interval
-dump                                        my_dump_rate all custom ${mydumprate} ${data_file_dump_rate} id type x y z
+dump                                        my_dump_rate all custom ${mydumprate} ${data_file_dump_rate} id type xu yu zu
 dump_modify                                 my_dump_rate sort id
 
 ################################################################################

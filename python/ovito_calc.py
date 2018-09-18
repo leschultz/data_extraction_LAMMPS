@@ -31,8 +31,8 @@ def msdmodify(frame, input, output):
         index = (input.particles['Particle Type'] == item)
 
         # Compute MSD for a type of atom
-        msd = np.sum(dispmag[index] ** 2) / len(dispmag[index])
-        msdeim = st.sem(dispmag[index] ** 2)
+        msd = np.sum(dispmag[index]**2)/len(dispmag[index])
+        msdeim = st.sem(dispmag[index]**2)
 
         # Output MSD value as a global attribute:
         attr_name = 'MSD_type'+str(item)
@@ -41,14 +41,14 @@ def msdmodify(frame, input, output):
         output.attributes[attr_name_EIM] = msdeim
 
     # Compute MSD for all atoms
-    msd = np.sum(dispmag ** 2) / len(dispmag)
-    msdeim = st.sem(dispmag ** 2)
+    msd = np.sum(dispmag**2)/len(dispmag)
+    msdeim = st.sem(dispmag**2)
     output.attributes['MSD'] = msd
     output.attributes['MSD_EIM'] = msdeim
 
 
 # Load the data for trajectories
-def calc(name, start, stop, unwrap=False):
+def calc(name, start, stop):
     '''
     Load the lammps trajectories and calculate MSD.
     '''
@@ -58,7 +58,7 @@ def calc(name, start, stop, unwrap=False):
 
     # Calculate per-particle displacements with respect to a start
     modifier = CalculateDisplacementsModifier()
-    modifier.assume_unwrapped_coordinates = unwrap
+    modifier.assume_unwrapped_coordinates = True
     modifier.reference.load(name)
     modifier.reference_frame = start
     node.modifiers.append(modifier)
