@@ -1,6 +1,5 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
-from scipy import stats as st
 from single import analize
 
 import pandas as pd
@@ -104,7 +103,8 @@ for item in names:
 
             diffmulti[key].append(diffusion[key])
 
-        count += dumprate
+        count += dumprate*500
+        print('\n')
 
     # Define the frequency of errorbars
     errorfreq = newhold3//10
@@ -115,6 +115,7 @@ for item in names:
 
         if '_EIM' not in key:
             for i in list(range(0, len(msdmulti[key]))):
+
                 pl.errorbar(
                             timemulti[key][i],
                             msdmulti[key][i],
@@ -138,7 +139,9 @@ for item in names:
         nh += key+' '
 
         if '_Err' not in key:
+
             for i in list(range(0, len(diffmulti[key]))):
+
                 pl.errorbar(
                             startpoints[i],
                             diffmulti[key][i],
@@ -163,5 +166,3 @@ for item in names:
     df.insert(0, 'time', startpoints)
 
     df.to_csv(output, sep=' ', index=False)
-
-    print('\n')
