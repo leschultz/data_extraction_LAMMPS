@@ -103,7 +103,7 @@ for item in names:
 
             diffmulti[key].append(diffusion[key])
 
-        count += dumprate*500
+        count += dumprate
         print('\n')
 
     # Define the frequency of errorbars
