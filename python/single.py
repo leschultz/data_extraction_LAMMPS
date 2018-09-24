@@ -92,11 +92,11 @@ class analize(object):
         '''
 
         # Gather the MSD values
-        self.steps, self.msd = calc(
-                                    self.trjfile,
-                                    self.startframe,
-                                    self.stopframe
-                                    )
+        self.msd = calc(
+                        self.trjfile,
+                        self.startframe,
+                        self.stopframe
+                        )
 
         self.data['msd'] = self.msd
 
@@ -136,35 +136,37 @@ class analize(object):
         # The number of relevant frames
         length = self.stopframe-self.startframe
 
-        # The time in the relevant frames
-        time = self.time[0:length]
-
-        # Split the relevant region in half
+        # Split the relevant region
         N = 2
         halflength = length//N
 
-        # Iterate for multiple origins
-        count = 0
-        diffmulti = {}
+        # The time in the relevant frames
+        time = self.time[0:halflength+1]
 
+        diffmulti = {}
         for key in self.diffusion:
             diffmulti[key] = []
 
+        count = 0
         while count <= halflength:
 
+            start = self.startframe+count
+            stop = self.startframe+count+halflength
+
             # Gather the MSD values
-            steps, msd = calc(
-                              self.trjfile,
-                              self.startframe+count,
-                              self.stopframe+count-halflength
-                              )
+            msd = calc(
+                       self.trjfile,
+                       start,
+                       stop
+                       )
 
             diff = diffusion(time, msd)
 
             for key in diff:
+                
                 diffmulti[key].append(diff[key])
 
-            count += self.frq
+            count += 1
 
         self.diffmulti = diffmulti
         self.data['diffusion_multiple_origins'] = self.diffmulti
@@ -187,7 +189,7 @@ class analize(object):
         export = '../datacalculated/msd/'+self.run
         df.to_csv(export, index=False)
 
-    def save_diffusion_multiple_origins(self):
+    def save_multiple_origins_diffusion(self):
         '''
         Save the diffusion data for multiple origins.
         '''
@@ -198,10 +200,9 @@ class analize(object):
             fmt += '%f '
             nh += key+' '
 
-        output = '../datacalculated/diffusion/'+item+'_origins'
+        output = '../datacalculated/diffusion/'+self.run+'_origins'
 
-        df = pd.DataFrame(data=diffmulti)
-        df.insert(0, 'time', startpoints)
+        df = pd.DataFrame(data=self.diffmulti)
         df.to_csv(output, sep=' ', index=False)
 
     def save_rdf(self):

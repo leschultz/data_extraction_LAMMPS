@@ -101,7 +101,7 @@ def calc(name, start, stop):
         msdall[str(key)] = msd_types[key]
         msdall[str(key)+'_EIM'] = msd_types_eim[key]
 
-    return step, msdall
+    return msdall
 
 
 def rdfcalc(name, frame, cut, bins):
