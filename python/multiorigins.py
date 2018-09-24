@@ -1,5 +1,6 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
+from nameparser import parse
 from single import analize
 
 import pandas as pd
@@ -26,25 +27,11 @@ for item in names:
     print(string)
     print('+'*len(string))
 
-    # Parameters from the naming convention
-    value = item.split('_')
-    system = value[0]
-    side = value[1].split('-')[1]
-    hold1 = int(value[2].split('-')[1])
-    hold2 = int(value[3].split('-')[1])
-    hold3 = int(value[4].split('-')[1])
-    dumprate = int(value[6].split('-')[1])
-    inittemp = int(value[7].split('K-')[0])
-    finaltemp = int(value[7].split('K-')[1][:-1])
+    points, timestep, dumprate = parse(item)
 
-    timestep = ''
-    ptimestep = value[5].split('-')[1]
-    for letter in ptimestep:
-        if letter == 'p':
-            letter = '.'
-        timestep += letter
-
-    timestep = float(timestep)
+    hold1 = points[0]
+    hold2 = points[1]-points[0]
+    hold3 = points[2]-points[1]-points[0]
 
     # Split the relevant region in half
     N = 2
@@ -110,26 +97,6 @@ for item in names:
     errorfreq = newhold3//10
     if errorfreq == 0:
         errorfreq = 1
-
-    for key in msdmulti:
-
-        if '_EIM' not in key:
-            for i in list(range(0, len(msdmulti[key]))):
-
-                pl.errorbar(
-                            timemulti[key][i],
-                            msdmulti[key][i],
-                            yerr=msdmulti[key+'_EIM'][i],
-                            ecolor='r',
-                            errorevery=errorfreq,
-                            )
-
-    pl.xlabel('Time [ps]')
-    pl.ylabel('MSD [A^2]')
-    pl.grid(b=True, which='both')
-    pl.tight_layout()
-    pl.savefig('../images/msd/'+item+'_origins')
-    pl.clf()
 
     fmt = ''
     nh = ''

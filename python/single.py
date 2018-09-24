@@ -9,6 +9,24 @@ import numpy as np
 import setup
 
 
+def diffusion(time, msd):
+    '''
+    Calculate the diffusivity from a linear fit of MSD data.
+    '''
+
+    # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
+    diffusion = {}
+    for key in msd:
+        if '_EIM' not in key:
+            p = linregress(time, msd[key])
+            slope = p[0]
+            stderr = p[-1]
+            diffusion[key] = slope/6
+            diffusion[key+'_Err'] = stderr/6
+
+    return diffusion
+
+
 class analize(object):
     '''Computation functions are defined here'''
 
@@ -55,20 +73,34 @@ class analize(object):
         self.startframe = int(self.start/self.frq)
         self.stopframe = int(self.stop/self.frq)
 
-    def calculate(self):
+        # Where all relevant data is stored
+        self.data = {}
+
+    def calculate_time(self):
         '''
-        Gather data for steps, MSD, RDF, and common neighborhood analysis.
+        Calculate the time from the steps.
         '''
 
-        # All data to be returned
-        data = {}
+        self.steps = list(range(0, self.stop-self.start+1, self.frq))
+        time = [i*self.stepsize for i in self.steps]  # Time from steps
+        self.time = [i-time[0] for i in time]  # Normalize time
+        self.data['time'] = self.time
 
-        # Gather the MSD and common neighbor values
+    def calculate_msd(self):
+        '''
+        Gather data for MSD.
+        '''
+
+        # Gather the MSD values
         self.steps, self.msd = calc(
                                     self.trjfile,
                                     self.startframe,
                                     self.stopframe
                                     )
+
+        self.data['msd'] = self.msd
+
+    def calculate_rdf(self):
 
         # Gather the RDF for steps defined
         if self.step is not None:
@@ -85,29 +117,66 @@ class analize(object):
                                           ))
 
             # The RDF data if the acquisition steps are defined
-            data['rdf'] = self.rdf
+            self.data['rdf'] = self.rdf
 
-        time = [i*self.stepsize for i in self.steps]  # Time from steps
-        self.time = [i-time[0] for i in time]  # Normalize time
+    def calculate_diffusion(self):
+        '''
+        Calculate the diffusivity from a linear fit of MSD data.
+        '''
 
         # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
-        self.diffusion = {}
-        for key in self.msd:
-            if '_EIM' not in key:
-                p = linregress(self.time, self.msd[key])
-                slope = p[0]
-                stderr = p[-1]
-                self.diffusion[key] = slope/6
-                self.diffusion[key+'_Err'] = stderr/6
+        self.diffusion = diffusion(self.time, self.msd)
+        self.data['diffusion'] = self.diffusion
 
-        data['time'] = self.time
-        data['msd'] = self.msd
-        data['diffusion'] = self.diffusion
-        self.data = data
+    def multiple_origins_diffusion(self):
+        '''
+        Calculate the diffusion by multiple origins method.
+        '''
+
+        # The number of relevant frames
+        length = self.stopframe-self.startframe
+
+        # The time in the relevant frames
+        time = self.time[0:length]
+
+        # Split the relevant region in half
+        N = 2
+        halflength = length//N
+
+        # Iterate for multiple origins
+        count = 0
+        diffmulti = {}
+
+        for key in self.diffusion:
+            diffmulti[key] = []
+
+        while count <= halflength:
+
+            # Gather the MSD values
+            steps, msd = calc(
+                              self.trjfile,
+                              self.startframe+count,
+                              self.stopframe+count-halflength
+                              )
+
+            diff = diffusion(time, msd)
+
+            for key in diff:
+                diffmulti[key].append(diff[key])
+
+            count += self.frq
+
+        self.diffmulti = diffmulti
+        self.data['diffusion_multiple_origins'] = self.diffmulti
+
+    def calculation_export(self):
+        '''
+        Return the data for calculated properties.
+        '''
 
         return self.data
 
-    def msdsave(self):
+    def save_msd(self):
         '''
         Method for saving MSD data
         '''
@@ -118,7 +187,24 @@ class analize(object):
         export = '../datacalculated/msd/'+self.run
         df.to_csv(export, index=False)
 
-    def rdfsave(self):
+    def save_diffusion_multiple_origins(self):
+        '''
+        Save the diffusion data for multiple origins.
+        '''
+
+        fmt = ''
+        nh = ''
+        for key in self.diffmulti:
+            fmt += '%f '
+            nh += key+' '
+
+        output = '../datacalculated/diffusion/'+item+'_origins'
+
+        df = pd.DataFrame(data=diffmulti)
+        df.insert(0, 'time', startpoints)
+        df.to_csv(output, sep=' ', index=False)
+
+    def save_rdf(self):
         '''
         Method for saving the RDF data
         '''
@@ -133,7 +219,7 @@ class analize(object):
         export = '../datacalculated/rdf/'+self.run
         df.to_csv(export, index=False)
 
-    def diffusionsave(self):
+    def save_diffusion(self):
         '''
         Method for saving the diffusion data
         '''
@@ -143,7 +229,7 @@ class analize(object):
         export = '../datacalculated/diffusion/'+self.run
         df.to_csv(export, index=False)
 
-    def plotmsd(self):
+    def plot_msd(self):
         '''
         Plot mean squared displacement.
         '''
@@ -171,7 +257,7 @@ class analize(object):
         pl.savefig('../images/msd/'+self.run+'_MSD')
         pl.clf()
 
-    def plotrdf(self):
+    def plot_rdf(self):
         '''
         Plot the radial distribution at a point and throughout time.
         '''

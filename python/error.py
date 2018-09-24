@@ -70,5 +70,4 @@ name = path+run
 
 data = load(name)
 print(variance(data['all']))
-print(np.std(data['all']))
-print(np.var(data['all'])**.5)
+print(np.var(data['all']))
