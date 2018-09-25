@@ -3,7 +3,6 @@ from matplotlib import pyplot as pl
 from ovito_calc import calc, rdfcalc
 from scipy.stats import linregress
 
-import parameters as par
 import pandas as pd
 import numpy as np
 import setup
@@ -46,15 +45,12 @@ class analize(object):
 
         self.run = run  # The name of the run
 
-        # Relevant files (trajectories and other LAMMPS outputs)
+        # Relevant files (trajectories)
         self.trjfile = '../data/lammpstrj/'+self.run+'.lammpstrj'
-        self.sysfile = '../data/txt/'+self.run+'.txt'
 
         self.stepsize = stepsize  # The step size used in LAMMPS
 
         # The rate of data acqusition and number of atoms
-        param = par.gather(self.trjfile)
-        self.size = param['size']
         self.frq = dumprate
 
         print('_'*79)

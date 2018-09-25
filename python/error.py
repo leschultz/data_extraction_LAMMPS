@@ -64,7 +64,7 @@ def variance(x):
     return var
 
 path = '/home/nerve/Desktop/motion_curves/datacalculated/diffusion/'
-run = 'Al100Sm0_boxside-10_hold1-100000_hold2-137500_hold3-500000_timestep-0p001_dumprate-100_2000K-1065K_run1_origins'
+run = 'Al100Sm0_boxside-10_hold1-100000_hold2-237500_hold3-500000_timestep-0p001_dumprate-100_2000K-385K_run1_origins'
 
 name = path+run
 
