@@ -49,7 +49,7 @@ def block_averaging(data):
     # Filter the data
     del data['start_time']
 
-    # The following delete lines are temporary
+    # The following delete lines remove the error from linear fits
     delete = []
     for key in data:
         if '_Err' in key:
@@ -58,6 +58,7 @@ def block_averaging(data):
     for key in delete:
         del data[key]
 
+    # Divide the data into blocks
     block_data = {}
     for key in data:
         count = 0
@@ -70,17 +71,28 @@ def block_averaging(data):
 
             count += 1
 
-    averages = []
+    # Grab the keys for data
+    keys = list(data.keys())
+
+    # Grab averages of each block
+    values = {}
+    for key in keys:
+        values[key] = []
+
     count = 0
     for key in block_data:
-        averages.append(np.mean(block_data[key]))
+        for item in keys:
+            if item in key:
+                values[item].append(np.mean(block_data[key]))
 
         count += 1
 
-    diffusion = np.mean(averages)
-    diffusion_eim = st.sem(averages)
+    averages = {}
+    for key in values:
+        averages[key] = np.mean(values[key])
+        averages[key+'_err'] = st.sem(values[key])
 
-    return diffusion, diffusion_eim
+    return averages 
 
 path = '/home/nerve/Desktop/motion_curves/datacalculated/diffusion/'
 run = 'Al100Sm0_boxside-10_hold1-100000_hold2-237500_hold3-500000_timestep-0p001_dumprate-100_2000K-385K_run1_origins'
