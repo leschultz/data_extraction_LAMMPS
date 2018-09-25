@@ -1,5 +1,6 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 
+
 def parse(name):
     '''
     Grab values from filename.

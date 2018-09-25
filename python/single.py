@@ -140,6 +140,7 @@ class analize(object):
         time = self.time[0:halflength+1]
 
         diffmulti = {}
+        startpoints = []
         for key in self.diffusion:
             diffmulti[key] = []
 
@@ -156,16 +157,23 @@ class analize(object):
                        stop
                        )
 
+            # Calculate the diffusion from each line of MSD
             diff = diffusion(time, msd)
 
+            # Save the begginging time for each line of best fit
+            startpoints.append(count*self.frq*self.stepsize)
+
+            # Save the diffusion for each line of bet fit
             for key in diff:
-                
                 diffmulti[key].append(diff[key])
 
             count += 1
 
         self.diffmulti = diffmulti
+        self.startpoints = startpoints
+
         self.data['diffusion_multiple_origins'] = self.diffmulti
+        self.data['startpoints'] = self.startpoints
 
     def calculation_export(self):
         '''
@@ -199,6 +207,7 @@ class analize(object):
         output = '../datacalculated/diffusion/'+self.run+'_origins'
 
         df = pd.DataFrame(data=self.diffmulti)
+        df.insert(0, 'start_time', self.startpoints)
         df.to_csv(output, sep=' ', index=False)
 
     def save_rdf(self):
