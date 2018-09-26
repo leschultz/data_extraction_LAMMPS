@@ -182,7 +182,7 @@ class analize(object):
 
         return self.data
 
-    def save_msd(self):
+    def save_msd(self, savename):
         '''
         Method for saving MSD data
         '''
@@ -190,10 +190,10 @@ class analize(object):
         df = pd.DataFrame(data=self.data['msd'])
         df.insert(loc=0, value=self.data['time'], column='time')
 
-        export = '../datacalculated/msd/'+self.run
+        export = '../datacalculated/msd/'+self.run+'_'+savename
         df.to_csv(export, index=False)
 
-    def save_multiple_origins_diffusion(self):
+    def save_multiple_origins_diffusion(self, savename):
         '''
         Save the diffusion data for multiple origins.
         '''
@@ -204,13 +204,19 @@ class analize(object):
             fmt += '%f '
             nh += key+' '
 
-        output = '../datacalculated/diffusion/'+self.run+'_origins'
+        output = (
+                  '../datacalculated/diffusion/' +
+                  self.run +
+                  '_origins' +
+                  '_' +
+                  savename
+                  )
 
         df = pd.DataFrame(data=self.diffmulti)
         df.insert(0, 'start_time', self.startpoints)
         df.to_csv(output, sep=' ', index=False)
 
-    def save_rdf(self):
+    def save_rdf(self, savename):
         '''
         Method for saving the RDF data
         '''
@@ -222,20 +228,20 @@ class analize(object):
 
         df = pd.DataFrame(data=data)
 
-        export = '../datacalculated/rdf/'+self.run
+        export = '../datacalculated/rdf/'+self.run+'_'+savename
         df.to_csv(export, index=False)
 
-    def save_diffusion(self):
+    def save_diffusion(self, savename):
         '''
         Method for saving the diffusion data
         '''
 
         df = pd.DataFrame(data=self.data['diffusion'], index=[0])
 
-        export = '../datacalculated/diffusion/'+self.run
+        export = '../datacalculated/diffusion/'+self.run+'_'+savename
         df.to_csv(export, index=False)
 
-    def plot_msd(self):
+    def plot_msd(self, savename):
         '''
         Plot mean squared displacement.
         '''
@@ -260,10 +266,10 @@ class analize(object):
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.legend(loc='upper left')
-        pl.savefig('../images/msd/'+self.run+'_MSD')
+        pl.savefig('../images/msd/'+self.run+'_MSD_'+savename)
         pl.clf()
 
-    def plot_rdf(self):
+    def plot_rdf(self, savename):
         '''
         Plot the radial distribution at a point and throughout time.
         '''
@@ -284,6 +290,7 @@ class analize(object):
                            self.run +
                            '_step' +
                            str(key) +
-                           '_rdf'
+                           '_rdf_' +
+                           savename
                            )
                 pl.clf()
