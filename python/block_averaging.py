@@ -1,38 +1,6 @@
 from scipy import stats as st
-from itertools import islice
 
 import numpy as np
-
-
-def load(name):
-    '''
-    This function loads the diffusion data from multiple origins.
-    '''
-
-    # Save the headers from the data file
-    with open(name) as file:
-        for line in islice(file, 0, 1):
-            header = line.strip().split(' ')
-
-    # Crate a dictionary to store lists of values
-    data = {}
-    for head in header:
-        data[head] = []
-
-    # Save the data for diffusion
-    with open(name) as file:
-        next(file)
-        for line in file:
-            value = line.strip().split(' ')
-            value = [float(i) for i in value]
-
-            count = 0
-            for item in value:
-                data[header[count]].append(value[count])
-                count += 1
-
-    # Return all diffusivity data
-    return data
 
 
 def block_averaging(data):
@@ -41,13 +9,13 @@ def block_averaging(data):
     '''
 
     N = 10  # Number of blocks
-    length = len(data['start_time'])  # The data length
+    length = len(data['time'])  # The data length
     half = length//10  # Divide indexes but removes point if remainder exists
 
     blocks = list(range(0, length, half))  # Index intervals
 
     # Filter the data
-    del data['start_time']
+    del data['time']
 
     # The following delete lines remove the error from linear fits
     delete = []
@@ -93,11 +61,3 @@ def block_averaging(data):
         averages[key+'_err'] = st.sem(values[key])
 
     return averages 
-
-path = '/home/nerve/Desktop/motion_curves/datacalculated/diffusion/'
-run = 'Al100Sm0_boxside-10_hold1-100000_hold2-237500_hold3-500000_timestep-0p001_dumprate-100_2000K-385K_run1_origins'
-
-name = path+run
-
-data = load(name)
-print(block_averaging(data))
