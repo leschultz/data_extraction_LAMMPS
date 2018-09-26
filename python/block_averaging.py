@@ -9,13 +9,13 @@ def block_averaging(data):
     '''
 
     N = 10  # Number of blocks
-    length = len(data['time'])  # The data length
+    length = len(data['start_time'])  # The data length
     half = length//10  # Divide indexes but removes point if remainder exists
 
     blocks = list(range(0, length, half))  # Index intervals
 
     # Filter the data
-    del data['time']
+    del data['start_time']
 
     # The following delete lines remove the error from linear fits
     delete = []
@@ -60,4 +60,4 @@ def block_averaging(data):
         averages[key] = np.mean(values[key])
         averages[key+'_err'] = st.sem(values[key])
 
-    return averages 
+    return averages

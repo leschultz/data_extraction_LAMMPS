@@ -40,8 +40,8 @@ for run in runs:
     if '_origins' in run:
 
         word = run.split('run1_')[1]
-        number = int(word.split('K_')[0])
-        temp2.append(1350-number)
+        number = int(word.split('_')[1])
+        temp2.append(number)
 
         data = load(directory+run, ' ')
         block = bl(data)
@@ -49,8 +49,7 @@ for run in runs:
         differr['block'].append(block['all_err'])
 
         diffusion['var'].append(np.mean(data['all']))
-        differr['var'].append(st.sem(data['all']))
-        print(diffusion['var'])
+        differr['var'].append((np.var(data['all'])**0.5))
 
 directory = '../datacalculated/msd/'
 
@@ -99,12 +98,22 @@ axs[1, 1].errorbar(
                    ecolor='r'
                    )
 
+axs[0, 0].set_xlabel('test')
+xlabel = 'Temperature [K]'
+ylabel = 'Diffusion [*10^-4 cm^2 s^-1]'
 
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
-pl.grid(b=True, which='both')
+axs[0, 0].set_title('Scipy fit error')
+axs[1, 0].set_title('Atom displacements error')
+axs[0, 1].set_title('Block averaging')
+axs[1, 1].set_title('Square root of variance')
+
+for i in range(0, 2):
+    for j in range(0, 2):
+        axs[i, j].set_xlabel(xlabel)
+        axs[i, j].set_ylabel(ylabel)
+        axs[i, j].grid()
+
 pl.tight_layout()
 pl.show()
-#pl.savefig('../images/diffusion/diffusion_v_temp_scipy')
+# pl.savefig('../images/diffusion/diffusion_v_temp_scipy')
 pl.clf()
-
