@@ -49,7 +49,8 @@ for run in runs:
         differr['block'].append(block['all_err'])
 
         diffusion['sem'].append(np.mean(data['all']))
-        differr['sem'].append(st.sem(data['all']))
+        # differr['sem'].append(st.sem(data['all']))
+        differr['sem'].append(np.std(data['all']))
 
 directory = '../datacalculated/msd/'
 
@@ -110,8 +111,8 @@ ylabel = 'Diffusion [*10^-4 cm^2 s^-1]'
 
 axs[0, 0].set_title('Scipy fit error')
 axs[1, 0].set_title('Atom displacements error')
-axs[0, 1].set_title('Block averaging')
-axs[1, 1].set_title('Standard error')
+axs[0, 1].set_title('Block averaging std')
+axs[1, 1].set_title('std')
 
 for i in range(0, 2):
     for j in range(0, 2):
