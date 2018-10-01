@@ -68,7 +68,7 @@ def error3(x):
 
     return c
 
-directory = '../datacalculated/diffusion/'
+directory = '../export/datacalculated/diffusion/'
 
 runs = os.listdir(directory)
 
@@ -92,7 +92,7 @@ for run in runs:
 
     if '_origins' not in run:
 
-        temp.append(int(run.split('run1_')[1]))
+        temp.append(int(run.split('run1_')[1][:-1]))
 
         with open(directory+run) as file:
             next(file)
@@ -104,7 +104,7 @@ for run in runs:
     if '_origins' in run:
 
         word = run.split('run1_')[1]
-        number = int(word.split('_')[1])
+        number = int(word[:-1])
         temp2.append(number)
 
         data = load(directory+run, ' ')
@@ -119,7 +119,7 @@ for run in runs:
         differr['2'].append(error2(data['all']))
         differr['3'].append(error3(data['all']))
 
-directory = '../datacalculated/msd/'
+directory = '../export/datacalculated/msd/'
 
 runs = os.listdir(directory)
 
@@ -132,14 +132,12 @@ pl.plot(temp, differr['scipy'], '.', label='Slope Fitting')
 pl.plot(temp2, differr['block'], '.', label='Block Avg (n=10)')
 pl.plot(temp2, differr['sem'], '.', label='EIM Scipy')
 pl.plot(temp, differr['fit'], '.', label='MSD Bounds')
-#pl.plot(temp2, differr['1'], '.', label='1')
-#pl.plot(temp2, differr['2'], '.', label='2')
-#pl.plot(temp2, differr['3'], '.', label='3')
+pl.plot(temp2, differr['1'], '.', label='1')
+pl.plot(temp2, differr['2'], '.', label='2')
+pl.plot(temp2, differr['3'], '.', label='3')
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Error [*10^-4 cm^2 s^-1]')
 pl.legend(loc='best')
 pl.grid()
 pl.show()
-
-print(differr['VandeWall'])
