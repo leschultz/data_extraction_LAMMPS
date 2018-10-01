@@ -8,6 +8,34 @@ import pandas as pd
 import numpy as np
 import os
 
+
+def error(x):
+    '''
+    Error calculation by Van de Wall.
+    '''
+
+    L = len(x)
+    mean = np.mean(x)
+
+    V = 0
+    for i in range(0, L):
+        for j in range(0, L):
+            l = abs(i-j)
+
+            q = 0
+            for k in range(0, L-l):
+                q += x[k]*x[k+l]-mean**2
+
+            q /= (L-l)
+
+            V += q
+
+    V /= L**2
+    V **= 0.5
+
+    return V
+
+
 directory = '../datacalculated/diffusion/'
 
 runs = os.listdir(directory)
@@ -21,6 +49,7 @@ differr['scipy'] = []
 differr['block'] = []
 differr['fit'] = []
 differr['sem'] = []
+differr['VandeWall'] = []
 
 temp = []
 temp2 = []
@@ -51,6 +80,8 @@ for run in runs:
         diffusion['sem'].append(np.mean(data['all']))
         differr['sem'].append(st.sem(data['all']))
 
+        differr['VandeWall'].append(error(data['all']))
+
 directory = '../datacalculated/msd/'
 
 runs = os.listdir(directory)
@@ -60,66 +91,16 @@ for run in runs:
     atom = di(data)
     differr['fit'].append(atom['all_err'])
 
-fig, axs = pl.subplots(2, 2)
+pl.plot(temp, differr['scipy'], '.', label='Slope Fitting')
+pl.plot(temp2, differr['block'], '.', label='Block Avg (n=10)')
+pl.plot(temp2, differr['sem'], '.', label='EIM Scipy')
+pl.plot(temp, differr['fit'], '.', label='MSD Bounds')
+pl.plot(temp, differr['VandeWall'], '.', label='Van de Wall')
 
-sizemarker = 2
-
-axs[0, 0].errorbar(
-                   temp,
-                   diffusion['scipy'],
-                   differr['scipy'],
-                   marker='.',
-                   markersize = sizemarker,
-                   linestyle='None',
-                   ecolor='r'
-                   )
-
-axs[1, 0].errorbar(
-                   temp,
-                   diffusion['scipy'],
-                   differr['fit'],
-                   marker='.',
-                   markersize = sizemarker,
-                   linestyle='None',
-                   ecolor='r'
-                   )
-
-axs[0, 1].errorbar(
-                   temp2,
-                   diffusion['block'],
-                   differr['block'],
-                   marker='.',
-                   markersize = sizemarker,
-                   linestyle='None',
-                   ecolor='r'
-                   )
-
-axs[1, 1].errorbar(
-                   temp2,
-                   diffusion['sem'],
-                   differr['sem'],
-                   marker='.',
-                   markersize = sizemarker,
-                   linestyle='None',
-                   ecolor='r'
-                   )
-
-axs[0, 0].set_xlabel('test')
-xlabel = 'Temperature [K]'
-ylabel = 'Diffusion [*10^-4 cm^2 s^-1]'
-
-axs[0, 0].set_title('Scipy fit error')
-axs[1, 0].set_title('Atom displacements error')
-axs[0, 1].set_title('Block averaging std')
-axs[1, 1].set_title('std')
-
-for i in range(0, 2):
-    for j in range(0, 2):
-        axs[i, j].set_xlabel(xlabel)
-        axs[i, j].set_ylabel(ylabel)
-        axs[i, j].grid()
-
-pl.tight_layout()
+pl.xlabel('Temperature [K]')
+pl.ylabel('Error [*10^-4 cm^2 s^-1]')
+pl.legend(loc='best')
+pl.grid()
 pl.show()
-pl.savefig('../images/diffusion/diffusion_v_temp_scipy')
-pl.clf()
+
+print(differr['VandeWall'])
