@@ -18,6 +18,7 @@ for name in names:
 
 n = 25
 increment = 50000
+starttemp = 1350
 
 for item in names:
 
@@ -67,7 +68,7 @@ for item in names:
         value.multiple_origins_diffusion()
         data = value.calculation_export()
 
-        savename = str(1350-iteration*50)
+        savename = str(starttemp-iteration*50)+'K'
         value.plot_msd(savename)
         value.plot_rdf(savename)
         value.save_msd(savename)
