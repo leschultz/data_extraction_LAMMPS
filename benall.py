@@ -5,28 +5,30 @@ import os
 
 # Directories
 firstdir = os.getcwd()
-lammpstrjdir = firstdir+'/../data/lammpstrj/'
+lammpstrjdir = firstdir+'/../data/'
 
 # Grab the file names from the lammpstrj directory
 names = os.listdir(lammpstrjdir)
 
-# Grab the names of runs to be averaged
-count = 0
-for name in names:
-    names[count] = name.split('.lammpstrj')[0]
-    count += 1
+names = [lammpstrjdir+i for i in names]
 
 n = 25
 increment = 50000
 deltatemp = 50
 starttemp = 1350
+savepath = '../export'
 
 for item in names:
+    filename = item.split('/')[-1]
+    print('File: '+filename)
+    print('_'*79)
 
     for iteration in list(range(0, n)):
 
+        print('Temp: '+str(starttemp-iteration*deltatemp)+'K')
+
         # Parameters from the naming convention
-        value = item.split('_')
+        value = item.split('/')[-1].split('_')
         system = value[0]
         side = value[1].split('-')[1]
 
@@ -53,6 +55,7 @@ for item in names:
         # Do averaging for files
         value = analize(
                         item,
+                        savepath,
                         points[1],
                         points[2],
                         timestep,
@@ -69,7 +72,13 @@ for item in names:
         value.multiple_origins_diffusion()
         data = value.calculation_export()
 
-        savename = str(starttemp-iteration*deltatemp)+'K'
+        savename = (
+                    filename.split('.')[0] +
+                    '_' +
+                    str(starttemp-iteration*deltatemp) +
+                    'K'
+                    )
+
         value.plot_msd(savename)
         value.plot_rdf(savename)
         value.save_msd(savename)

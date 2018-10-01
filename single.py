@@ -2,10 +2,10 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
 from ovito_calc import calc, rdfcalc
 from scipy.stats import linregress
+from setup import exportdir
 
 import pandas as pd
 import numpy as np
-import setup
 
 
 def diffusion(time, msd):
@@ -32,6 +32,7 @@ class analize(object):
     def __init__(
                  self,
                  run,
+                 savepath,
                  start,
                  stop,
                  stepsize,
@@ -43,19 +44,21 @@ class analize(object):
 
         '''Load data'''
 
-        self.run = run  # The name of the run
+        # Create the folder for where data will be saved
+        exportdir(savepath)
+        self.savepath = savepath
 
-        # Relevant files (trajectories)
-        self.trjfile = '../data/lammpstrj/'+self.run+'.lammpstrj'
+        # The name of the run
+        self.run = run.split('.')[0]
+        self.run = self.run.split('/')[-1]
+
+        # Relevant file (trajectories)
+        self.trjfile = run
 
         self.stepsize = stepsize  # The step size used in LAMMPS
 
         # The rate of data acqusition and number of atoms
         self.frq = dumprate
-
-        print('_'*79)
-        print('Crunching data for: ')
-        print(self.run)
 
         self.bins = bins  # The number of bins
         self.cut = cut  # Data for RDF
@@ -193,7 +196,7 @@ class analize(object):
         df = pd.DataFrame(data=self.data['msd'])
         df.insert(loc=0, value=self.data['time'], column='time')
 
-        export = '../datacalculated/msd/'+self.run+'_'+savename
+        export = self.savepath+'/datacalculated/msd/'+savename
         df.to_csv(export, index=False)
 
     def save_multiple_origins_diffusion(self, savename):
@@ -208,8 +211,8 @@ class analize(object):
             nh += key+' '
 
         output = (
-                  '../datacalculated/diffusion/' +
-                  self.run +
+                  self.savepath +
+                  '/datacalculated/diffusion/' +
                   '_origins' +
                   '_' +
                   savename
@@ -231,7 +234,7 @@ class analize(object):
 
         df = pd.DataFrame(data=data)
 
-        export = '../datacalculated/rdf/'+self.run+'_'+savename
+        export = self.savepath+'/datacalculated/rdf/'+savename
         df.to_csv(export, index=False)
 
     def save_diffusion(self, savename):
@@ -241,7 +244,12 @@ class analize(object):
 
         df = pd.DataFrame(data=self.data['diffusion'], index=[0])
 
-        export = '../datacalculated/diffusion/'+self.run+'_'+savename
+        export = (
+                  self.savepath +
+                  '/datacalculated/diffusion/' +
+                  savename
+                  )
+
         df.to_csv(export, index=False)
 
     def plot_msd(self, savename):
@@ -269,7 +277,7 @@ class analize(object):
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.legend(loc='upper left')
-        pl.savefig('../images/msd/'+self.run+'_MSD_'+savename)
+        pl.savefig(self.savepath+'/images/msd/'+savename)
         pl.clf()
 
     def plot_rdf(self, savename):
@@ -289,11 +297,11 @@ class analize(object):
                 pl.grid(b=True, which='both')
                 pl.tight_layout()
                 pl.savefig(
-                           '../images/rdf/' +
-                           self.run +
+                           self.savepath +
+                           '/images/rdf/' +
+                           savename +
                            '_step' +
                            str(key) +
-                           '_rdf_' +
-                           savename
+                           '_rdf'
                            )
                 pl.clf()
