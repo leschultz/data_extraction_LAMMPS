@@ -49,8 +49,7 @@ for run in runs:
         differr['block'].append(block['all_err'])
 
         diffusion['sem'].append(np.mean(data['all']))
-        # differr['sem'].append(st.sem(data['all']))
-        differr['sem'].append(np.std(data['all']))
+        differr['sem'].append(st.sem(data['all']))
 
 directory = '../datacalculated/msd/'
 
@@ -122,5 +121,5 @@ for i in range(0, 2):
 
 pl.tight_layout()
 pl.show()
-# pl.savefig('../images/diffusion/diffusion_v_temp_scipy')
+pl.savefig('../images/diffusion/diffusion_v_temp_scipy')
 pl.clf()

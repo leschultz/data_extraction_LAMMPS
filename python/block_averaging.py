@@ -58,7 +58,6 @@ def block_averaging(data):
     averages = {}
     for key in values:
         averages[key] = np.mean(values[key])
-        # averages[key+'_err'] = st.sem(values[key])
-        averages[key+'_err'] = np.std(values[key])
+        averages[key+'_err'] = st.sem(values[key])
 
     return averages

@@ -97,6 +97,9 @@ class analize(object):
         self.data['msd'] = self.msd
 
     def calculate_rdf(self):
+        '''
+        Gather the RDF dat from Ovito.
+        '''
 
         # Gather the RDF for steps defined
         if self.step is not None:
