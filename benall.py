@@ -80,6 +80,7 @@ for item in names:
                     )
 
         value.plot_msd(savename)
+        value.plot_diffusion(savename)
         value.plot_rdf(savename)
         value.save_msd(savename)
         value.save_rdf(savename)

@@ -280,6 +280,36 @@ class analize(object):
         pl.savefig(self.savepath+'/images/msd/'+savename)
         pl.clf()
 
+    def plot_diffusion(self, savename):
+        '''
+        Plot the multiple origins diffusion.
+        '''
+
+        # Control the frequency of errorbars
+        errorfreq = len(self.time)//10
+        if errorfreq == 0:
+            errorfreq = 1
+
+        for key in self.diffmulti:
+            if '_Err' not in key:
+                pl.errorbar(
+                            self.startpoints,
+                            self.diffmulti[key],
+                            self.diffmulti[key+'_Err'],
+                            label='element Type: %s' % key,
+                            ecolor='r',
+                            linestyle='dotted',
+                            errorevery=errorfreq,
+                            )
+
+        pl.xlabel('Start Time [ps]')
+        pl.ylabel('Diffusion [*10^-4 cm^2 s^-1]')
+        pl.grid(b=True, which='both')
+        pl.tight_layout()
+        pl.legend(loc='best')
+        pl.savefig(self.savepath+'/images/diffusion/'+savename)
+        pl.clf()
+
     def plot_rdf(self, savename):
         '''
         Plot the radial distribution at a point and throughout time.
