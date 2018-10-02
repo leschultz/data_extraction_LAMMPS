@@ -197,7 +197,7 @@ class analize(object):
         df.insert(loc=0, value=self.data['time'], column='time')
 
         export = self.savepath+'/datacalculated/msd/'+savename
-        df.to_csv(export, index=False)
+        df.to_csv(export, sep=' ', index=False)
 
     def save_multiple_origins_diffusion(self, savename):
         '''
@@ -213,9 +213,8 @@ class analize(object):
         output = (
                   self.savepath +
                   '/datacalculated/diffusion/' +
-                  '_origins' +
-                  '_' +
-                  savename
+                  savename +
+                  '_origins'
                   )
 
         df = pd.DataFrame(data=self.diffmulti)
@@ -235,7 +234,7 @@ class analize(object):
         df = pd.DataFrame(data=data)
 
         export = self.savepath+'/datacalculated/rdf/'+savename
-        df.to_csv(export, index=False)
+        df.to_csv(export, sep=' ', index=False)
 
     def save_diffusion(self, savename):
         '''
@@ -250,7 +249,7 @@ class analize(object):
                   savename
                   )
 
-        df.to_csv(export, index=False)
+        df.to_csv(export, sep=' ', index=False)
 
     def plot_msd(self, savename):
         '''
