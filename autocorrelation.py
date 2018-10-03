@@ -36,7 +36,6 @@ class error(object):
 
         val /= self.meanofsquared-self.mean**2  # The correlation time
 
-        print(val)
         self.time = val
 
         return self.time

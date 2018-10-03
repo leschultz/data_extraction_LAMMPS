@@ -68,7 +68,7 @@ for run in runs:
 #pl.plot(temp, differr['scipy'], '.', label='Slope Fitting')
 pl.plot(temp2, differr['block'], '.', label='Block Avg (n=10)')
 #pl.plot(temp2, differr['sem'], '.', label='EIM Scipy')
-#pl.plot(temp, differr['fit'], '.', label='MSD Bounds')
+pl.plot(temp, differr['fit'], '.', label='MSD Bounds')
 pl.plot(temp2, differr['error'], '.', label='Correlated Error')
 
 pl.xlabel('Temperature [K]')
