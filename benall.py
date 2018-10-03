@@ -1,54 +1,40 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
+from infoparser import parameters
 from single import analize
 
 import os
 
-# Directories
-firstdir = os.getcwd()
-lammpstrjdir = firstdir+'/../data/'
+runs = parameters("/home/nerve/Desktop/data")
+runs.files()
+param = runs.inputinfo()
 
-# Grab the file names from the lammpstrj directory
-names = os.listdir(lammpstrjdir)
+for item in param:
+    filename = item
 
-names = [lammpstrjdir+i for i in names]
+    printname = 'File: '+filename
 
-n = 25
-increment = 50000
-deltatemp = 50
-starttemp = 1350
-savepath = '../export'
+    print('-'*len(printname))
+    print(printname)
+    print('-'*len(printname))
 
-for item in names:
-    filename = item.split('/')[-1]
-    print('File: '+filename)
-    print('_'*79)
+    n = param[item]['iterations']
+    increment = param[item]['increment']
+    deltatemp = param[item]['deltatemp']
+    starttemp = param[item]['tempstart']
+    timestep = param[item]['timestep']
+    dumprate = param[item]['dumprate']
+
+    hold2 = param[item]['hold2']
+    hold3 = param[item]['hold3']
+
+    savepath = '../export/'+item.split('/')[-2]
 
     for iteration in list(range(0, n)):
 
-        print('Temp: '+str(starttemp-iteration*deltatemp)+'K')
+        print('Temperature step: '+str(starttemp-iteration*deltatemp)+' [K]')
 
-        # Parameters from the naming convention
-        value = item.split('/')[-1].split('_')
-        system = value[0]
-        side = value[1].split('-')[1]
-
-        hold1 = int(value[2].split('-')[1])
+        hold1 = param[item]['hold1']
         hold1 += iteration*increment
-
-        hold2 = int(value[3].split('-')[1])
-        hold3 = int(value[4].split('-')[1])
-        dumprate = int(value[6].split('-')[1])
-        inittemp = int(value[7].split('K-')[0])
-        finaltemp = int(value[7].split('K-')[1][:-1])
-
-        timestep = ''
-        ptimestep = value[5].split('-')[1]
-        for letter in ptimestep:
-            if letter == 'p':
-                letter = '.'
-            timestep += letter
-
-        timestep = float(timestep)
 
         points = [hold1, hold1+hold2, hold1+hold2+hold3]
 
@@ -73,9 +59,9 @@ for item in names:
         data = value.calculation_export()
 
         savename = (
-                    filename.split('.')[0] +
+                    item.split('/')[-2] +
                     '_' +
-                    str(starttemp-iteration*deltatemp) +
+                    str(starttemp-iteration*deltatemp).split('.')[0] +
                     'K'
                     )
 

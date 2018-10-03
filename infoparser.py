@@ -1,7 +1,7 @@
 import os
 
 
-class data(object):
+class parameters(object):
     '''
     Class to grab relevant files and data for computation.
     '''
@@ -35,6 +35,7 @@ class data(object):
         Parse the input file to grab run information.
         '''
 
+        count = 0
         for item in self.input_files:
 
             runsteps = []
@@ -52,7 +53,7 @@ class data(object):
                     if 'dump' in value:
                         for i in value:
                             try:
-                                dumprate = float(i)
+                                dumprate = int(i)
                             except Exception:
                                 pass
 
@@ -73,15 +74,24 @@ class data(object):
                     if 'tfi' in value:
                         tfi = value[-1]
                         tfi = tfi.split('-${i}*')
-                        tempstart = tfi[0]
-                        deltatemp = tfi[1]
+                        tempstart = float(tfi[0])
+                        deltatemp = float(tfi[1])
 
             increment = sum(runsteps[-2:])
 
-            self.parameters[item] = {
+            hold1 = sum(runsteps[:-2])
+            hold2 = runsteps[-2]
+            hold3 = runsteps[-1]
+
+            traj = self.trajectory_files[count]
+            count += 1
+
+            self.parameters[traj] = {
                                      'timestep': timestep,
                                      'dumprate': dumprate,
-                                     'runsteps': runsteps,
+                                     'hold1': hold1,
+                                     'hold2': hold2,
+                                     'hold3': hold3,
                                      'iterations': iterations,
                                      'tempstart': tempstart,
                                      'deltatemp': deltatemp,
