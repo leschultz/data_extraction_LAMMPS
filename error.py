@@ -8,7 +8,7 @@ from scipy import stats as st
 import numpy as np
 import os
 
-directory = '../export/datacalculated/diffusion/'
+directory = '../export/4000atom545000/datacalculated/diffusion/'
 
 runs = os.listdir(directory)
 
@@ -29,7 +29,7 @@ for run in runs:
 
     if '_origins' not in run:
 
-        temp.append(int(run.split('run1_')[1][:-1]))
+        temp.append(int(run.split('_')[1][:-1]))
 
         with open(directory+run) as file:
             next(file)
@@ -40,7 +40,7 @@ for run in runs:
 
     if '_origins' in run:
 
-        word = run.split('run1_')[1]
+        word = run.split('_')[1]
         number = int(word[:-1])
         temp2.append(number)
 
@@ -56,7 +56,7 @@ for run in runs:
         value.correlationtime()
         differr['error'].append(value.error())
 
-directory = '../export/datacalculated/msd/'
+directory = '../export/4000atom545000/datacalculated/msd/'
 
 runs = os.listdir(directory)
 
@@ -65,9 +65,9 @@ for run in runs:
     atom = di(data)
     differr['fit'].append(atom['all_err'])
 
-#pl.plot(temp, differr['scipy'], '.', label='Slope Fitting')
+pl.plot(temp, differr['scipy'], '.', label='Slope Fitting')
 pl.plot(temp2, differr['block'], '.', label='Block Avg (n=10)')
-#pl.plot(temp2, differr['sem'], '.', label='EIM Scipy')
+pl.plot(temp2, differr['sem'], '.', label='EIM Scipy')
 pl.plot(temp, differr['fit'], '.', label='MSD Bounds')
 pl.plot(temp2, differr['error'], '.', label='Correlated Error')
 

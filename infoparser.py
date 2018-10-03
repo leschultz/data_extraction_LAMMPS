@@ -25,7 +25,7 @@ class parameters(object):
             directory = self.path+'/'+folder+'/'
 
             inputs.append(directory+'dep.in')
-            trajectories.append(directory+'traj.lammpstrj')
+            trajectories.append(directory+'uwtraj.lammpstrj')
 
         self.input_files = inputs
         self.trajectory_files = trajectories
