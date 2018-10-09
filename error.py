@@ -11,29 +11,82 @@ import numpy as np
 import os
 
 maindir = '../export/'
-directory = maindir+'4000atom545000/datacalculated/diffusion/'
 
-runs = os.listdir(directory)
+folders = os.listdir(maindir)
 
-diffusion = {}
-diffusion['block'] = []
-differr = {}
-differr['block'] = []
+paths = {}
+for folder in folders:
+    paths[maindir+folder+'/datacalculated/diffusion/'] = {}
 
-temp = []
-temp2 = []
-for run in runs:
+megadata = {}
+for folder in paths:
 
-    if '_origins' in run:
+    runs =  os.listdir(folder)
 
-        word = run.split('_')[1]
-        number = int(word[:-1])
-        temp2.append(number)
+    diffusion = {}
+    diffusion['block'] = []
+    differr = {}
+    differr['block'] = []
 
-        data = load(directory+run, ' ')
-        block = bl(data)
-        diffusion['block'].append(block['all'])
-        differr['block'].append(block['all_err'])
+    temp = []
+    temp2 = []
+    for run in runs:
+
+        if '_origins' in run:
+
+            word = run.split('_')[1]
+            number = int(word[:-1])
+            temp2.append(number)
+            if megadata.get(number) is None:
+                megadata[number] = []
+
+            data = load(folder+run, ' ')
+
+            megadata[number].append(data)
+            block = bl(data)
+            diffusion['block'].append(block['all'])
+            differr['block'].append(block['all_err'])
+
+    paths[folder] = {
+                     'temp': temp2,
+                     'block': diffusion['block'],
+                     'block_err': differr['block']
+                     }
+
+megablock = {}
+for key in megadata:
+    megablock[key] = {
+                      'start_time': [],
+                      'all': [],
+                      'all_Err': [],
+                      '1': [],
+                      '1_Err': []
+                      }
+
+for key in megadata:
+    count = 0
+    for item in megadata[key]:
+        for key2 in item:
+            megablock[key][key2] += megadata[key][count][key2]
+        count += 1
+
+temp3 = []
+newdata = {}
+for key in megablock:
+    temp3.append(key)
+    block = bl(megablock[key])
+    newdata[key] = block
+
+blocks = []
+blockserr = []
+for key in paths:
+    print(key)
+    print(paths[key]['block'])
+    blocks.append(paths[key]['block'])
+    blockserr.append(paths[key]['block_err'])
+
+blockmean = np.mean(blockserr, axis=0)
+blockmeanerr = st.sem(blockserr, axis=0)
 
 real = actual("/home/nerve/Desktop/export")
 x = []
@@ -43,9 +96,13 @@ for key in real:
         x.append(key)
         y.append(real[str(key)+'_err'])
 
+
 pl.plot(x, y, '.', label='Actual Standard Error (10 runs)')
 
-pl.plot(temp2, differr['block'], '.', label='Block Avg (n=10)')
+pl.errorbar(temp2, blockmean, blockmeanerr, marker='.', linestyle='None', label='Block Avg (n=10)')
+
+for key in newdata:
+    pl.plot(key, newdata[key]['all_err'], 'b.')
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Error [*10^-4 cm^2 s^-1]')

@@ -3,15 +3,20 @@ from scipy import stats as st
 import numpy as np
 
 
-def block_averaging(data, N=10):
+def block_averaging(data0, N=10):
     '''
     Devides the data into ten portions (default) do do block averaging.
     '''
 
+    # Prevent actual deletion of original data input
+    data = {}
+    for key in data0:
+        data[key] = data0[key]
+
     length = len(data['start_time'])  # The data length
     half = length//10  # Divide indexes but removes point if remainder exists
 
-    blocks = list(range(0, length, half))  # Index intervals
+    blocks = list(range(0, length+1, half))  # Index intervals
 
     # Filter the data
     del data['start_time']
@@ -36,6 +41,9 @@ def block_averaging(data, N=10):
             name = key+'_'+str(count)
             block_data[name] = data[key][start:end]
 
+            # Add last points to final block
+            if count == 9:
+                block_data[name]+data[key][end:]
             count += 1
 
     # Grab the keys for data

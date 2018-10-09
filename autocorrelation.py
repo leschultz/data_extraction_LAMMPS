@@ -61,7 +61,6 @@ def autocorrelation(x):
 directory = '../export/4000atom545000/datacalculated/diffusion/'
 
 runs = os.listdir(directory)
-print(runs)
 
 for run in runs:
     if 'origins' in run:
