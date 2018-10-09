@@ -10,44 +10,65 @@ import numpy as np
 import os
 
 
-class error(object):
-    '''Compute the error of corelated data'''
+def correlation(x, l):
+    '''
+    Calculate the autocorrelation at different lengths.
+    '''
 
-    def __init__(self, data):
-        '''Compute common factors for data'''
+    n = len(x)
 
-        self.data = data  # The data provided
-        self.length = len(data)  # Length of data
-        self.mean = np.mean(data)  # Mean of data
+    val = 0
+    for i in range(0, n-l):
+        val += x[i]*x[i+l]-np.mean(x)**2
 
-        # Mean of squared values of data
-        self.meanofsquared = np.mean([i**2 for i in data])
+    val /= n-l
 
-    def correlationtime(self):
-        '''
-        Calculate the correlation time for correlated data.
-        '''
+    return val
 
-        dl = 1  # Define how many points after to evaluate
 
-        val = 0
-        for i in range(0, self.length-dl):
-            val += self.data[i]*self.data[i+dl]-self.mean**2
+def standarderror(x, l):
+    '''
+    Return the standard error based on variance.
+    '''
 
-        val /= self.meanofsquared-self.mean**2  # The correlation time
+    n = len(x)
 
-        self.time = val
+    val = 0
+    for i in range(0, n):
+        for j in range(0, n):
+            val += autocorrelation(x, l)
 
-        return self.time
+    val /= n**2
+    val **= 0.5
+    val /= n**0.5
 
-    def error(self):
-        '''
-        Calculate the error of a data set.
-        '''
+    return val
 
-        val = (self.meanofsquared-self.mean**2)/(self.length-1)*(1+2*self.time)
-        val **= 0.5
+def autocorrelation(x):
+    '''
+    Use correlation value for l
+    '''
 
-        self.error = val/(self.length)**0.5  # Standard Error
+    N = len(x)
+    l = list(range(0, N-1))
 
-        return self.error
+    values = []
+    for i in l:
+        values.append(correlation(x, i))
+
+    return l, values
+
+directory = '../export/4000atom545000/datacalculated/diffusion/'
+
+runs = os.listdir(directory)
+print(runs)
+
+for run in runs:
+    if 'origins' in run:
+        data = load(directory+run, ' ')
+
+        temp = run.split('_')[-2]
+        l, values = autocorrelation(data['all'])
+        # pl.plot(l, values, label=temp)
+
+# pl.legend(loc='best')
