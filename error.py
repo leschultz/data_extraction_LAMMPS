@@ -1,12 +1,10 @@
-from atom_error_propagation import diffusion as di
 from block_averaging import block_averaging as bl
-from autocorrelation import standarderror as er
 from matplotlib import pyplot as pl
-from diffusionimport import load
 from scipy import stats as st
-from itertools import islice
 
-from actualldiffusion import actual
+from diffusionimport import load
+from matplotlib import lines
+from itertools import islice
 
 import numpy as np
 import os
@@ -29,27 +27,30 @@ def errorcomparison(maindir):
         data[folder]['origins'] = origins
         data[folder]['regular'] = regular
 
-    origins = {}
-    regular = {}
+    regular = {}  # Save the single diffusivity values
+    blockorigins = {}  # Save the block method applied to multiple origins
     for key in data:
         for item in data[key]:
             if 'origins' in item:
                 for name in data[key][item]:
                     temp = name.split('_')[-2]
+                    temp = float(temp[:-1])
                     loaded = load(name)
                     block = bl(loaded)
 
-                    if origins.get(temp) is None:
-                        origins[temp] = {}
+                    if blockorigins.get(temp) is None:
+                        blockorigins[temp] = {}
 
                     for i in block:
-                        if origins[temp].get(i) is None:
-                            origins[temp][i] = []
+                        if blockorigins[temp].get(i) is None:
+                            blockorigins[temp][i] = []
 
-                        origins[temp][i].append(block[i])
+                        blockorigins[temp][i].append(block[i])
+
             if 'regular' in item:
                 for name in data[key][item]:
                     temp = name.split('_')[-1]
+                    temp = float(temp[:-1])
                     with open(name) as file:
                         for line in islice(file, 0, 1):
                             header = line.strip().split(' ')
@@ -65,27 +66,75 @@ def errorcomparison(maindir):
                     count = 0
                     for head in header:
                         if regular[temp].get(head) is None:
-                            regular[temp][head] = None
-                        regular[temp][head] = value[count]
+                            regular[temp][head] = []
+                        regular[temp][head].append(value[count]
+)
                         count += 1
 
-    return regular, origins
+    return regular, blockorigins
 
-real = actual("/home/nerve/Desktop/export")
-x = []
-y = []
-for key in real:
-    if 'err' not in str(key):
-        x.append(key)
-        y.append(real[str(key)+'_err'])
+# Gather the standard error from actual runs
+regular, blockorigins = errorcomparison('../export/')
+for temp in regular:
+    for item in regular[temp]:
+        if 'all' == item:
+            pl.plot(temp, st.sem(regular[temp][item]), 'b.')
 
+# Gather the standard error from block error averages
+for temp in blockorigins:
+    for item in blockorigins[temp]:
+        if 'all' == item:
+            pl.plot(temp, st.sem(blockorigins[temp][item]), 'r*')
 
-pl.plot(x, y, '.', label='Actual Standard Error (10 runs)')
+# Gather the mean of the standard error given by block method
+for temp in blockorigins:
+    for item in blockorigins[temp]:
+        if 'all_err' in item:
+            pl.errorbar(
+                        temp,
+                        np.mean(blockorigins[temp][item]),
+                        st.sem(blockorigins[temp][item]),
+                        marker='x',
+                        color='g',
+                        ecolor='g',
+                        linestyle='None'
+                        )
+
+actual = lines.Line2D(
+                      [],
+                      [],
+                      color='blue',
+                      marker='.',
+                      linestyle='None',
+                      markersize=8,
+                      label='SEM 10 Runs'
+                      )
+
+blocksem = lines.Line2D(
+                        [],
+                        [],
+                        color='red',
+                        marker='*',
+                        linestyle='None',
+                        markersize=8,
+                        label='SEM Blocks (N=10)'
+                        )
+
+blockerr = lines.Line2D(
+                        [],
+                        [],
+                        color='green',
+                        marker='x',
+                        linestyle='None',
+                        markersize=8,
+                        label='Blocks SEM Average (N=10)'
+                        )
+
+plotlables = [actual, blocksem, blockerr]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Error [*10^-4 cm^2 s^-1]')
-pl.legend(loc='best')
+pl.legend(handles=plotlables, loc='best')
 pl.grid()
-# pl.show()
-
-errorcomparison('../export/')
+pl.show()
+pl.clf()
