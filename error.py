@@ -29,6 +29,7 @@ def errorcomparison(maindir):
 
     regular = {}  # Save the single diffusivity values
     blockorigins = {}  # Save the block method applied to multiple origins
+    megablock = {}  # Save all the multiple origins data
     for key in data:
         for item in data[key]:
             if 'origins' in item:
@@ -36,6 +37,7 @@ def errorcomparison(maindir):
                     temp = name.split('_')[-2]
                     temp = float(temp[:-1])
                     loaded = load(name)
+                    print(loaded)
                     block = bl(loaded)
 
                     if blockorigins.get(temp) is None:
@@ -46,6 +48,16 @@ def errorcomparison(maindir):
                             blockorigins[temp][i] = []
 
                         blockorigins[temp][i].append(block[i])
+
+                    if megablock.get(temp) is None:
+                        megablock[temp] = {}
+
+                    for i in loaded:
+                        if megablock[temp].get(i) is None:
+                            megablock[temp][i] = []
+
+                        megablock[temp][i] += loaded[i]
+
 
             if 'regular' in item:
                 for name in data[key][item]:
@@ -67,14 +79,18 @@ def errorcomparison(maindir):
                     for head in header:
                         if regular[temp].get(head) is None:
                             regular[temp][head] = []
-                        regular[temp][head].append(value[count]
-)
+                        regular[temp][head].append(value[count])
                         count += 1
+    blocked = {}
+    for temp in megablock:
+        block = bl(megablock[temp])
+        blocked[temp] = block
 
-    return regular, blockorigins
+    return regular, blockorigins, blocked 
+
 
 # Gather the standard error from actual runs
-regular, blockorigins = errorcomparison('../export/')
+regular, blockorigins, megablock = errorcomparison('../export/')
 for temp in regular:
     for item in regular[temp]:
         if 'all' == item:
@@ -85,6 +101,12 @@ for temp in blockorigins:
     for item in blockorigins[temp]:
         if 'all' == item:
             pl.plot(temp, st.sem(blockorigins[temp][item]), 'r*')
+
+# Gather the standard error from block error averages
+for temp in megablock:
+    for item in megablock[temp]:
+        if 'all_err' == item:
+            pl.plot(temp, megablock[temp][item], 'vk')
 
 # Gather the mean of the standard error given by block method
 for temp in blockorigins:
@@ -130,7 +152,18 @@ blockerr = lines.Line2D(
                         label='Blocks SEM Average (N=10)'
                         )
 
-plotlables = [actual, blocksem, blockerr]
+mega = lines.Line2D(
+                    [],
+                    [],
+                    color='black',
+                    marker='v',
+                    linestyle='None',
+                    markersize=8,
+                    label='Block method on all multiple origins'
+                    )
+
+
+plotlables = [actual, blocksem, blockerr, mega]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Error [*10^-4 cm^2 s^-1]')
