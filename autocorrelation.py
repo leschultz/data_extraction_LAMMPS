@@ -16,17 +16,18 @@ def correlation(x, l):
     '''
 
     n = len(x)
+    mean = np.mean(x)
 
     val = 0
     for i in range(0, n-l):
-        val += x[i]*x[i+l]-np.mean(x)**2
+        val += x[i]*x[i+l]-mean**2
 
     val /= n-l
 
     return val
 
 
-def standarderror(x, l):
+def standarderror(x):
     '''
     Return the standard error based on variance.
     '''
@@ -36,7 +37,7 @@ def standarderror(x, l):
     val = 0
     for i in range(0, n):
         for j in range(0, n):
-            val += autocorrelation(x, l)
+            val += sum(autocorrelation(x)[1])
 
     val /= n**2
     val **= 0.5
@@ -53,10 +54,15 @@ def autocorrelation(x):
     l = list(range(0, N-1))
 
     values = []
+    lout = []
     for i in l:
-        values.append(correlation(x, i))
+        value = correlation(x, i)
 
-    return l, values
+        if value >= 0:
+            values.append(value)
+            lout.append(i)
+
+    return lout, values
 
 directory = '../export/4000atom545000/datacalculated/diffusion/'
 
@@ -64,10 +70,9 @@ runs = os.listdir(directory)
 
 for run in runs:
     if 'origins' in run:
+        print(run)
         data = load(directory+run, ' ')
 
         temp = run.split('_')[-2]
-        l, values = autocorrelation(data['all'])
-        # pl.plot(l, values, label=temp)
-
-# pl.legend(loc='best')
+        err = standarderror(data['all'])
+        print(err)
