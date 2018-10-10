@@ -4,89 +4,72 @@ from autocorrelation import standarderror as er
 from matplotlib import pyplot as pl
 from diffusionimport import load
 from scipy import stats as st
+from itertools import islice
 
 from actualldiffusion import actual
 
 import numpy as np
 import os
 
-maindir = '../export/'
 
-folders = os.listdir(maindir)
+def errorcomparison(maindir):
+    folders = os.listdir(maindir)
 
-paths = {}
-for folder in folders:
-    paths[maindir+folder+'/datacalculated/diffusion/'] = {}
+    data = {}
+    for folder in folders:
+        data[folder] = {}
 
-megadata = {}
-for folder in paths:
+        filepath = maindir+folder+'/datacalculated/diffusion/'
+        files = os.listdir(filepath)
 
-    runs =  os.listdir(folder)
+        origins = [filepath+i for i in files if 'origin' in i]
+        regular = [filepath+i for i in files if 'origin' not in i]
 
-    diffusion = {}
-    diffusion['block'] = []
-    differr = {}
-    differr['block'] = []
+        data[folder]['path'] = filepath
+        data[folder]['origins'] = origins
+        data[folder]['regular'] = regular
 
-    temp = []
-    temp2 = []
-    for run in runs:
+    origins = {}
+    regular = {}
+    for key in data:
+        for item in data[key]:
+            if 'origins' in item:
+                for name in data[key][item]:
+                    temp = name.split('_')[-2]
+                    loaded = load(name)
+                    block = bl(loaded)
 
-        if '_origins' in run:
+                    if origins.get(temp) is None:
+                        origins[temp] = {}
 
-            word = run.split('_')[1]
-            number = int(word[:-1])
-            temp2.append(number)
-            if megadata.get(number) is None:
-                megadata[number] = []
+                    for i in block:
+                        if origins[temp].get(i) is None:
+                            origins[temp][i] = []
 
-            data = load(folder+run, ' ')
+                        origins[temp][i].append(block[i])
+            if 'regular' in item:
+                for name in data[key][item]:
+                    temp = name.split('_')[-1]
+                    with open(name) as file:
+                        for line in islice(file, 0, 1):
+                            header = line.strip().split(' ')
 
-            megadata[number].append(data)
-            block = bl(data)
-            diffusion['block'].append(block['all'])
-            differr['block'].append(block['all_err'])
+                    with open(name) as file:
+                        for line in islice(file, 1, None):
+                            value = line.strip().split(' ')
+                            value = [float(i) for i in value]
 
-    paths[folder] = {
-                     'temp': temp2,
-                     'block': diffusion['block'],
-                     'block_err': differr['block']
-                     }
+                    if regular.get(temp) is None:
+                        regular[temp] = {}
 
-megablock = {}
-for key in megadata:
-    megablock[key] = {
-                      'start_time': [],
-                      'all': [],
-                      'all_Err': [],
-                      '1': [],
-                      '1_Err': []
-                      }
+                    count = 0
+                    for head in header:
+                        if regular[temp].get(head) is None:
+                            regular[temp][head] = None
+                        regular[temp][head] = value[count]
+                        count += 1
 
-for key in megadata:
-    count = 0
-    for item in megadata[key]:
-        for key2 in item:
-            megablock[key][key2] += megadata[key][count][key2]
-        count += 1
-
-temp3 = []
-newdata = {}
-for key in megablock:
-    temp3.append(key)
-    block = bl(megablock[key])
-    newdata[key] = block
-
-blocks = []
-blockserr = []
-for key in paths:
-    print(key)
-    print(paths[key]['block'])
-    blocks.append(paths[key]['block'])
-    blockserr.append(paths[key]['block_err'])
-
-blockmean = np.mean(blockserr, axis=0)
-blockmeanerr = st.sem(blockserr, axis=0)
+    return regular, origins
 
 real = actual("/home/nerve/Desktop/export")
 x = []
@@ -99,13 +82,10 @@ for key in real:
 
 pl.plot(x, y, '.', label='Actual Standard Error (10 runs)')
 
-pl.errorbar(temp2, blockmean, blockmeanerr, marker='.', linestyle='None', label='Block Avg (n=10)')
-
-for key in newdata:
-    pl.plot(key, newdata[key]['all_err'], 'b.')
-
 pl.xlabel('Temperature [K]')
 pl.ylabel('Error [*10^-4 cm^2 s^-1]')
 pl.legend(loc='best')
 pl.grid()
-pl.show()
+# pl.show()
+
+errorcomparison('../export/')
