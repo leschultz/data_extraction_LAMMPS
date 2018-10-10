@@ -3,23 +3,10 @@ from scipy import stats as st
 import numpy as np
 
 
-def block_averaging(data0, N=10):
+def block_averaging(data, n=10):
     '''
     Devides the data into ten portions (default) do do block averaging.
     '''
-
-    # Prevent actual deletion of original data input
-    data = {}
-    for key in data0:
-        data[key] = data0[key]
-
-    length = len(data['start_time'])  # The data length
-    half = length//10  # Divide indexes but removes point if remainder exists
-
-    blocks = list(range(0, length+1, half))  # Index intervals
-
-    # Filter the data
-    del data['start_time']
 
     # The following delete lines remove the error from linear fits
     delete = []
@@ -33,17 +20,14 @@ def block_averaging(data0, N=10):
     # Divide the data into blocks
     block_data = {}
     for key in data:
+        dat = data[key]
+        blocktemp = [dat[i:i+n] for i in range(0, len(dat), n)]
+
         count = 0
-        for block in blocks[:-1]:
-            start = blocks[count]
-            end = blocks[count+1]
-
+        for b in blocktemp:
             name = key+'_'+str(count)
-            block_data[name] = data[key][start:end]
+            block_data[name] = blocktemp[count]
 
-            # Add last points to final block
-            if count == 9:
-                block_data[name]+data[key][end:]
             count += 1
 
     # Grab the keys for data

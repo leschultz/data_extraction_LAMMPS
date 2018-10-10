@@ -57,7 +57,6 @@ def errorcomparison(maindir):
 
                         megablock[temp][i] += loaded[i]
 
-
             if 'regular' in item:
                 for name in data[key][item]:
                     temp = name.split('_')[-1]
@@ -85,7 +84,7 @@ def errorcomparison(maindir):
         block = bl(megablock[temp])
         blocked[temp] = block
 
-    return regular, blockorigins, blocked 
+    return regular, blockorigins, blocked
 
 
 # Gather the standard error from actual runs
@@ -131,6 +130,16 @@ actual = lines.Line2D(
                       label='SEM 10 Runs'
                       )
 
+spread = lines.Line2D(
+                      [],
+                      [],
+                      color='red',
+                      marker='.',
+                      linestyle='None',
+                      markersize=8,
+                      label='Spread for 10 Runs'
+                      )
+
 blocksem = lines.Line2D(
                         [],
                         [],
@@ -169,4 +178,26 @@ pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
 pl.legend(handles=plotlables, loc='best')
 pl.grid()
 pl.savefig('../errorcomparison')
+pl.clf()
+
+# Gather the standard error from block error averages
+for temp in blockorigins:
+    for item in blockorigins[temp]:
+        if 'all_err' == item:
+            for run in blockorigins[temp][item]:
+                pl.plot(temp, run, 'r.')
+
+
+for temp in regular:
+    for item in regular[temp]:
+        if 'all' == item:
+            pl.plot(temp, st.sem(regular[temp][item]), 'b.')
+
+plotlables = [actual, spread]
+
+pl.xlabel('Temperature [K]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+pl.grid()
+pl.legend(handles=plotlables, loc='best')
+pl.savefig('../blockspread')
 pl.clf()
