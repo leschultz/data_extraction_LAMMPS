@@ -37,7 +37,6 @@ def errorcomparison(maindir):
                     temp = name.split('_')[-2]
                     temp = float(temp[:-1])
                     loaded = load(name)
-                    print(loaded)
                     block = bl(loaded)
 
                     if blockorigins.get(temp) is None:
@@ -159,15 +158,15 @@ mega = lines.Line2D(
                     marker='v',
                     linestyle='None',
                     markersize=8,
-                    label='Block method on all multiple origins'
+                    label='Block Method on All Multiple Origins'
                     )
 
 
 plotlables = [actual, blocksem, blockerr, mega]
 
 pl.xlabel('Temperature [K]')
-pl.ylabel('Error [*10^-4 cm^2 s^-1]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
 pl.legend(handles=plotlables, loc='best')
 pl.grid()
-pl.show()
+pl.savefig('../errorcomparison')
 pl.clf()
