@@ -2,6 +2,8 @@ from block_averaging import block_averaging as bl
 from matplotlib import pyplot as pl
 from scipy import stats as st
 
+from autocorrelation import *
+
 from diffusionimport import load
 from matplotlib import lines
 from itertools import islice
@@ -30,6 +32,7 @@ def errorcomparison(maindir):
     regular = {}  # Save the single diffusivity values
     blockorigins = {}  # Save the block method applied to multiple origins
     megablock = {}  # Save all the multiple origins data
+    correlationformula = {}  # Errors from correlation formula wrote
     for key in data:
         for item in data[key]:
             if 'origins' in item:
@@ -38,6 +41,19 @@ def errorcomparison(maindir):
                     temp = float(temp[:-1])
                     loaded = load(name)
                     block = bl(loaded)
+
+                    if correlationformula.get(temp) is None:
+                        correlationformula[temp] = {}
+
+                    for i in loaded:
+                        if correlationformula[temp].get(i) is  None:
+                            correlationformula[temp][i] = []
+
+                        lout, values, lcut = correlationlength(loaded[i])
+                        val = standarderror(loaded[i], lcut)
+
+                        correlationformula[temp][i].append(val)
+
 
                     if blockorigins.get(temp) is None:
                         blockorigins[temp] = {}
@@ -83,6 +99,8 @@ def errorcomparison(maindir):
     for temp in megablock:
         block = bl(megablock[temp])
         blocked[temp] = block
+
+    print(correlationformula)
 
     return regular, blockorigins, blocked
 
@@ -169,7 +187,6 @@ mega = lines.Line2D(
                     markersize=8,
                     label='Block Method on All Multiple Origins'
                     )
-
 
 plotlables = [actual, blocksem, blockerr, mega]
 

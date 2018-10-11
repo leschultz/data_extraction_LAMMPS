@@ -3,10 +3,18 @@ from scipy import stats as st
 import numpy as np
 
 
-def block_averaging(data, n=10):
+def block_averaging(data0, n=10):
     '''
     Devides the data into ten portions (default) do do block averaging.
     '''
+
+    # Prevent actual deletion of original data input
+    data = {}
+    for key in data0:
+        data[key] = data0[key]
+
+    # Filder the data
+    del data['start_time']
 
     # The following delete lines remove the error from linear fits
     delete = []
