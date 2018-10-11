@@ -46,14 +46,13 @@ def errorcomparison(maindir):
                         correlationformula[temp] = {}
 
                     for i in loaded:
-                        if correlationformula[temp].get(i) is  None:
+                        if correlationformula[temp].get(i) is None:
                             correlationformula[temp][i] = []
 
                         lout, values, lcut = correlationlength(loaded[i])
                         val = standarderror(loaded[i], lcut)
 
                         correlationformula[temp][i].append(val)
-
 
                     if blockorigins.get(temp) is None:
                         blockorigins[temp] = {}
@@ -100,13 +99,12 @@ def errorcomparison(maindir):
         block = bl(megablock[temp])
         blocked[temp] = block
 
-    print(correlationformula)
+    return regular, blockorigins, blocked, correlationformula
 
-    return regular, blockorigins, blocked
 
+regular, blockorigins, megablock, correlationformula = errorcomparison('../export/')
 
 # Gather the standard error from actual runs
-regular, blockorigins, megablock = errorcomparison('../export/')
 for temp in regular:
     for item in regular[temp]:
         if 'all' == item:
@@ -118,7 +116,7 @@ for temp in blockorigins:
         if 'all' == item:
             pl.plot(temp, st.sem(blockorigins[temp][item]), 'r*')
 
-# Gather the standard error from block error averages
+# Gather the block error from all runs combined into larege dataset
 for temp in megablock:
     for item in megablock[temp]:
         if 'all_err' == item:
@@ -137,6 +135,13 @@ for temp in blockorigins:
                         ecolor='g',
                         linestyle='None'
                         )
+
+# Use the autocorrelation function to determine error
+for temp in correlationformula:
+    for item in correlationformula[temp]:
+        if 'all' == item:
+            for i in correlationformula[temp][item]:
+                pl.plot(temp, i, '^m')
 
 actual = lines.Line2D(
                       [],
@@ -188,7 +193,17 @@ mega = lines.Line2D(
                     label='Block Method on All Multiple Origins'
                     )
 
-plotlables = [actual, blocksem, blockerr, mega]
+corr = lines.Line2D(
+                    [],
+                    [],
+                    color='magenta',
+                    marker='^',
+                    linestyle='None',
+                    markersize=8,
+                    label='Using the autocorrelation function'
+                    )
+
+plotlables = [actual, blocksem, blockerr, mega, corr]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
