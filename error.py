@@ -136,12 +136,14 @@ for temp in blockorigins:
                         linestyle='None'
                         )
 
+'''
 # Use the autocorrelation function to determine error
 for temp in correlationformula:
     for item in correlationformula[temp]:
         if 'all' == item:
             for i in correlationformula[temp][item]:
                 pl.plot(temp, i, '^m')
+'''
 
 actual = lines.Line2D(
                       [],

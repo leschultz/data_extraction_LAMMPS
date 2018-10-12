@@ -29,7 +29,7 @@ def block_averaging(data0, n=10):
     block_data = {}
     for key in data:
         dat = data[key]
-        blocktemp = [dat[i:i+n] for i in range(0, len(dat), n)]
+        blocktemp = [dat[i::n] for i in range(n)]
 
         count = 0
         for b in blocktemp:
