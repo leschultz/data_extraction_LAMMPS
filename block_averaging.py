@@ -12,7 +12,8 @@ def block(data, n=10):
     blocks = [data[i::n] for i in range(n)]
 
     # Average the blocks and find their error in the mean
-    averages = np.mean(blocks)
-    eim = st.sem(blocks, axis=None)
+    averages = [np.mean(i) for i in blocks]
+    eim = st.sem(averages, axis=None)
+    value = np.mean(averages)
 
-    return averages, eim
+    return value, eim

@@ -84,8 +84,15 @@ def regularblock(regular):
     return data
 
 
-def mo(multiple):
-    print(multiple)
+def multipleblock(multiple):
+    data = {}
+    for temp in multiple:
+        data[temp] = {}
+        for key in multiple[temp]:
+            if 'rr' not in key:
+                data[temp][key] = [block(i) for i in multiple[temp][key]]
+
+    return data
 
 regular, multiple = errorcomparison('../export/')
 blockedruns = regularblock(regular)
@@ -118,6 +125,15 @@ for temp in regular:
 
 pl.plot(temps, autoerror, '*y')
 
+temps = []
+autoerror = []
+for temp in regular:
+    temps.append(temp)
+    lout, values, lcut = correlationlength(regular[temp]['all'])
+    autoerror.append(standarderror(regular[temp]['all'], lcut))
+
+pl.plot(temps, autoerror, 'xk')
+
 regularval = lines.Line2D(
                          [],
                          [],
@@ -138,29 +154,182 @@ regularblocks = lines.Line2D(
                              label='10 Block Averaging SEM'
                              )
 
+autocorrelation0 = lines.Line2D(
+                                [],
+                                [],
+                                color='y',
+                                marker='*',
+                                linestyle='None',
+                                markersize=8,
+                                label='Autocorrelation (l=0)'
+                                )
+
 autocorrelation = lines.Line2D(
                                [],
                                [],
-                               color='y',
-                               marker='*',
+                               color='k',
+                               marker='x',
                                linestyle='None',
                                markersize=8,
-                               label='Autocorrelation (l=0)'
+                               label='Autocorrelation (l=lcut)'
                                )
 
-plotlables = [regularval, regularblocks, autocorrelation]
+plotlables = [regularval, regularblocks, autocorrelation0, autocorrelation]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
 pl.legend(handles=plotlables, loc='best')
 pl.grid()
+pl.tight_layout()
 pl.savefig('../errorcheck')
-pl.show()
+pl.clf()
+
+origins = multipleblock(multiple)
+
+temps = list(origins.keys())
+
+runs = {}
+for temp in origins:
+    count = 0
+    for item in origins[temp]['all']:
+        if runs.get(count) is None:
+            runs[count] = []
+
+        runs[count].append(item[1])
+        count += 1
+
+for run in runs:
+    pl.plot(temps, runs[run], 'b.')
+
+runs = {}
+for temp in multiple:
+    count = 0
+    for item in multiple[temp]['all']:
+        if runs.get(count) is None:
+            runs[count] = []
+
+        runs[count].append(st.sem(item))
+        count += 1
+
+for run in runs:
+    pl.plot(temps, runs[run], 'rx')
+
+one = lines.Line2D(
+                   [],
+                   [],
+                   color='b',
+                   marker='.',
+                   linestyle='None',
+                   markersize=8,
+                   label='Block Averaging (n=10) SEM'
+                   )
+
+two = lines.Line2D(
+                   [],
+                   [],
+                   color='r',
+                   marker='x',
+                   linestyle='None',
+                   markersize=8,
+                   label='Scipy SEM'
+                   )
+
+plotlabels = [one, two]
+
+pl.xlabel('Temperature [K]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+pl.legend(handles=plotlabels, loc='best')
+pl.grid()
+pl.tight_layout()
+pl.savefig('../blockvsscipy')
+pl.clf()
+
+runs = {}
+for temp in multiple:
+    count = 0
+    for item in multiple[temp]['all']:
+        if runs.get(count) is None:
+            runs[count] = []
+
+        lout, values, lcut = correlationlength(item)
+        runs[count].append(standarderror(item, lcut))
+        count += 1
+
+for run in runs:
+    pl.plot(temps, runs[run], 'b.')
+
+runs = {}
+for temp in multiple:
+    count = 0
+    for item in multiple[temp]['all']:
+        if runs.get(count) is None:
+            runs[count] = []
+
+        runs[count].append(st.sem(item))
+        count += 1
+
+for run in runs:
+    pl.plot(temps, runs[run], 'rx')
+
+one = lines.Line2D(
+                   [],
+                   [],
+                   color='b',
+                   marker='.',
+                   linestyle='None',
+                   markersize=8,
+                   label='Autocorrelation (l=lcut)'
+                   )
+
+two = lines.Line2D(
+                   [],
+                   [],
+                   color='r',
+                   marker='x',
+                   linestyle='None',
+                   markersize=8,
+                   label='Scipy SEM'
+                   )
+
+plotlabels = [one, two]
+
+
+pl.xlabel('Temperature [K]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+pl.legend(handles=plotlabels, loc='best')
+pl.grid()
+pl.tight_layout()
+pl.savefig('../autovsscipy')
+pl.clf()
+
+runs = {}
+for temp in multiple:
+    if runs.get(temp) is None:
+        runs[temp] = []
+    for item in multiple[temp]['all']:
+        runs[temp] += item
 
 temps = []
-autoerror = []
-for temp in regular:
+megablock = []
+autocorr = []
+scipysem = []
+for temp in runs:
     temps.append(temp)
-    lout, values, lcut = correlationlength(regular[temp]['all'])
-    autoerror.append(standarderror(regular[temp]['all'], lcut))
+    megablock.append(block(runs[temp])[1])
+    lout, values, lcut = correlationlength(runs[temp])
+    print(lcut)
+    autocorr.append(standarderror(runs[temp], lcut))
+    scipysem.append(st.sem(runs[temp]))
 
+pl.plot(temps, megablock, 'b.', label='Block Average for All')
+pl.plot(temps, scipysem, '*k', label='Autoccorrelation for All')
+pl.plot(temps, scipysem, 'rx', label='Scipy SEM for All')
+
+pl.xlabel('Temperature [K]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+pl.legend(loc='best')
+pl.grid()
+pl.tight_layout()
+pl.savefig('../megaset')
+pl.show()
+pl.clf()
