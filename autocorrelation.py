@@ -7,14 +7,15 @@ def autocorrelation(x, l):
     '''
 
     n = len(x)
-    meansquared = np.mean(x)**2
+    minusl = n-l
 
     val = 0
-    for i in range(0, n-l):
-        val += x[i]*x[i+l]-meansquared
+    for i in range(0, minusl):
+        val += x[i]*x[i+l]
 
-    val /= n-l
-    
+    val /= minusl
+    val -= np.mean(x)**2.0
+
     return val
 
 
@@ -24,29 +25,32 @@ def standarderror(x, l):
     '''
 
     n = len(x)
-    
+
+    covariance = autocorrelation(x, l)
+
     val = 0
     for i in range(0, n):
         for j in range(0, n):
-            val += autocorrelation(x, l)
+            val += covariance
 
-    val /= n**2
+    val /= n**2.0
     val /= n
     val **= 0.5
 
     return val
+
 
 def correlationlength(x):
     '''
     Use correlation value for l
     '''
 
-    N = len(x)
-    l = list(range(0, N-1))
+    n = len(x)
+    lvals = list(range(0, n-1))
 
     values = []
     lout = []
-    for i in l:
+    for i in lvals:
         lout.append(i)
         values.append(autocorrelation(x, i))
 

@@ -70,7 +70,7 @@ def errorcomparison(maindir):
                         regular[temp][head].append(value[count])
                         count += 1
 
-    return regular, multiple 
+    return regular, multiple
 
 
 def regularblock(regular):
@@ -96,7 +96,7 @@ for temp in regular:
     averages.append(np.mean(regular[temp]['all']))
     error.append(st.sem(regular[temp]['all'], ddof=ddof))
 
-pl.plot(temps, error, 'ob', markerfacecolor='none', markersize = 12)
+pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
 
 temps = []
 blockedaverages = []
@@ -334,7 +334,6 @@ pl.savefig('../blocksizechange')
 pl.clf()
 '''
 
-'''
 runs = {}
 for temp in multiple:
     if runs.get(temp) is None:
@@ -363,4 +362,4 @@ pl.legend(loc='best')
 pl.grid()
 pl.tight_layout()
 pl.savefig('../megaset')
-pl.clf()'''
+pl.clf()
