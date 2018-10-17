@@ -1,13 +1,4 @@
-'''
-Katzgraber, H. G. (2009). Introduction to Monte Carlo Methods.
-Retrieved from http://arxiv.org/abs/0905.1629
-'''
-
-from matplotlib import pyplot as pl
-from diffusionimport import load
-
 import numpy as np
-import os
 
 
 def autocorrelation(x, l):
@@ -59,13 +50,14 @@ def correlationlength(x):
         lout.append(i)
         values.append(autocorrelation(x, i))
 
+    # Find where the autocorrelation first comes close to zero
     count = 0
     for i in values:
-        if i > 0:
+        if i >= 0:
             lcut = lout[count]
+            count += 1
+
         else:
             break
-
-        count += 1
 
     return lout, values, lcut

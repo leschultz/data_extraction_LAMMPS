@@ -1,5 +1,3 @@
-from scipy import stats as st
-
 import numpy as np
 
 
@@ -13,7 +11,8 @@ def block(data, n=10):
 
     # Average the blocks and find their error in the mean
     averages = [np.mean(i) for i in blocks]
-    eim = st.sem(averages, axis=None)
     value = np.mean(averages)
+    eim = np.std(averages)
+    eim /= len(averages)**0.5
 
     return value, eim
