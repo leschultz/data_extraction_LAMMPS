@@ -49,19 +49,17 @@ def correlationlength(x):
     lvals = list(range(0, n-1))
 
     values = []
-    lout = []
     for i in lvals:
-        lout.append(i)
         values.append(autocorrelation(x, i))
 
     # Find where the autocorrelation first comes close to zero
     count = 0
     for i in values:
         if i >= 0:
-            lcut = lout[count]
+            lcut = lvals[count]
             count += 1
 
         else:
             break
 
-    return lout, values, lcut
+    return lvals, values, lcut

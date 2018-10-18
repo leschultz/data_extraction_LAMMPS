@@ -345,11 +345,18 @@ temps = []
 megablock = []
 autocorr = []
 scipysem = []
+blockdiff = []
+actualldiff = []
 for temp in runs:
     temps.append(temp)
-    megablock.append(block(runs[temp])[1])
+
+    res = block(runs[temp])
+    megablock.append(res[1])
+    blockdiff.append(res[0])
+
     lout, values, lcut = correlationlength(runs[temp])
     autocorr.append(standarderror(runs[temp], lcut))
+
     scipysem.append(st.sem(runs[temp]))
 
 pl.plot(temps, megablock, 'b.', label='Block Average for All')
@@ -362,4 +369,37 @@ pl.legend(loc='best')
 pl.grid()
 pl.tight_layout()
 pl.savefig('../megaset')
+pl.clf()
+
+temps2 = []
+averages = []
+for temp in regular:
+    temps2.append(temp)
+    averages.append(np.mean(regular[temp]['all']))
+
+
+pl.plot(temps2, averages, 'rx', label='Average Diffusion')
+pl.plot(temps, blockdiff, 'b.', label='Block Average Diffusion')
+
+pl.xlabel('Temperature [K]')
+pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+pl.legend(loc='best')
+pl.grid()
+pl.tight_layout()
+pl.savefig('../diffusioncheck')
+pl.clf()
+
+
+cut = 100
+for temp in runs:
+    lout, values, lcut = correlationlength(runs[temp])
+
+    pl.plot(lout[:cut], values[:cut], label=temp)
+
+pl.legend(loc='best')
+pl.grid()
+pl.tight_layout()
+pl.xlabel('l [-]')
+pl.ylabel('Autocorrelation [*10^-4 cm^2 s^-1]^2')
+pl.show()
 pl.clf()
