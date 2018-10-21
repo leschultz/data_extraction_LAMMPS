@@ -91,12 +91,22 @@ blockedruns = regularblock(regular)
 temps = []
 averages = []
 error = []
+autoerror = []
+autoerror0 = []
 for temp in regular:
     temps.append(temp)
     averages.append(np.mean(regular[temp]['all']))
+
     error.append(st.sem(regular[temp]['all'], ddof=ddof))
 
+    lout, values, lcut, add = correlationlength(regular[temp]['all'])
+    autoerror.append(standarderror(regular[temp]['all'], lcut, add))
+
+    autoerror0.append(standarderror(regular[temp]['all'], 0, add))
+
 pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
+pl.plot(temps, autoerror0, 'y*', markerfacecolor='none', markersize=12)
+pl.plot(temps, autoerror, 'xk', markerfacecolor='none', markersize=12)
 
 temps = []
 blockedaverages = []
@@ -107,23 +117,6 @@ for temp in blockedruns:
     blockederror.append(blockedruns[temp]['all'][1])
 
 pl.plot(temps, blockederror, '.r', markersize=10)
-
-temps = []
-autoerror = []
-for temp in regular:
-    temps.append(temp)
-    autoerror.append(standarderror(regular[temp]['all'], 0))
-
-pl.plot(temps, autoerror, '*y')
-
-temps = []
-autoerror = []
-for temp in regular:
-    temps.append(temp)
-    lout, values, lcut = correlationlength(regular[temp]['all'])
-    autoerror.append(standarderror(regular[temp]['all'], lcut))
-
-pl.plot(temps, autoerror, 'xk')
 
 regularval = lines.Line2D(
                          [],
@@ -243,8 +236,8 @@ for temp in multiple:
         if runs.get(count) is None:
             runs[count] = []
 
-        lout, values, lcut = correlationlength(item)
-        runs[count].append(standarderror(item, lcut))
+        lout, values, lcut, add = correlationlength(item)
+        runs[count].append(standarderror(item, lcut, add))
         count += 1
 
 for run in runs:
@@ -294,48 +287,6 @@ pl.tight_layout()
 pl.savefig('../autovsscipy')
 pl.clf()
 
-'''
-runs = {}
-for temp in multiple:
-    if runs.get(temp) is None:
-        runs[temp] = []
-    for item in multiple[temp]['all']:
-        runs[temp] += item
-
-temps = []
-megablock1 = []
-megablock10 = []
-megablock50 = []
-megablock100 = []
-megablock150 = []
-scipysem = []
-for temp in runs:
-    temps.append(temp)
-    megablock1.append(block(runs[temp], 1)[1])
-    megablock10.append(block(runs[temp], 10)[1])
-    megablock50.append(block(runs[temp], 50)[1])
-    megablock100.append(block(runs[temp], 100)[1])
-    megablock150.append(block(runs[temp], 150)[1])
-
-    scipysem.append(st.sem(runs[temp]))
-
-pl.plot(temps, megablock1, 'bx', label='Block Average (n=1)')
-pl.plot(temps, megablock10, 'g+', label='Block Average (n=10)')
-pl.plot(temps, megablock50, 'm*', label='Block Average (n=50)')
-pl.plot(temps, megablock100, 'yo', label='Block Average (n=100)')
-pl.plot(temps, megablock150, 'k.', label='Block Average (n=150)')
-
-pl.plot(temps, scipysem, 'rx', label='Scipy SEM for All')
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../blocksizechange')
-pl.clf()
-'''
-
 runs = {}
 for temp in multiple:
     if runs.get(temp) is None:
@@ -356,8 +307,8 @@ for temp in runs:
     megablock.append(res[1])
     blockdiff.append(res[0])
 
-    lout, values, lcut = correlationlength(runs[temp])
-    autocorr.append(standarderror(runs[temp], lcut))
+    lout, values, lcut, add = correlationlength(runs[temp])
+    autocorr.append(standarderror(runs[temp], lcut, add))
 
     scipysem.append(st.sem(runs[temp]))
 
@@ -394,7 +345,7 @@ pl.clf()
 
 cut = 100
 for temp in runs:
-    lout, values, lcut = correlationlength(runs[temp])
+    lout, values, lcut, add = correlationlength(runs[temp])
 
     pl.plot(lout[:cut], values[:cut], label=temp)
 

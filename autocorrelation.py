@@ -19,7 +19,7 @@ def autocorrelation(x, l):
     return val
 
 
-def standarderror(x, l):
+def standarderror(x, l, add):
     '''
     Return the standard error based on variance.
     '''
@@ -32,6 +32,7 @@ def standarderror(x, l):
     for i in range(0, n):
         for j in range(0, n):
             val += covariance
+            # val += add
 
     val /= n**2.0
     val /= n
@@ -63,4 +64,4 @@ def correlationlength(x):
 
         count += 1
 
-    return lvals, values, lcut
+    return lvals, values, lcut, sum(values)
