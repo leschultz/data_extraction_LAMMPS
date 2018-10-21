@@ -235,8 +235,10 @@ pl.savefig('../blockvsscipy')
 pl.clf()
 
 runs = {}
+temps = []
 for temp in multiple:
     count = 0
+    temps.append(temp)
     for item in multiple[temp]['all']:
         if runs.get(count) is None:
             runs[count] = []

@@ -9,7 +9,7 @@ def autocorrelation(x, l):
     n = len(x)
     minusl = n-l
 
-    val = 0
+    val = 0.0
     for i in range(0, minusl):
         val += x[i]*x[i+l]
 
@@ -28,7 +28,7 @@ def standarderror(x, l):
 
     covariance = autocorrelation(x, l)
 
-    val = 0
+    val = 0.0
     for i in range(0, n):
         for j in range(0, n):
             val += covariance
@@ -57,9 +57,10 @@ def correlationlength(x):
     for i in values:
         if i >= 0:
             lcut = lvals[count]
-            count += 1
 
         else:
             break
+
+        count += 1
 
     return lvals, values, lcut
