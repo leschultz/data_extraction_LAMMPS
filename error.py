@@ -73,26 +73,17 @@ def errorcomparison(maindir):
     return regular, multiple
 
 
-def regularblock(regular):
-    data = {}
-    for temp in regular:
-        data[temp] = {}
-        for key in regular[temp]:
-            if 'rr' not in key:
-                data[temp][key] = block(regular[temp][key])
-
-    return data
-
-
 ddof = 0
 regular, multiple = errorcomparison('../export/')
-blockedruns = regularblock(regular)
 
+# Apply methods to single runs
 temps = []
 averages = []
 error = []
 autoerror = []
 autoerror0 = []
+blockedaverages = []
+blockederror = []
 for temp in regular:
     temps.append(temp)
     averages.append(np.mean(regular[temp]['all']))
@@ -104,18 +95,13 @@ for temp in regular:
 
     autoerror0.append(standarderror(regular[temp]['all'], 0, add))
 
+    bl = block(regular[temp]['all'])
+    blockedaverages.append(bl[0])
+    blockederror.append(bl[1])
+
 pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
 pl.plot(temps, autoerror0, 'y*', markerfacecolor='none', markersize=12)
 pl.plot(temps, autoerror, 'xk', markerfacecolor='none', markersize=12)
-
-temps = []
-blockedaverages = []
-blockederror = []
-for temp in blockedruns:
-    temps.append(temp)
-    blockedaverages.append(blockedruns[temp]['all'][0])
-    blockederror.append(blockedruns[temp]['all'][1])
-
 pl.plot(temps, blockederror, '.r', markersize=10)
 
 regularval = lines.Line2D(
@@ -169,33 +155,32 @@ pl.tight_layout()
 pl.savefig('../errorcheck')
 pl.clf()
 
+# Apply methods to Multiple Origins
 temps = []
-runs = {}
+runsblock = {}
+runsscipy = {}
+runsauto = {}
 for temp in multiple:
     count = 0
     temps.append(temp)
     for item in multiple[temp]['all']:
-        if runs.get(count) is None:
-            runs[count] = []
+        if runsblock.get(count) is None:
+            runsblock[count] = []
+            runsscipy[count] = []
+            runsauto[count] = []
 
-        runs[count].append(block(item)[1])
+        runsblock[count].append(block(item)[1])
+        runsscipy[count].append(st.sem(item, ddof=ddof))
+
+        lout, values, lcut, add = correlationlength(item)
+        runsauto[count].append(standarderror(item, lcut, add))
+
         count += 1
 
-for run in runs:
-    pl.plot(temps, runs[run], 'b.')
-
-runs = {}
-for temp in multiple:
-    count = 0
-    for item in multiple[temp]['all']:
-        if runs.get(count) is None:
-            runs[count] = []
-
-        runs[count].append(st.sem(item, ddof=ddof))
-        count += 1
-
-for run in runs:
-    pl.plot(temps, runs[run], 'rx')
+for run in runsblock:
+    pl.plot(temps, runsblock[run], 'b.')
+    pl.plot(temps, runsscipy[run], 'rx')
+    pl.plot(temps, runsauto[run], 'yo', markerfacecolor='none')
 
 one = lines.Line2D(
                    [],
@@ -217,76 +202,28 @@ two = lines.Line2D(
                    label='Scipy SEM'
                    )
 
-plotlabels = [one, two]
+three = lines.Line2D(
+                     [],
+                     [],
+                     color='y',
+                     marker='o',
+                     linestyle='None',
+                     markersize=8,
+                     label='Autocorrelation (l=lcut)',
+                     markerfacecolor='none'
+                     )
+
+plotlabels = [one, two, three]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
 pl.legend(handles=plotlabels, loc='best')
 pl.grid()
 pl.tight_layout()
-pl.savefig('../blockvsscipy')
+pl.savefig('../comparisonsmulti')
 pl.clf()
 
-runs = {}
-temps = []
-for temp in multiple:
-    count = 0
-    temps.append(temp)
-    for item in multiple[temp]['all']:
-        if runs.get(count) is None:
-            runs[count] = []
-
-        lout, values, lcut, add = correlationlength(item)
-        runs[count].append(standarderror(item, lcut, add))
-        count += 1
-
-for run in runs:
-    pl.plot(temps, runs[run], 'b.')
-
-runs = {}
-for temp in multiple:
-    count = 0
-    for item in multiple[temp]['all']:
-        if runs.get(count) is None:
-            runs[count] = []
-
-        runs[count].append(st.sem(item, ddof=ddof))
-        count += 1
-
-for run in runs:
-    pl.plot(temps, runs[run], 'rx')
-
-one = lines.Line2D(
-                   [],
-                   [],
-                   color='b',
-                   marker='.',
-                   linestyle='None',
-                   markersize=8,
-                   label='Autocorrelation (l=lcut)'
-                   )
-
-two = lines.Line2D(
-                   [],
-                   [],
-                   color='r',
-                   marker='x',
-                   linestyle='None',
-                   markersize=8,
-                   label='Scipy SEM'
-                   )
-
-plotlabels = [one, two]
-
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(handles=plotlabels, loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../autovsscipy')
-pl.clf()
-
+# Apply methods to multiple origins together
 runs = {}
 for temp in multiple:
     if runs.get(temp) is None:
@@ -324,6 +261,7 @@ pl.tight_layout()
 pl.savefig('../megaset')
 pl.clf()
 
+# Check actual value averages
 temps2 = []
 averages = []
 for temp in regular:
@@ -342,7 +280,7 @@ pl.tight_layout()
 pl.savefig('../diffusioncheck')
 pl.clf()
 
-
+# The autocorrelation plots
 cut = 100
 for temp in runs:
     lout, values, lcut, add = correlationlength(runs[temp])
@@ -354,5 +292,7 @@ pl.grid()
 pl.tight_layout()
 pl.xlabel('l [-]')
 pl.ylabel('Autocorrelation [*10^-4 cm^2 s^-1]^2')
-pl.show()
+figure = pl.gcf()
+figure.set_size_inches(12, 10)
+pl.savefig('../auto', dpi=100)
 pl.clf()
