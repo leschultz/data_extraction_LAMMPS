@@ -81,7 +81,6 @@ temps = []
 averages = []
 error = []
 autoerror = []
-autoerror0 = []
 blockedaverages = []
 blockederror = []
 for temp in regular:
@@ -90,17 +89,13 @@ for temp in regular:
 
     error.append(st.sem(regular[temp]['all'], ddof=ddof))
 
-    lout, values, lcut, add = correlationlength(regular[temp]['all'])
-    autoerror.append(standarderror(regular[temp]['all'], lcut, add))
-
-    autoerror0.append(standarderror(regular[temp]['all'], 0, add))
+    autoerror.append(standarderror(regular[temp]['all']))
 
     bl = block(regular[temp]['all'])
     blockedaverages.append(bl[0])
     blockederror.append(bl[1])
 
 pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
-pl.plot(temps, autoerror0, 'y*', markerfacecolor='none', markersize=12)
 pl.plot(temps, autoerror, 'xk', markerfacecolor='none', markersize=12)
 pl.plot(temps, blockederror, '.r', markersize=10)
 
@@ -125,16 +120,6 @@ regularblocks = lines.Line2D(
                              label='10 Block Averaging SEM'
                              )
 
-autocorrelation0 = lines.Line2D(
-                                [],
-                                [],
-                                color='y',
-                                marker='*',
-                                linestyle='None',
-                                markersize=8,
-                                label='Autocorrelation (l=0)'
-                                )
-
 autocorrelation = lines.Line2D(
                                [],
                                [],
@@ -142,10 +127,10 @@ autocorrelation = lines.Line2D(
                                marker='x',
                                linestyle='None',
                                markersize=8,
-                               label='Autocorrelation (l=lcut)'
+                               label='Autocorrelation'
                                )
 
-plotlables = [regularval, regularblocks, autocorrelation0, autocorrelation]
+plotlables = [regularval, regularblocks, autocorrelation]
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
@@ -172,8 +157,7 @@ for temp in multiple:
         runsblock[count].append(block(item)[1])
         runsscipy[count].append(st.sem(item, ddof=ddof))
 
-        lout, values, lcut, add = correlationlength(item)
-        runsauto[count].append(standarderror(item, lcut, add))
+        runsauto[count].append(standarderror(item))
 
         count += 1
 
@@ -209,7 +193,7 @@ three = lines.Line2D(
                      marker='o',
                      linestyle='None',
                      markersize=8,
-                     label='Autocorrelation (l=lcut)',
+                     label='Autocorrelation',
                      markerfacecolor='none'
                      )
 
@@ -244,8 +228,7 @@ for temp in runs:
     megablock.append(res[1])
     blockdiff.append(res[0])
 
-    lout, values, lcut, add = correlationlength(runs[temp])
-    autocorr.append(standarderror(runs[temp], lcut, add))
+    autocorr.append(standarderror(runs[temp]))
 
     scipysem.append(st.sem(runs[temp]))
 
@@ -278,21 +261,4 @@ pl.legend(loc='best')
 pl.grid()
 pl.tight_layout()
 pl.savefig('../diffusioncheck')
-pl.clf()
-
-# The autocorrelation plots
-cut = 100
-for temp in runs:
-    lout, values, lcut, add = correlationlength(runs[temp])
-
-    pl.plot(lout[:cut], values[:cut], label=temp)
-
-pl.legend(loc='best')
-pl.grid()
-pl.tight_layout()
-pl.xlabel('l [-]')
-pl.ylabel('Autocorrelation [*10^-4 cm^2 s^-1]^2')
-figure = pl.gcf()
-figure.set_size_inches(12, 10)
-pl.savefig('../auto', dpi=100)
 pl.clf()

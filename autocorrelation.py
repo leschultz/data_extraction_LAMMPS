@@ -1,38 +1,37 @@
 import numpy as np
 
 
-def autocorrelation(x, l):
+def selfcovariance(x):
     '''
     Calculate the autocorrelation at different lengths.
     '''
 
     n = len(x)
-    minusl = n-l
+    minus = n-1
+    average = np.mean(x)
 
     val = 0.0
-    for i in range(0, minusl):
-        val += x[i]*x[i+l]
+    for i in range(0, minus):
+        val += (x[i]-average)**2
 
-    val /= minusl
-    val -= np.mean(x)**2.0
+    val /= minus
 
     return val
 
 
-def standarderror(x, l, add):
+def standarderror(x):
     '''
     Return the standard error based on variance.
     '''
 
     n = len(x)
 
-    covariance = autocorrelation(x, l)
+    cov = selfcovariance(x)
 
     val = 0.0
     for i in range(0, n):
         for j in range(0, n):
-            val += covariance
-            # val += add
+            val += cov
 
     val /= n**2.0
     val /= n
@@ -40,28 +39,22 @@ def standarderror(x, l, add):
 
     return val
 
-
-def correlationlength(x):
+def variance(x, y):
     '''
-    Use correlation value for l
+    Return the variance of the data.
     '''
 
     n = len(x)
-    lvals = list(range(0, n-1))
 
-    values = []
-    for i in lvals:
-        values.append(autocorrelation(x, i))
+    if n != len(y):
+        raise ValueError('Both arrays are not the same length')
 
-    # Find where the autocorrelation first comes close to zero
-    count = 0
-    for i in values:
-        if i >= 0:
-            lcut = lvals[count]
+    val = 0.0
+    for i in range(0, n):
+        for j in range(i+1, n):
+            val += (x[i]-x[j])*(y[i]-y[j])
 
-        else:
-            break
+    val /= n**3
+    val **= 0.5
 
-        count += 1
-
-    return lvals, values, lcut, sum(values)
+    return val
