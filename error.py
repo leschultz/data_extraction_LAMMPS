@@ -73,7 +73,7 @@ def errorcomparison(maindir):
     return regular, multiple
 
 
-ddof = 0
+ddof = 1
 regular, multiple = errorcomparison('../export/')
 
 # Apply methods to single runs
@@ -127,7 +127,7 @@ autocorrelation = lines.Line2D(
                                marker='x',
                                linestyle='None',
                                markersize=8,
-                               label='Autocorrelation'
+                               label='Correlation'
                                )
 
 plotlables = [regularval, regularblocks, autocorrelation]
@@ -193,7 +193,7 @@ three = lines.Line2D(
                      marker='o',
                      linestyle='None',
                      markersize=8,
-                     label='Autocorrelation',
+                     label='Correlation',
                      markerfacecolor='none'
                      )
 
@@ -233,7 +233,7 @@ for temp in runs:
     scipysem.append(st.sem(runs[temp]))
 
 pl.plot(temps, megablock, 'b.', label='Block Average for All')
-pl.plot(temps, autocorr, '*k', label='Autoccorrelation for All')
+pl.plot(temps, autocorr, '*k', label='Correlation for All')
 pl.plot(temps, scipysem, 'rx', label='Scipy SEM for All')
 
 pl.xlabel('Temperature [K]')

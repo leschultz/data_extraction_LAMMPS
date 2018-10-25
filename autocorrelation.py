@@ -7,14 +7,13 @@ def selfcovariance(x):
     '''
 
     n = len(x)
-    minus = n-1
     average = np.mean(x)
 
     val = 0.0
-    for i in range(0, minus):
+    for i in range(0, n):
         val += (x[i]-average)**2
 
-    val /= minus
+    val /= n-1
 
     return val
 
