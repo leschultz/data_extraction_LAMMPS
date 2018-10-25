@@ -11,7 +11,7 @@ def selfcovariance(x):
 
     val = 0.0
     for i in range(0, n):
-        val += (x[i]-average)**2
+        val += (x[i]-average)**2.0
 
     val /= n-1
 

@@ -262,3 +262,21 @@ pl.grid()
 pl.tight_layout()
 pl.savefig('../diffusioncheck')
 pl.clf()
+
+data = {}
+temps = []
+for temp in runs:
+    temps.append(temp)
+    for i in range(10, 461, 100):
+        if data.get(i) is None:
+            data[i] = []
+
+        data[i].append(block(runs[temp], i)[1])
+
+for key in data:
+    pl.plot(temps, data[key], '.', label='Blocks='+str(key))
+
+pl.legend(loc='best')
+pl.grid()
+pl.tight_layout()
+pl.savefig('../varyblock')
