@@ -9,10 +9,7 @@ import random as rnd
 x = [100]*100
 x = [i+rnd.randint(-10, 10) for i in x]
 
-print(x)
-
-for i in range(1, len(x), len(x)//10):
-    print(i)
+for i in range(3, len(x), len(x)//10):
     bl = block(x, i)
     pl.plot(i, bl[1], '.', label='n='+str(i))
 

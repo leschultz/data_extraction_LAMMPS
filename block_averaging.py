@@ -1,6 +1,3 @@
-'''http://www.eng.buffalo.edu/~kofke/ce530/Lectures/Lecture3/sld010.htm'''
-
-
 def block(data, n=10):
     '''
     Devides the data into ten portions (default) to do block averaging.
