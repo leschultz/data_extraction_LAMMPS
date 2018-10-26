@@ -23,6 +23,6 @@ def block(data, n=10):
     sigma -= mean**2.0
     sigma **= 0.5
 
-    eim = sigma/(n-1)**0.5
+    eim = sigma/(n)**0.5
 
     return mean, eim
