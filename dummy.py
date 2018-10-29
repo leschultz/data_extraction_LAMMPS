@@ -1,23 +1,44 @@
+'''https://emcee.readthedocs.io/en/latest/tutorials/autocorr/'''
+
+
 from matplotlib import pyplot as pl
 
 from autocorrelation import *
 from block_averaging import block
 
 import numpy as np
-import random as rnd
 
-x = [100]*100
-x = [i+rnd.randint(-10, 10) for i in x]
+# Build the celerite model:
+import celerite
+from celerite import terms
+kernel = terms.RealTerm(log_a=0.0, log_c=-6.0)
+kernel += terms.RealTerm(log_a=0.0, log_c=-2.0)
 
-for i in range(3, len(x), len(x)//10):
-    bl = block(x, i)
-    pl.plot(i, bl[1], '.', label='n='+str(i))
+# Simulate a set of chains:
+gp = celerite.GP(kernel)
+t = np.arange(100)
+gp.compute(t)
+y = gp.sample(size=32)
+data = y[3]
 
-mean = np.mean(x)
-pl.xlabel('Number of Blocks')
-pl.ylabel('Deviation from mean='+str(mean))
-pl.legend(loc='best')
+data = [i+100 for i in data]
+
+pl.plot(data)
+pl.ylabel('Random Markov Chain')
+pl.xlabel('Index')
 pl.tight_layout()
 pl.grid()
-pl.savefig('../random')
+pl.show()
+pl.clf()
+
+print(block(data))
+a, index, values = autoerror(data)
+print(a)
+
+pl.plot(index, values, '.')
+pl.ylabel('Autocorrelation')
+pl.xlabel('Index')
+pl.tight_layout()
+pl.grid()
+pl.show()
 pl.clf()
