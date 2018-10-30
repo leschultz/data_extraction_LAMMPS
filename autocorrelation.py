@@ -10,11 +10,10 @@ def autoerror(x):
     for i in range(0, n):
         for j in range(-i, n-i):
             cov = 0.0
-            minus = n-1
-            for k in range(0, minus):
+            for k in range(0, n):
                 cov += (x[i]-mean)*(x[i+j]-mean)
 
-            cov /= minus
+            cov /= n-1
             
             var += cov
 
