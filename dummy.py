@@ -6,6 +6,7 @@ from matplotlib import pyplot as pl
 from autocorrelation import *
 from block_averaging import block
 
+from scipy import stats as st
 import numpy as np
 
 # Build the celerite model:
@@ -31,9 +32,24 @@ pl.grid()
 pl.show()
 pl.clf()
 
-print(block(data))
-a, index, values = autoerror(data)
-print(a)
+var = block(data)
+print('Block error: '+str(var[1]))
+
+a = autoerror(data)
+print('Variance (from formula): '+str(a))
+
+a = error(data)
+print('Time estimate error: '+str(a))
+
+print('Scipy SEM: '+str(st.sem(data)))
+
+n = len(data)
+
+index = []
+values = []
+for i in range(0, n):
+    index.append(i)
+    values.append(autocorrelation(data, i))
 
 pl.plot(index, values, '.')
 pl.ylabel('Autocorrelation')
