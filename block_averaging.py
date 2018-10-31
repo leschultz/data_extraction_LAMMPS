@@ -11,11 +11,9 @@ def block(data, n=10):
 
     # Average the blocks and find their error in the mean
     averages = [sum(i)/len(i) for i in blocks]
-    n = len(averages)
     mean = sum(averages)/n
 
     # The standard deviation
-    sigma = np.std(averages)
-    eim = sigma/(n**0.5)
+    sigma = np.var(averages)**0.5
 
-    return mean, eim
+    return mean, sigma

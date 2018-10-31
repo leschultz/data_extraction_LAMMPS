@@ -1,6 +1,19 @@
 import numpy as np
 
 
+def autocorrelation(x, k):
+    n = len(x)
+    mean = sum(x)/n
+    minus = n-k
+
+    val = 0.0
+    for i in range(0, minus):
+        val += (x[i]-mean)*(x[i+k]-mean)
+
+    val /= minus
+
+    return val
+
 def autoerror(x):
 
     n = len(x)
@@ -10,10 +23,11 @@ def autoerror(x):
     for i in range(0, n):
         for j in range(-i, n-i):
             cov = 0.0
-            for k in range(0, n):
-                cov += (x[i]-mean)*(x[i+j]-mean)
+            minus = n-1
+            for k in range(0, minus):
+                cov += (x[k]-mean)*(x[k+1]-mean)
 
-            cov /= n-1
+            cov /= minus
             
             var += cov
 
@@ -23,7 +37,7 @@ def autoerror(x):
     return var
 
 
-def autocorrelation(x, k):
+def normautocor(x, k):
 
     n = len(x)
     mean = sum(x)/n
@@ -47,10 +61,10 @@ def autocortime(x):
 
     tau = 0.0
     for i in range(0, n):
-        tau += autocorrelation(x, i)
+        tau += normautocor(x, i)
 
     tau *= 2.0
-    tau += 1
+    tau += 1.0
 
     return tau
 

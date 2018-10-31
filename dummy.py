@@ -2,59 +2,71 @@
 
 
 from matplotlib import pyplot as pl
+from scipy import stats as st
+from itertools import islice
 
 from autocorrelation import *
-from block_averaging import block
+from block_averaging import *
+from chainerror import *
 
-from scipy import stats as st
 import numpy as np
 
-# Build the celerite model:
-import celerite
-from celerite import terms
-kernel = terms.RealTerm(log_a=0.0, log_c=-6.0)
-kernel += terms.RealTerm(log_a=0.0, log_c=-2.0)
+step = []
+temp = []
+with open('../data.txt') as file:
+    for line in islice(file, 2, None):
+        values = line.strip().split(' ')
+        values = [float(i) for i in values]
+        step.append(values[0])
+        temp.append(values[1])
 
-# Simulate a set of chains:
-gp = celerite.GP(kernel)
-t = np.arange(100)
-gp.compute(t)
-y = gp.sample(size=32)
-data = y[3]
+start = 10000
+stop = None  # start+6801*5
+step = step[start:stop]
+temp = temp[start:stop]
 
-data = [i+100 for i in data]
+meantemp = sum(temp)/len(temp)
+pl.plot(
+        step,
+        temp,
+        label='Mean Temperature: '+str(meantemp)+' [K]'
+        )
 
-pl.plot(data)
-pl.ylabel('Random Markov Chain')
-pl.xlabel('Index')
+pl.legend(loc='best')
+pl.xlabel('Step [-]')
+pl.ylabel('Temperature [K]')
 pl.tight_layout()
 pl.grid()
 pl.show()
 pl.clf()
 
-var = block(data)
+period = 6800
+
+var = block(temp)
 print('Block error: '+str(var[1]))
 
-a = autoerror(data)
+'''
+a = autoerror(temp)
 print('Variance (from formula): '+str(a))
 
-a = error(data)
+a = error(temp)
 print('Time estimate error: '+str(a))
 
-print('Scipy SEM: '+str(st.sem(data)))
+print('Scipy SEM: '+str(st.sem(temp)))
+'''
+print(errorchain(temp, period))
+print(other(temp, period))
 
-n = len(data)
-
-index = []
+n = len(temp)
+'''
 values = []
 for i in range(0, n):
-    index.append(i)
-    values.append(autocorrelation(data, i))
+    values.append(normautocor(temp[::10], i))
 
-pl.plot(index, values, '.')
+pl.plot(step, values, '.')
 pl.ylabel('Autocorrelation')
-pl.xlabel('Index')
+pl.xlabel('Step')
 pl.tight_layout()
 pl.grid()
-pl.show()
-pl.clf()
+#pl.show()
+pl.clf()'''
