@@ -5,11 +5,10 @@ from matplotlib import pyplot as pl
 from scipy import stats as st
 from itertools import islice
 
-from overlappingbatchmeans import *
+from asymptoticvariance import error as asymp 
+from batchmeans import error as batch
+from block_averaging import block
 from autocorrelation import *
-from block_averaging import *
-from batchmeans import batchmean
-from chainerror import *
 
 import numpy as np
 
@@ -23,9 +22,12 @@ with open('../data.txt') as file:
         temp.append(values[1])
 
 start = 10000
-stop = None  # start+6801*5
-step = step[start:stop]
-temp = temp[start:stop]
+stop = start + 6801*5
+skip = 100
+period = 6800
+
+step = step[start:stop:skip]
+temp = temp[start:stop:skip]
 n = len(temp)
 
 meantemp = sum(temp)/len(temp)
@@ -40,43 +42,37 @@ pl.xlabel('Step [-]')
 pl.ylabel('Temperature [K]')
 pl.tight_layout()
 pl.grid()
-#pl.show()
+# pl.show()
 pl.clf()
 
-period = 6800
-
-'''
-var = block(temp, n)
-print('Block error blocks=n: '+str(var[1]))
-
-var = block(temp, 300)
-print('Block error blocks~sqrt(n): '+str(var[1]))
-'''
-var = block(temp, 10)
-print('Block error blocks=10: '+str(var[1]))
-'''
-a = autoerror(temp)
-print('Variance (from formula): '+str(a))
-
-a = error(temp)
-print('Time estimate error: '+str(a))
-
+# print(asymp(temp, period))
 print('Scipy SEM: '+str(st.sem(temp)))
-'''
+print('Batch Means Error a=10: '+str(batch(temp, 10)))
+print('General Formula Error: '+str(asymp(temp)))
 
-print(errorchain(temp, period))
-print(other(temp, period))
-print(np.std(temp))
 
 '''
+x = []
+y = []
+for i in range(1, n, 100):
+    x.append(i)
+    y.append(batch(temp, i))
+
+pl.plot(x, y, '.b')
+print(y[-1])
+pl.show()
+'''
+'''
+index = []
 values = []
 for i in range(0, n):
-    values.append(normautocor(temp[::10], i))
+    index.append(i)
+    values.append(normautocor(temp, i))
 
-pl.plot(step, values, '.')
+pl.plot(index, values, '.')
 pl.ylabel('Autocorrelation')
 pl.xlabel('Step')
 pl.tight_layout()
 pl.grid()
-#pl.show()
+pl.show()
 pl.clf()'''

@@ -1,27 +1,37 @@
 '''
 This method used the batch means.
-The choice of l can be set as high as 30.
-l = 10 is a safe choice.
+A standard recomendation is block size 10.
+
+Source:
+http://www.stat.umn.edu/geyer/5102/notes/mcmc.pdf
 '''
 
+import math
 
-def batch(x, k, l):
+
+def error(x, a=10):
+    n = len(x)
+    mean = sum(x)/n
+
+    b = math.floor(n/a)
+
+    averages = []
+    for k in range(0, a):
+        val = 0.0
+        for i in range(k*b, (k+1)*b):
+            val += x[i]
+
+        val /= b
+        averages.append(val)
+
     val = 0.0
-    for i in range((k-1)*l+1, k*l):
-        val += x[i]
+    for i in range(0, a):
+        val += (averages[i]-mean)**2.0
 
-    val /= l
+    val /= a
+    val *= b
 
-    return val
+    sigma = val**0.5
+    error = sigma/(a**0.5)
 
-
-def batchmean(x, l=10):
-
-    length = len(x)
-    m = length*l
-
-    blocks = []
-    for i in range(0, m-1):
-        blocks.append(batch(x, i, l))
-
-    return blocks
+    return error

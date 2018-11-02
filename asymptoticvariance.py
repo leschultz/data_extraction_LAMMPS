@@ -1,9 +1,8 @@
-def error(x, period):
+def error(x):
     n = len(x)
     mean = sum(x)/n
     minus = n-1
 
-    # Compute the covariance between blocks
     valcov = 0.0
     for i in range(0, n):
         for j in range(0, n):
@@ -16,7 +15,6 @@ def error(x, period):
 
     valcov /= n
 
-    # Compute variance of each block
     valvar = 0.0
     for i in range(0, n):
         val = 0.0
