@@ -29,6 +29,6 @@ def error(x):
     valvar /= n
 
     variance = valvar+valcov
-    error = variance**0.5
+    sigma = variance**0.5
 
-    return error
+    return sigma

@@ -28,10 +28,10 @@ def error(x, a=10):
     for i in range(0, a):
         val += (averages[i]-mean)**2.0
 
-    val /= a
+    val /= a-1
     val *= b
 
     sigma = val**0.5
-    error = sigma/(a**0.5)
+    standarderror = sigma/(a**0.5)
 
-    return error
+    return standarderror
