@@ -25,6 +25,7 @@ def error(x, last=None):
     valvar -= mean**2.0
 
     val += valvar
+    val /= n
     val **= 0.5
 
     return val

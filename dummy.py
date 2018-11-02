@@ -61,24 +61,28 @@ y = []
 z = []
 w = []
 u = []
+g = []
 lengths = [10, 100, 1000]
 lengths += [50, 500, 5000]
 lengths += [25, 250, 2500]
 lengths += [75, 750, 7500]
 lengths += [400, 650]
+batches = 5
 for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
     x.append(len(data)*skip)
-    y.append(batch(data))
+    y.append(batch(data, batches))
+    g.append(batch(data, 10))
     w.append(staerr(data))
     z.append(asymp(data))
-    u.append(np.std(data))
+    u.append(st.sem(data))
 
-pl.plot(x, y, '.b', label='Batch Means')
+pl.plot(x, y, '.b', label='Batch Means (a='+str(batches)+')')
+pl.plot(x, g, '.b', label='Batch Means (a='+str(10)+')')
 pl.plot(x, z, '.r', label='General Formula')
 pl.plot(x, w, '.k', label='Stationary Time Series')
-pl.plot(x, u, 'xy', label='Standard Deviation')
+pl.plot(x, u, 'xy', label='Independent SEM')
 pl.xlabel('Data Length [steps]')
 pl.ylabel('Error [K]')
 pl.tight_layout()
@@ -108,7 +112,8 @@ for i in lengths:
 
 pl.plot(x, y, '.b', label='Not Truncated')
 pl.plot(x, z, '*r', label='Truncated at k='+str(last))
-pl.plot(x, z, 'xk', label='Truncated at k='+str(newlast))
+pl.plot(x, w, 'xk', label='Truncated at k='+str(newlast))
+pl.plot(x, u, 'xy', label='Independent SEM')
 pl.xlabel('Data Length')
 pl.ylabel('Error [K]')
 pl.tight_layout()
@@ -116,3 +121,17 @@ pl.legend(loc='best')
 pl.grid()
 pl.savefig('../cutuncut')
 pl.clf()
+
+blocksizes = list(range(2, 30))
+err = []
+for size in blocksizes:
+    err.append(batch(temp, size))
+
+pl.plot(blocksizes, err, '.b')
+pl.xlabel('Number of Blocks')
+pl.ylabel('Error [K]')
+pl.tight_layout()
+pl.grid()
+pl.savefig('../varyblock')
+pl.clf()
+
