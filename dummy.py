@@ -4,13 +4,10 @@
 from matplotlib import pyplot as pl
 from scipy import stats as st
 from itertools import islice
+import numpy as np
 
 from asymptoticvariance import error as asymp 
 from batchmeans import error as batch
-from block_averaging import block
-from autocorrelation import *
-
-import numpy as np
 
 step = []
 temp = []
@@ -22,7 +19,7 @@ with open('../data.txt') as file:
         temp.append(values[1])
 
 start = 10000
-stop = start + 6801*5
+stop = None
 skip = 100
 period = 6800
 
@@ -42,37 +39,33 @@ pl.xlabel('Step [-]')
 pl.ylabel('Temperature [K]')
 pl.tight_layout()
 pl.grid()
-# pl.show()
+pl.savefig('../data')
 pl.clf()
 
-# print(asymp(temp, period))
 print('Scipy SEM: '+str(st.sem(temp)))
-print('Batch Means Error a=10: '+str(batch(temp, 10)))
+print('Batch Means Error (a=10): '+str(batch(temp, 10)))
 print('General Formula Error: '+str(asymp(temp)))
 
-
-'''
 x = []
 y = []
-for i in range(1, n, 100):
-    x.append(i)
-    y.append(batch(temp, i))
+z = []
+lengths = [10, 100, 1000]
+lengths += [50, 500, 5000]
+lengths += [25, 250, 2500]
+lengths += [75, 750, 7500]
+for i in lengths:
+    print('Data Length: '+str(i))
+    data = temp[:i]
+    x.append(len(data)*skip)
+    y.append(batch(data))
+    z.append(asymp(data))
 
-pl.plot(x, y, '.b')
-print(y[-1])
-pl.show()
-'''
-'''
-index = []
-values = []
-for i in range(0, n):
-    index.append(i)
-    values.append(normautocor(temp, i))
-
-pl.plot(index, values, '.')
-pl.ylabel('Autocorrelation')
-pl.xlabel('Step')
+pl.plot(x, y, '.b', label='Batch Means')
+pl.plot(x, z, '.r', label='General Formula')
+pl.xlabel('Data Length')
+pl.ylabel('Error [K]')
 pl.tight_layout()
+pl.legend(loc='best')
 pl.grid()
-pl.show()
-pl.clf()'''
+pl.savefig('../convergence')
+pl.clf()
