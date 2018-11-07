@@ -9,26 +9,32 @@ import math
 from asymptoticvariance import error as asymp
 from stationary import error as staerr
 from batchmeans import error as batch
+from autocoverr import error as new
 from autocovariance import auto
 
-x = np.linspace(0, 10, 1000)
-y = signal.square(x)
+x = np.linspace(0, 100, 1000)
+y = np.sin(x)
+mean = sum(y)/len(y)
 
 k, r, last = auto(y)
-err, gamma0, gammak = staerr(y, math.floor(len(x)**0.5))
+err = staerr(y, math.floor(len(x)**0.5))
 
 print(st.sem(y))
 print(err)
-print(last)
+print(new(y, math.floor(len(y)**0.5)))
+print(batch(y))
 
-pl.plot(x, y)
-pl.show()
+pl.plot(x, y, label='Mean = '+str(mean))
+pl.xlabel('x-point')
+pl.ylabel('y-point')
+pl.grid()
+pl.legend(loc='best')
+pl.savefig('../sine')
 pl.clf()
 
 pl.plot(k, r)
-pl.show()
-pl.clf()
-
-pl.plot(gammak)
-pl.show()
+pl.xlabel('Lag-k')
+pl.ylabel('Autocorrelation')
+pl.grid()
+pl.savefig('../sineauto')
 pl.clf()

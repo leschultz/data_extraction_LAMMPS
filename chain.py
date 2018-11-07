@@ -26,7 +26,7 @@ true_tau /= sum(np.exp(t.log_a) for t in kernel.terms)
 print(true_tau)
 
 # Simulate a set of chains:
-points = 10000
+points = 1000
 gp = celerite.GP(kernel)
 t = np.arange(points)
 gp.compute(t)
@@ -51,18 +51,41 @@ pl.grid()
 pl.savefig('../data')
 pl.clf()
 
+
+k, r, last = auto(temp)
+
+pl.plot(k, r)
+pl.xlabel('Lag-k')
+pl.ylabel('Autocovrrelation')
+pl.tight_layout()
+pl.legend(['Last k before zero: '+str(last)], loc='best')
+pl.grid()
+pl.savefig('../auto')
+pl.clf()
+
+
 x = []
 y = []
 u = []
+z = []
+g = []
+t = []
+batches = 5
 lengths = list(range(points//10, points, points//10))
 for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
     x.append(len(data))
-    y.append(etest(data, math.floor(n**0.5)))
+    y.append(etest(data))
+    t.append(batch(data, batches))
+    g.append(batch(data))
     u.append(st.sem(data))
+    z.append(staerr(data))
 
-pl.plot(x, y, '+r', label='Test')
+pl.plot(x, t, '.', label='Batch Means (a='+str(batches)+')')
+pl.plot(x, g, '*b', label='Batch Means (b='+str(math.floor(n**0.5))+')')
+pl.plot(x, y, '+r', label='Ukui Estimator')
+pl.plot(x, z, '.k', label='Handook Estimator')
 pl.plot(x, u, 'xy', label='Independent SEM')
 pl.xlabel('Data Length [steps]')
 pl.ylabel('Error [K]')

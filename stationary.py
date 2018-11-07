@@ -1,31 +1,32 @@
+def estimator(x, k, n, mean):
+
+    gamma = 0.0
+    for i in range(0, n-k):
+        gamma += (x[i]-mean)*(x[i+k]-mean)
+
+    gamma /= n
+
+    return gamma
+
+
 def error(x, last=None):
     n = len(x)
     mean = sum(x)/n
     minus = n-1
 
-    val = 0.0
-    for i in range(0, n-1):
-        if i == last:
+    gammak = 0.0
+    for k in range(0, n-1):
+        if k == last:
             break
 
-        cov = 0.0
-        for j in range(0, n-1):
-            cov += (x[i]-mean)*(x[i-j]-mean)
-        cov /= minus
+        gammak += (n-k)/n*estimator(x, k, n, mean)
 
-        val += (n-j)/n*cov
+    gammak *= 2.0
 
-    val *= 2.0
+    gamma0 = estimator(x, 0, n, mean)
 
-    valvar = 0.0
-    for i in range(0, n):
-        valvar += x[i]**2.0
+    variance = gamma0+gammak
+    sigma = variance**0.5
+    error = sigma/(n**0.5)
 
-    valvar /= n
-    valvar -= mean**2.0
-
-    val += valvar
-    val /= n
-    val **= 0.5
-
-    return val
+    return error

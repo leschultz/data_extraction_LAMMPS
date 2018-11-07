@@ -7,14 +7,14 @@ from itertools import islice
 import numpy as np
 import math
 
-from asymptoticvariance import error as asymp
 from batchmeans import error as batch
 from autocovariance import auto
 from stationary import error as staerr
+from autocoverr import error as asymp
 
 step = []
 temp = []
-with open('../data.txt') as file:
+with open('../nve.txt') as file:
     for line in islice(file, 2, None):
         values = line.strip().split(' ')
         values = [float(i) for i in values]
@@ -23,7 +23,7 @@ with open('../data.txt') as file:
 
 start = 10000
 stop = None
-skip = 100
+skip = 1000
 period = 6800
 
 step = step[start:stop:skip]
@@ -47,7 +47,7 @@ pl.clf()
 
 k, r, last = auto(temp)
 
-pl.plot(k, r, '.b')
+pl.plot(k, r)
 pl.xlabel('Lag-k')
 pl.ylabel('Autocovrrelation')
 pl.tight_layout()
@@ -62,26 +62,22 @@ z = []
 w = []
 u = []
 g = []
-lengths = [10, 100, 1000]
-lengths += [50, 500, 5000]
-lengths += [25, 250, 2500]
-lengths += [75, 750, 7500]
-lengths += [400, 650]
+lengths = list(range(n//10, n, n//10))
 batches = 5
 for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
-    x.append(len(data)*skip)
+    x.append(len(data))
     y.append(batch(data, batches))
-    g.append(batch(data, 10))
+    g.append(batch(data))
     w.append(staerr(data))
     z.append(asymp(data))
     u.append(st.sem(data))
 
 pl.plot(x, y, '.b', label='Batch Means (a='+str(batches)+')')
-pl.plot(x, g, '.b', label='Batch Means (a='+str(10)+')')
-pl.plot(x, z, '.r', label='General Formula')
-pl.plot(x, w, '.k', label='Stationary Time Series')
+pl.plot(x, g, '*b', label='Batch Means (b='+str(math.floor(n**0.5))+')')
+pl.plot(x, z, '+r', label='Ukui Estimator')
+pl.plot(x, w, '.k', label='Handbook Estimator')
 pl.plot(x, u, 'xy', label='Independent SEM')
 pl.xlabel('Data Length [steps]')
 pl.ylabel('Error [K]')
@@ -97,15 +93,11 @@ z = []
 w = []
 newlast = math.floor(n**0.5)
 
-lengths = [10, 100, 1000]
-lengths += [50, 500, 5000]
-lengths += [25, 250, 2500]
-lengths += [75, 750, 7500]
-lengths += [400, 650]
+lengths = list(range(n//10, n, n//10))
 for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
-    x.append(len(data)*skip)
+    x.append(len(data))
     y.append(staerr(data))
     z.append(staerr(data, last))
     w.append(staerr(data, newlast))

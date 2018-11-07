@@ -1,19 +1,30 @@
 '''
 This method used the batch means.
-A standard recomendation is block size 10.
+A standard recomendation is block size sqrt(n).
 
 Source:
-http://www.stat.umn.edu/geyer/5102/notes/mcmc.pdf
+@article{,
+file = {:home/nerve/Documents/UW/Papers/batchmeans.pdf:pdf},
+mendeley-groups = {Monte Carlo},
+pages = {95--95},
+title = {{Batch means standard errors for MCMC}},
+year = {2005}
+}
 '''
 
 import math
 
 
-def error(x, a=10):
+def error(x, a=None):
     n = len(x)
     mean = sum(x)/n
 
-    b = math.floor(n/a)
+    if a is None:
+        b = math.floor(n**0.5)
+        a = math.floor(n/b)
+
+    else:
+        b = math.floor(n/a)
 
     averages = []
     for k in range(0, a):
@@ -32,6 +43,6 @@ def error(x, a=10):
     val *= b
 
     sigma = val**0.5
-    standarderror = sigma/(a**0.5)
+    standarderror = sigma/(n**0.5)
 
     return standarderror

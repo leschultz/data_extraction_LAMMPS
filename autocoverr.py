@@ -25,7 +25,7 @@ def error(x, cut=None):
 
     gammaj *= 2.0
 
-    variance = (gamma0+gammaj)/n
+    variance = (gamma0+gammaj)/n  # Already devided by n for standard error
     sigma = variance**0.5
 
     return sigma
