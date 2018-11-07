@@ -17,15 +17,19 @@ def error(x, cut=None):
     gamma0 = autocovariance(x, 0, n, mean)
 
     gammaj = 0.0
+    gammajchange = []
+    jvals = []
     for j in range(0, n-1):
         if j == cut:
             break
 
+        jvals.append(j)
         gammaj += (n-j)/n*autocovariance(x, j, n, mean)
+        gammajchange.append(gammaj)
 
     gammaj *= 2.0
 
     variance = (gamma0+gammaj)/n  # Already devided by n for standard error
     sigma = variance**0.5
 
-    return sigma
+    return sigma, gamma0, gammajchange, jvals

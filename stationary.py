@@ -15,11 +15,15 @@ def error(x, last=None):
     minus = n-1
 
     gammak = 0.0
+    gammakchange = []
+    kvals = []
     for k in range(0, n-1):
         if k == last:
             break
 
+        kvals.append(k)
         gammak += (n-k)/n*estimator(x, k, n, mean)
+        gammakchange.append(gammak)
 
     gammak *= 2.0
 
@@ -29,4 +33,4 @@ def error(x, last=None):
     sigma = variance**0.5
     error = sigma/(n**0.5)
 
-    return error
+    return error, gamma0, gammakchange, kvals

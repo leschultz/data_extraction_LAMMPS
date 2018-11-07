@@ -70,8 +70,8 @@ for i in lengths:
     x.append(len(data))
     y.append(batch(data, batches))
     g.append(batch(data))
-    w.append(staerr(data))
-    z.append(asymp(data))
+    w.append(staerr(data)[0])
+    z.append(asymp(data)[0])
     u.append(st.sem(data))
 
 pl.plot(x, y, '.b', label='Batch Means (a='+str(batches)+')')
@@ -98,9 +98,9 @@ for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
     x.append(len(data))
-    y.append(staerr(data))
-    z.append(staerr(data, last))
-    w.append(staerr(data, newlast))
+    y.append(staerr(data)[0])
+    z.append(staerr(data, last)[0])
+    w.append(staerr(data, newlast)[0])
 
 pl.plot(x, y, '.b', label='Not Truncated')
 pl.plot(x, z, '*r', label='Truncated at k='+str(last))
