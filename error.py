@@ -1,12 +1,15 @@
 from matplotlib import pyplot as pl
-from block_averaging import block
 from scipy import stats as st
 
 from diffusionimport import load
 from matplotlib import lines
 from itertools import islice
 
-from autocorrelation import *
+from asymptoticvariance import error as asymp
+from stationary import error as standarderror
+from batchmeans import error as block
+from autocoverr import error as new
+from autocovariance import auto
 
 import numpy as np
 import os
@@ -89,11 +92,10 @@ for temp in regular:
 
     error.append(st.sem(regular[temp]['all'], ddof=ddof))
 
-    autoerror.append(standarderror(regular[temp]['all']))
+    autoerror.append(standarderror(regular[temp]['all'])[0])
 
     bl = block(regular[temp]['all'])
-    blockedaverages.append(bl[0])
-    blockederror.append(bl[1])
+    blockederror.append(bl)
 
 pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
 pl.plot(temps, autoerror, 'xk', markerfacecolor='none', markersize=12)
@@ -117,7 +119,7 @@ regularblocks = lines.Line2D(
                              marker='.',
                              linestyle='None',
                              markersize=8,
-                             label='10 Block Averaging SEM'
+                             label='Block Averaging'
                              )
 
 autocorrelation = lines.Line2D(
@@ -154,17 +156,17 @@ for temp in multiple:
             runsscipy[count] = []
             runsauto[count] = []
 
-        runsblock[count].append(block(item)[1])
+        runsblock[count].append(block(item))
         runsscipy[count].append(st.sem(item, ddof=ddof))
 
-        runsauto[count].append(standarderror(item))
+        runsauto[count].append(standarderror(item)[0])
 
         count += 1
 
 for run in runsblock:
-    pl.plot(temps, runsblock[run], 'b.')
-    pl.plot(temps, runsscipy[run], 'rx')
-    pl.plot(temps, runsauto[run], 'yo', markerfacecolor='none')
+    pl.plot(temps, runsblock[0], 'b.')
+    pl.plot(temps, runsscipy[0], 'rx')
+    pl.plot(temps, runsauto[0], 'yo', markerfacecolor='none')
 
 one = lines.Line2D(
                    [],
@@ -173,7 +175,7 @@ one = lines.Line2D(
                    marker='.',
                    linestyle='None',
                    markersize=8,
-                   label='Block Averaging (n=10) SEM'
+                   label='Block Averaging'
                    )
 
 two = lines.Line2D(
@@ -225,10 +227,9 @@ for temp in runs:
     temps.append(temp)
 
     res = block(runs[temp])
-    megablock.append(res[1])
-    blockdiff.append(res[0])
+    megablock.append(res)
 
-    autocorr.append(standarderror(runs[temp]))
+    autocorr.append(standarderror(runs[temp])[0])
 
     scipysem.append(st.sem(runs[temp]))
 
@@ -243,40 +244,3 @@ pl.grid()
 pl.tight_layout()
 pl.savefig('../megaset')
 pl.clf()
-
-# Check actual value averages
-temps2 = []
-averages = []
-for temp in regular:
-    temps2.append(temp)
-    averages.append(np.mean(regular[temp]['all']))
-
-
-pl.plot(temps2, averages, 'rx', label='Average Diffusion')
-pl.plot(temps, blockdiff, 'b.', label='Block Average Diffusion')
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../diffusioncheck')
-pl.clf()
-
-data = {}
-temps = []
-for temp in runs:
-    temps.append(temp)
-    for i in range(10, 461, 100):
-        if data.get(i) is None:
-            data[i] = []
-
-        data[i].append(block(runs[temp], i)[1])
-
-for key in data:
-    pl.plot(temps, data[key], '.', label='Blocks='+str(key))
-
-pl.legend(loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../varyblock')
