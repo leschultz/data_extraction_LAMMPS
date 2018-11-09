@@ -2,7 +2,7 @@ def autocovariance(x, k, n, mean):
 
     gamma = 0.0
     for i in range(0, n):
-        for t in range(k+1, n):
+        for t in range(k, n):
             gamma += (x[t]-mean)*(x[t-k]-mean)
 
     gamma /= n*(n-k)

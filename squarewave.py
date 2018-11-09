@@ -20,8 +20,8 @@ k, r, last = auto(y)
 err = staerr(y, math.floor(len(x)**0.5))
 
 print(st.sem(y))
-print(err)
-print(new(y, math.floor(len(y)**0.5)))
+print(err[0])
+print(new(y, math.floor(len(y)**0.5))[0])
 print(batch(y))
 print(((((1-0)**2+(-1-0)**2+(1-0)**2+(-1-0)**2)/(4-1))**0.5)/(4**0.5))
 

@@ -76,11 +76,11 @@ for i in lengths:
     print('Data Length: '+str(i))
     data = temp[:i]
     x.append(len(data))
-    y.append(etest(data))
+    y.append(etest(data)[0])
     t.append(batch(data, batches))
     g.append(batch(data))
     u.append(st.sem(data))
-    z.append(staerr(data))
+    z.append(staerr(data)[0])
 
 pl.plot(x, t, '.', label='Batch Means (a='+str(batches)+')')
 pl.plot(x, g, '*b', label='Batch Means (b='+str(math.floor(n**0.5))+')')
