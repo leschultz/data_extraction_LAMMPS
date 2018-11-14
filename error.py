@@ -5,11 +5,9 @@ from diffusionimport import load
 from matplotlib import lines
 from itertools import islice
 
-from asymptoticvariance import error as asymp
-from stationary import error as standarderror
-from batchmeans import error as block
-from autocoverr import error as new
-from autocovariance import auto
+from handbookestimator import error as handbook
+from ukuiestimator import error as ukui
+from batchmeans import error as batch
 
 import numpy as np
 import os
@@ -79,94 +77,31 @@ def errorcomparison(maindir):
 ddof = 1
 regular, multiple = errorcomparison('../export/')
 
-# Apply methods to single runs
-temps = []
-averages = []
-error = []
-autoerror = []
-blockedaverages = []
-blockederror = []
-for temp in regular:
-    temps.append(temp)
-    averages.append(np.mean(regular[temp]['all']))
-
-    error.append(st.sem(regular[temp]['all'], ddof=ddof))
-
-    autoerror.append(standarderror(regular[temp]['all'])[0])
-
-    bl = block(regular[temp]['all'])
-    blockederror.append(bl)
-
-pl.plot(temps, error, 'ob', markerfacecolor='none', markersize=12)
-pl.plot(temps, autoerror, 'xk', markerfacecolor='none', markersize=12)
-pl.plot(temps, blockederror, '.r', markersize=10)
-
-regularval = lines.Line2D(
-                         [],
-                         [],
-                         color='blue',
-                         marker='o',
-                         linestyle='None',
-                         markersize=8,
-                         markerfacecolor='none',
-                         label='Scipy SEM'
-                         )
-
-regularblocks = lines.Line2D(
-                             [],
-                             [],
-                             color='red',
-                             marker='.',
-                             linestyle='None',
-                             markersize=8,
-                             label='Block Averaging'
-                             )
-
-autocorrelation = lines.Line2D(
-                               [],
-                               [],
-                               color='k',
-                               marker='x',
-                               linestyle='None',
-                               markersize=8,
-                               label='Correlation'
-                               )
-
-plotlables = [regularval, regularblocks, autocorrelation]
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(handles=plotlables, loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../errorcheck')
-pl.clf()
-
 # Apply methods to Multiple Origins
 temps = []
-runsblock = {}
+runsbatch5 = {}
+runsbatch10 = {}
+runshandbook = {}
+runsukui = {}
 runsscipy = {}
-runsauto = {}
 for temp in multiple:
     count = 0
     temps.append(temp)
     for item in multiple[temp]['all']:
-        if runsblock.get(count) is None:
-            runsblock[count] = []
+        if runsscipy.get(count) is None:
+            runsbatch5[count] = []
+            runsbatch10[count] = []
+            runshandbook[count] = []
+            runsukui[count] = []
             runsscipy[count] = []
-            runsauto[count] = []
 
-        runsblock[count].append(block(item))
+        runsbatch5[count].append(batch(item, 5))
+        runsbatch10[count].append(batch(item, 10))
+        runshandbook[count].append(handbook(item))
+        runsukui[count].append(ukui(item))
         runsscipy[count].append(st.sem(item, ddof=ddof))
 
-        runsauto[count].append(standarderror(item)[0])
-
         count += 1
-
-for run in runsblock:
-    pl.plot(temps, runsblock[0], 'b.')
-    pl.plot(temps, runsscipy[0], 'rx')
-    pl.plot(temps, runsauto[0], 'yo', markerfacecolor='none')
 
 one = lines.Line2D(
                    [],
@@ -175,39 +110,68 @@ one = lines.Line2D(
                    marker='.',
                    linestyle='None',
                    markersize=8,
-                   label='Block Averaging'
+                   label='Batch Means (a=5)'
                    )
 
 two = lines.Line2D(
                    [],
                    [],
                    color='r',
-                   marker='x',
+                   marker='.',
                    linestyle='None',
                    markersize=8,
-                   label='Scipy SEM'
+                   label='Batch Means (a=10)'
                    )
 
 three = lines.Line2D(
                      [],
                      [],
-                     color='y',
-                     marker='o',
+                     color='m',
+                     marker='d',
                      linestyle='None',
                      markersize=8,
-                     label='Correlation',
+                     label='Handbook Estimator',
                      markerfacecolor='none'
                      )
 
-plotlabels = [one, two, three]
+four = lines.Line2D(
+                    [],
+                    [],
+                    color='y',
+                    marker='+',
+                    linestyle='None',
+                    markersize=8,
+                    label='Ukui Estimator',
+                    markerfacecolor='none'
+                    )
 
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(handles=plotlabels, loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../comparisonsmulti')
-pl.clf()
+five = lines.Line2D(
+                    [],
+                    [],
+                    color='k',
+                    marker='x',
+                    linestyle='None',
+                    markersize=8,
+                    label='Scipy SEM',
+                    markerfacecolor='none'
+                    )
+
+for run in runsscipy:
+    pl.plot(temps, runsbatch5[run], 'b.')
+    pl.plot(temps, runsbatch10[run], 'r.')
+    pl.plot(temps, runshandbook[run], 'md', markerfacecolor='none')
+    pl.plot(temps, runsukui[run], 'y+')
+    pl.plot(temps, runsscipy[run], 'kx')
+
+    plotlabels = [one, two, three, four, five]
+
+    pl.xlabel('Temperature [K]')
+    pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
+    pl.legend(handles=plotlabels, loc='best')
+    pl.grid()
+    pl.tight_layout()
+    pl.savefig('../'+str(run))
+    pl.clf()
 
 # Apply methods to multiple origins together
 runs = {}
@@ -217,25 +181,27 @@ for temp in multiple:
     for item in multiple[temp]['all']:
         runs[temp] += item
 
-temps = []
-megablock = []
-autocorr = []
-scipysem = []
-blockdiff = []
-actualldiff = []
+temps = [] 
+runsbatch5 = []
+runsbatch10 = []
+runshandbook = []
+runsukui = []
+runsscipy = []
 for temp in runs:
     temps.append(temp)
 
-    res = block(runs[temp])
-    megablock.append(res)
+    runsbatch5.append(batch(runs[temp], 5))
+    runsbatch10.append(batch(runs[temp], 10))
+    runshandbook.append(handbook(runs[temp]))
+    runsukui.append(batch(runs[temp]))
+    runsscipy.append(st.sem(runs[temp]))
 
-    autocorr.append(standarderror(runs[temp])[0])
 
-    scipysem.append(st.sem(runs[temp]))
-
-pl.plot(temps, megablock, 'b.', label='Block Average for All')
-pl.plot(temps, autocorr, '*k', label='Correlation for All')
-pl.plot(temps, scipysem, 'rx', label='Scipy SEM for All')
+pl.plot(temps, runsbatch5, 'b.', label='Batch Means (a=5)')
+pl.plot(temps, runsbatch10, 'r.', label='Batch Means (a=10)')
+pl.plot(temps, runshandbook, 'md', label='Handbook Estimator', markerfacecolor='none')
+pl.plot(temps, runsukui, 'y+', label='Ukui Estimator')
+pl.plot(temps, runsscipy, 'kx', label='Scipy SEM')
 
 pl.xlabel('Temperature [K]')
 pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')

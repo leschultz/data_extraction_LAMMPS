@@ -32,4 +32,4 @@ def error(x, cut=None):
     variance = (gamma0+gammaj)/n  # Already devided by n for standard error
     sigma = variance**0.5
 
-    return sigma, gamma0, gammajchange, jvals
+    return sigma

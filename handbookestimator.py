@@ -33,4 +33,4 @@ def error(x, last=None):
     sigma = variance**0.5
     error = sigma/(n**0.5)
 
-    return error, gamma0, gammakchange, kvals
+    return error
