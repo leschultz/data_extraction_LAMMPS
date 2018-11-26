@@ -5,7 +5,6 @@ from diffusionimport import load
 from matplotlib import lines
 from itertools import islice
 
-from handbookestimator import error as handbook
 from ukuiestimator import error as ukui
 from batchmeans import error as batch
 
@@ -81,7 +80,6 @@ regular, multiple = errorcomparison('../export/')
 temps = []
 runsbatch5 = {}
 runsbatch10 = {}
-runshandbook = {}
 runsukui = {}
 runsscipy = {}
 for temp in multiple:
@@ -91,79 +89,65 @@ for temp in multiple:
         if runsscipy.get(count) is None:
             runsbatch5[count] = []
             runsbatch10[count] = []
-            runshandbook[count] = []
             runsukui[count] = []
             runsscipy[count] = []
 
         runsbatch5[count].append(batch(item, 5))
         runsbatch10[count].append(batch(item, 10))
-        runshandbook[count].append(handbook(item))
         runsukui[count].append(ukui(item))
         runsscipy[count].append(st.sem(item, ddof=ddof))
 
         count += 1
 
-one = lines.Line2D(
-                   [],
-                   [],
-                   color='b',
-                   marker='.',
-                   linestyle='None',
-                   markersize=8,
-                   label='Batch Means (a=5)'
-                   )
+batch5label = lines.Line2D(
+                           [],
+                           [],
+                           color='b',
+                           marker='.',
+                           linestyle='None',
+                           markersize=8,
+                           label='Batch Means (a=5)'
+                           )
 
-two = lines.Line2D(
-                   [],
-                   [],
-                   color='r',
-                   marker='.',
-                   linestyle='None',
-                   markersize=8,
-                   label='Batch Means (a=10)'
-                   )
+batch10label = lines.Line2D(
+                            [],
+                            [],
+                            color='r',
+                            marker='.',
+                            linestyle='None',
+                            markersize=8,
+                            label='Batch Means (a=10)'
+                            )
 
-three = lines.Line2D(
-                     [],
-                     [],
-                     color='m',
-                     marker='d',
-                     linestyle='None',
-                     markersize=8,
-                     label='Handbook Estimator',
-                     markerfacecolor='none'
-                     )
+ukuilabel = lines.Line2D(
+                         [],
+                         [],
+                         color='y',
+                         marker='+',
+                         linestyle='None',
+                         markersize=8,
+                         label='Ukui Estimator',
+                         markerfacecolor='none'
+                         )
 
-four = lines.Line2D(
-                    [],
-                    [],
-                    color='y',
-                    marker='+',
-                    linestyle='None',
-                    markersize=8,
-                    label='Ukui Estimator',
-                    markerfacecolor='none'
-                    )
+scipylabel = lines.Line2D(
+                          [],
+                          [],
+                          color='k',
+                          marker='x',
+                          linestyle='None',
+                          markersize=8,
+                          label='Scipy SEM',
+                          markerfacecolor='none'
+                          )
 
-five = lines.Line2D(
-                    [],
-                    [],
-                    color='k',
-                    marker='x',
-                    linestyle='None',
-                    markersize=8,
-                    label='Scipy SEM',
-                    markerfacecolor='none'
-                    )
+plotlabels = [batch5label, batch10label, ukuilabel, scipylabel]
 
 for run in runsscipy:
     pl.plot(temps, runsbatch5[run], 'b.')
     pl.plot(temps, runsbatch10[run], 'r.')
-    pl.plot(temps, runshandbook[run], 'md', markerfacecolor='none')
     pl.plot(temps, runsukui[run], 'y+')
     pl.plot(temps, runsscipy[run], 'kx')
-
-    plotlabels = [one, two, three, four, five]
 
     pl.xlabel('Temperature [K]')
     pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
@@ -173,40 +157,4 @@ for run in runsscipy:
     pl.savefig('../'+str(run))
     pl.clf()
 
-# Apply methods to multiple origins together
-runs = {}
-for temp in multiple:
-    if runs.get(temp) is None:
-        runs[temp] = []
-    for item in multiple[temp]['all']:
-        runs[temp] += item
-
-temps = [] 
-runsbatch5 = []
-runsbatch10 = []
-runshandbook = []
-runsukui = []
-runsscipy = []
-for temp in runs:
-    temps.append(temp)
-
-    runsbatch5.append(batch(runs[temp], 5))
-    runsbatch10.append(batch(runs[temp], 10))
-    runshandbook.append(handbook(runs[temp]))
-    runsukui.append(batch(runs[temp]))
-    runsscipy.append(st.sem(runs[temp]))
-
-
-pl.plot(temps, runsbatch5, 'b.', label='Batch Means (a=5)')
-pl.plot(temps, runsbatch10, 'r.', label='Batch Means (a=10)')
-pl.plot(temps, runshandbook, 'md', label='Handbook Estimator', markerfacecolor='none')
-pl.plot(temps, runsukui, 'y+', label='Ukui Estimator')
-pl.plot(temps, runsscipy, 'kx', label='Scipy SEM')
-
-pl.xlabel('Temperature [K]')
-pl.ylabel('Diffusion SEM [*10^-4 cm^2 s^-1]')
-pl.legend(loc='best')
-pl.grid()
-pl.tight_layout()
-pl.savefig('../megaset')
-pl.clf()
+print(multiple)
