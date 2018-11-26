@@ -15,15 +15,14 @@ year = {2005}
 import math
 
 
-def error(x, a=None):
+def error(x, a=None, b=None):
     n = len(x)
     mean = sum(x)/n
 
     if a is None:
-        b = math.floor(n**0.5)
         a = math.floor(n/b)
 
-    else:
+    if b is None:
         b = math.floor(n/a)
 
     averages = []

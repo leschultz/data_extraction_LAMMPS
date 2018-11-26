@@ -1,15 +1,4 @@
-from matplotlib import pyplot as pl
-from scipy import stats as st
-
-from diffusionimport import load
-from matplotlib import lines
-from itertools import islice
-
-from ukuiestimator import error as ukui
-from batchmeans import error as batch
-
 import pandas as pd
-import numpy as np
 import os
 
 
@@ -41,7 +30,7 @@ def diffusionimport(maindir):
                     temp = name.split('_')[-1]
 
                 temp = float(temp[:-1])
-                df = pd.read_csv(name, sep= ' ')
+                df = pd.read_csv(name, sep=' ')
                 datasets[key][item][temp] = df
 
     return datasets
