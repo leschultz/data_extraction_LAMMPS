@@ -21,7 +21,7 @@ def diffusion(time, msd):
             slope = p[0]
             stderr = p[-1]
             diffusion[key] = slope/6
-            diffusion[key+'_Err'] = stderr/6
+            diffusion[key+'_err'] = stderr/6
 
     return diffusion
 
@@ -290,11 +290,11 @@ class analize(object):
             errorfreq = 1
 
         for key in self.diffmulti:
-            if '_Err' not in key:
+            if '_err' not in key:
                 pl.errorbar(
                             self.startpoints,
                             self.diffmulti[key],
-                            self.diffmulti[key+'_Err'],
+                            self.diffmulti[key+'_err'],
                             label='element Type: %s' % key,
                             ecolor='r',
                             linestyle='dotted',
