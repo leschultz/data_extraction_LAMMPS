@@ -11,16 +11,21 @@ from batchmeans import error as batch
 
 import pandas as pd
 import numpy as np
+import math
 import os
 
 
 def percent(x, y):
     return [i/j*100.0 for i, j in zip(x, y)]
 
+datadir = '../export/'
+exportdir = '../testpics/'
 
-data = diffusionimport('../export/')
+data = diffusionimport(datadir)
 errors = {}
 for folder in data:
+    print(folder)
+
     errors[folder] = []
     for temp in data[folder]['origins']:
         cols = list(data[folder]['origins'][temp].columns.values)[1:]
@@ -29,18 +34,30 @@ for folder in data:
         regulardata = data[folder]['regular'][temp]
         modata = data[folder]['origins'][temp]
 
-        k, r = auto(modata['all'])
-
-        count = 0
-        for i in r:
-            if i >= 0.0:
-                index = count
-                count += 1
-            else:
-                break
-
         errordf = {}
         for col in cols:
+            k, r = auto(modata[col])
+
+            count = 0
+            for i in r:
+                if i >= 0.0:
+                    index = count
+                    count += 1
+                else:
+                    break
+
+            approxtemp = str(math.ceil(temp))
+            name = exportdir+folder+'_autocorrelation_temp_'+approxtemp+'_'+col
+            pl.plot(k, r, 'b.', label=approxtemp+' [K]')
+            pl.axvline(x=index, linestyle='--', color='r', label='Correlation Length') 
+            pl.grid()
+            pl.xlabel('k-lag [index]')
+            pl.ylabel('Autocorrelation [-]')
+            pl.legend(loc='upper right')
+            pl.tight_layout()
+            pl.savefig(name)
+            pl.clf()
+
             errordf[col+'_diff'] = regulardata[col]
             errordf[col+'_fiterr'] = regulardata[col+'_Err']
             errordf[col+'_mo_ukui'] = ukui(list(modata[col]))
@@ -125,6 +142,8 @@ plotlabels.append(ukuilabel)
 plotlabels.append(scipylabel)
 plotlabels.append(batchlcorrlabel)
 
+size = (15, 5)
+
 for folder in errors:
 
     cols = list(errors[folder].columns.values)
@@ -137,33 +156,40 @@ for folder in errors:
     elements = list(set(elements))
 
     for el in elements:
-        fig, ax = pl.subplots(2, 2, figsize=(10, 10))
+        fig, ax = pl.subplots(1, 2, figsize=size)
 
         x = errors[folder]['temp']
 
-        ax[0][0].plot(x, errors[folder][el+'_diff'], 'b.')
+        ax[0].plot(x, errors[folder][el+'_diff'], 'b.')
 
-        ax[0][0].set_ylabel('Diffusion [*10^-4 cm^2 s^-1]')
-        ax[0][0].set_xlabel('Temperature [K]')
-        ax[0][0].grid()
+        ax[0].set_ylabel('Diffusion [*10^-4 cm^2 s^-1]')
+        ax[0].set_xlabel('Temperature [K]')
+        ax[0].grid()
 
-        ax[0][1].plot(x, errors[folder][el+'_fiterr'], 'r.')
+        ax[1].plot(x, errors[folder][el+'_fiterr'], 'r.')
 
-        ax[0][1].set_ylabel('Diffusion Fit Error [*10^-4 cm^2 s^-1]')
-        ax[0][1].set_xlabel('Temperature [K]')
-        ax[0][1].grid()
+        ax[1].set_ylabel('Diffusion Fit Error [*10^-4 cm^2 s^-1]')
+        ax[1].set_xlabel('Temperature [K]')
+        ax[1].grid()
 
-        ax[1][0].plot(x, errors[folder][el+'_mo_batch(a=5)'], 'b.')
-        ax[1][0].plot(x, errors[folder][el+'_mo_batch(a=10)'], 'r.')
-        ax[1][0].plot(x, errors[folder][el+'_mo_batch(b=lcorr)'], 'g.')
-        ax[1][0].plot(x, errors[folder][el+'_mo_ukui'], 'y+')
-        ax[1][0].plot(x, errors[folder][el+'_mo_scipysem'], 'kx')
-        ax[1][0].plot(x, errors[folder][el+'_mo_fitavg'], 'g^')
+        name = exportdir+folder+'_element_'+el
+        fig.tight_layout()
+        fig.savefig(name)
+        pl.close(fig)
 
-        ax[1][0].set_ylabel('Diffusion MO Error [*10^-4 cm^2 s^-1]')
-        ax[1][0].set_xlabel('Temperature [K]')
-        ax[1][0].legend(handles=plotlabels, loc='best')
-        ax[1][0].grid()
+        fig, ax = pl.subplots(1, 2, figsize=size)
+
+        ax[0].plot(x, errors[folder][el+'_mo_batch(a=5)'], 'b.')
+        ax[0].plot(x, errors[folder][el+'_mo_batch(a=10)'], 'r.')
+        ax[0].plot(x, errors[folder][el+'_mo_batch(b=lcorr)'], 'g.')
+        ax[0].plot(x, errors[folder][el+'_mo_ukui'], 'y+')
+        ax[0].plot(x, errors[folder][el+'_mo_scipysem'], 'kx')
+        ax[0].plot(x, errors[folder][el+'_mo_fitavg'], 'g^')
+
+        ax[0].set_ylabel('Diffusion MO Error [*10^-4 cm^2 s^-1]')
+        ax[0].set_xlabel('Temperature [K]')
+        ax[0].legend(handles=plotlabels, loc='upper left')
+        ax[0].grid()
 
         # Change values to percent error
         diff = errors[folder][el+'_diff']
@@ -174,19 +200,19 @@ for folder in errors:
         runsscipypercent = percent(errors[folder][el+'_mo_scipysem'], diff)
         fiterrorpercent = percent(errors[folder][el+'_mo_fitavg'], diff)
 
-        ax[1][1].plot(x, runsbatch5percent, 'b.')
-        ax[1][1].plot(x, runsbatch10percent, 'r.')
-        ax[1][1].plot(x, runsbatchlcorrpercent, 'g.')
-        ax[1][1].plot(x, runsukuipercent, 'y+')
-        ax[1][1].plot(x, runsscipypercent, 'kx')
-        ax[1][1].plot(x, fiterrorpercent, 'g^')
+        ax[1].plot(x, runsbatch5percent, 'b.')
+        ax[1].plot(x, runsbatch10percent, 'r.')
+        ax[1].plot(x, runsbatchlcorrpercent, 'g.')
+        ax[1].plot(x, runsukuipercent, 'y+')
+        ax[1].plot(x, runsscipypercent, 'kx')
+        ax[1].plot(x, fiterrorpercent, 'g^')
 
-        ax[1][1].set_ylabel('Diffusion MO Percent Error')
-        ax[1][1].set_xlabel('Temperature [K]')
-        ax[1][1].legend(handles=plotlabels, loc='best')
-        ax[1][1].grid()
+        ax[1].set_ylabel('Diffusion MO Percent Error')
+        ax[1].set_xlabel('Temperature [K]')
+        ax[1].legend(handles=plotlabels, loc='upper right')
+        ax[1].grid()
 
-        name = folder+'_element_'+el
+        name = exportdir+folder+'_mo_'+'_element_'+el
         fig.tight_layout()
-        fig.savefig('../'+name)
+        fig.savefig(name)
         pl.close(fig)
