@@ -76,6 +76,7 @@ class parameters(object):
                         tfi = tfi.split('-${i}*')
                         tempstart = float(tfi[0])
                         deltatemp = float(tfi[1])
+                        tempstart -= deltatemp
 
             increment = sum(runsteps[-2:])
 
