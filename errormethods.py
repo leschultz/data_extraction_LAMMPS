@@ -29,7 +29,7 @@ for folder in data:
     errors[folder] = []
     for temp in data[folder]['origins']:
         cols = list(data[folder]['origins'][temp].columns.values)[1:]
-        cols = [i for i in cols if 'Err' not in i]
+        cols = [i for i in cols if 'err' not in i]
 
         regulardata = data[folder]['regular'][temp]
         modata = data[folder]['origins'][temp]
@@ -59,13 +59,13 @@ for folder in data:
             pl.clf()
 
             errordf[col+'_diff'] = regulardata[col]
-            errordf[col+'_fiterr'] = regulardata[col+'_Err']
+            errordf[col+'_fiterr'] = regulardata[col+'_err']
             errordf[col+'_mo_ukui'] = ukui(list(modata[col]))
             errordf[col+'_mo_batch(a=5)'] = batch(list(modata[col]), a=5)
             errordf[col+'_mo_batch(a=10)'] = batch(list(modata[col]), a=10)
             errordf[col+'_mo_batch(b=lcorr)'] = batch(list(modata[col]), b=k[index])
             errordf[col+'_mo_scipysem'] = st.sem(list(modata[col]))
-            errordf[col+'_mo_fitavg'] = np.mean(list(modata[col+'_Err']))
+            errordf[col+'_mo_fitavg'] = np.mean(list(modata[col+'_err']))
 
         errordf['temp'] = temp
         errordf = pd.DataFrame(errordf, index=[0])
@@ -124,23 +124,12 @@ scipylabel = lines.Line2D(
                           label='Scipy SEM'
                           )
 
-fitlabel = lines.Line2D(
-                        [],
-                        [],
-                        color='g',
-                        marker='^',
-                        linestyle='None',
-                        markersize=8,
-                        label='Fitting Error Averaged'
-                        )
-
 plotlabels = []
 plotlabels.append(batch5label)
 plotlabels.append(batch10label)
 plotlabels.append(batchlcorrlabel)
 plotlabels.append(ukuilabel)
 plotlabels.append(scipylabel)
-plotlabels.append(batchlcorrlabel)
 
 size = (15, 5)
 
@@ -184,7 +173,6 @@ for folder in errors:
         ax[0].plot(x, errors[folder][el+'_mo_batch(b=lcorr)'], 'g.')
         ax[0].plot(x, errors[folder][el+'_mo_ukui'], 'y+')
         ax[0].plot(x, errors[folder][el+'_mo_scipysem'], 'kx')
-        ax[0].plot(x, errors[folder][el+'_mo_fitavg'], 'g^')
 
         ax[0].set_ylabel('Diffusion MO Error [*10^-4 cm^2 s^-1]')
         ax[0].set_xlabel('Temperature [K]')
@@ -198,14 +186,12 @@ for folder in errors:
         runsbatchlcorrpercent = percent(errors[folder][el+'_mo_batch(b=lcorr)'], diff)
         runsukuipercent = percent(errors[folder][el+'_mo_ukui'], diff)
         runsscipypercent = percent(errors[folder][el+'_mo_scipysem'], diff)
-        fiterrorpercent = percent(errors[folder][el+'_mo_fitavg'], diff)
 
         ax[1].plot(x, runsbatch5percent, 'b.')
         ax[1].plot(x, runsbatch10percent, 'r.')
         ax[1].plot(x, runsbatchlcorrpercent, 'g.')
         ax[1].plot(x, runsukuipercent, 'y+')
         ax[1].plot(x, runsscipypercent, 'kx')
-        ax[1].plot(x, fiterrorpercent, 'g^')
 
         ax[1].set_ylabel('Diffusion MO Percent Error')
         ax[1].set_xlabel('Temperature [K]')
