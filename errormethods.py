@@ -18,6 +18,7 @@ import os
 def percent(x, y):
     return [i/j*100.0 for i, j in zip(x, y)]
 
+
 datadir = '../export/'
 exportdir = '../testpics/'
 
@@ -36,20 +37,17 @@ for folder in data:
 
         errordf = {}
         for col in cols:
-            k, r = auto(modata[col])
-
-            count = 0
-            for i in r:
-                if i >= 0.0:
-                    index = count
-                    count += 1
-                else:
-                    break
+            k, r, index = auto(modata[col])
 
             approxtemp = str(math.ceil(temp))
             name = exportdir+folder+'_autocorrelation_temp_'+approxtemp+'_'+col
             pl.plot(k, r, 'b.', label=approxtemp+' [K]')
-            pl.axvline(x=index, linestyle='--', color='r', label='Correlation Length') 
+            pl.axvline(
+                       x=index,
+                       linestyle='--',
+                       color='r',
+                       label='Correlation Length='+str(index)
+                       )
             pl.grid()
             pl.xlabel('k-lag [index]')
             pl.ylabel('Autocorrelation [-]')
@@ -61,9 +59,12 @@ for folder in data:
             errordf[col+'_diff'] = regulardata[col]
             errordf[col+'_fiterr'] = regulardata[col+'_err']
             errordf[col+'_mo_ukui'] = ukui(list(modata[col]))
-            errordf[col+'_mo_batch(a=5)'] = batch(list(modata[col]), a=5)
-            errordf[col+'_mo_batch(a=10)'] = batch(list(modata[col]), a=10)
-            errordf[col+'_mo_batch(b=lcorr)'] = batch(list(modata[col]), b=k[index])
+            errordf[col+'_mo_batch(a=5)'] = batch(list(modata[col]), a=5)[0]
+            errordf[col+'_mo_batch(a=10)'] = batch(list(modata[col]), a=10)[0]
+
+            corbatch = batch(list(modata[col]), b=k[index])
+            errordf[col+'_mo_batch(a=corbatch)'] = corbatch[0]
+
             errordf[col+'_mo_scipysem'] = st.sem(list(modata[col]))
             errordf[col+'_mo_fitavg'] = np.mean(list(modata[col+'_err']))
 
@@ -136,12 +137,7 @@ size = (15, 5)
 for folder in errors:
 
     cols = list(errors[folder].columns.values)
-    try:
-        elements = [i.split('_')[0] for i in cols if len(i.split('_')) > 1]
-
-    except Exception:
-        pass
-
+    elements = [i.split('_')[0] for i in cols if len(i.split('_')) > 1]
     elements = list(set(elements))
 
     for el in elements:
@@ -170,7 +166,7 @@ for folder in errors:
 
         ax[0].plot(x, errors[folder][el+'_mo_batch(a=5)'], 'b.')
         ax[0].plot(x, errors[folder][el+'_mo_batch(a=10)'], 'r.')
-        ax[0].plot(x, errors[folder][el+'_mo_batch(b=lcorr)'], 'g.')
+        ax[0].plot(x, errors[folder][el+'_mo_batch(a=corbatch)'], 'g.')
         ax[0].plot(x, errors[folder][el+'_mo_ukui'], 'y+')
         ax[0].plot(x, errors[folder][el+'_mo_scipysem'], 'kx')
 
@@ -181,11 +177,31 @@ for folder in errors:
 
         # Change values to percent error
         diff = errors[folder][el+'_diff']
-        runsbatch5percent = percent(errors[folder][el+'_mo_batch(a=5)'], diff)
-        runsbatch10percent = percent(errors[folder][el+'_mo_batch(a=10)'], diff)
-        runsbatchlcorrpercent = percent(errors[folder][el+'_mo_batch(b=lcorr)'], diff)
-        runsukuipercent = percent(errors[folder][el+'_mo_ukui'], diff)
-        runsscipypercent = percent(errors[folder][el+'_mo_scipysem'], diff)
+
+        runsbatch5percent = percent(
+                                    errors[folder][el+'_mo_batch(a=5)'],
+                                    diff
+                                    )
+
+        runsbatch10percent = percent(
+                                     errors[folder][el+'_mo_batch(a=10)'],
+                                     diff
+                                     )
+
+        runsbatchlcorrpercent = percent(
+                                        errors[folder][el+'_mo_batch(a=corbatch)'],
+                                        diff
+                                        )
+
+        runsukuipercent = percent(
+                                  errors[folder][el+'_mo_ukui'],
+                                  diff
+                                  )
+
+        runsscipypercent = percent(
+                                   errors[folder][el+'_mo_scipysem'],
+                                   diff
+                                   )
 
         ax[1].plot(x, runsbatch5percent, 'b.')
         ax[1].plot(x, runsbatch10percent, 'r.')

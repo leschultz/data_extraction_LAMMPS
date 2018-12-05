@@ -22,4 +22,12 @@ def auto(x):
         k.append(i)
         r.append(rho(x, mean, n, i))
 
-    return k, r
+    count = 0
+    for i in r:
+        if i >= 0.0:
+            last = count
+            count += 1
+        else:
+            break
+
+    return k, r, last

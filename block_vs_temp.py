@@ -1,13 +1,16 @@
 from matplotlib import pyplot as pl
+from scipy import stats as st
+
 from itertools import islice
 
 import pandas as pd
 import numpy as np
 
+from autocovariance import auto
+
 
 def batch(x, a=None, b=None):
     n = len(x)
-    mean = sum(x)/n
 
     if a is None:
         a = n//b
@@ -16,10 +19,35 @@ def batch(x, a=None, b=None):
         b = n//a
 
     blocks = np.array_split(x, a)
-    for i in blocks:
-        print(i)
 
-    return np.array_split(x, a)
+    return blocks, a
+
+
+def blockdata(y, *args, **kwargs):
+    x, bins = batch(y, *args, **kwargs)
+
+    std = []
+    for j in range(0, len(x)):
+        std.append(np.std(x[j]))
+
+    return std, bins
+
+
+def endfinder(x):
+    n = len(x)-1
+
+    for i in range(0, n):
+        diff = x[i+1]-x[i]
+        if diff > 0.0:
+            break
+
+    for j in range(n, 1, -1):
+        diff = x[j-1]-x[j]
+        if diff > 0.0:
+            break
+
+    return (i, j)
+
 
 directory = '../runs/AlCo/98-2/'
 dirfile = directory+'data.txt'
@@ -31,45 +59,73 @@ with open(dirfile) as file:
 
 df = pd.read_csv(dirfile, delimiter=' ', names=headers, skiprows=2)
 
+timestep = 0.001
+time = [timestep*i for i in df['TimeStep']]
+df['time'] = time
+
 start = None
 end = 1100
 
-start = 950
-end = 1000
-
 temp = list(df['c_mytemp'][start:end])
-step = list(df['TimeStep'][start:end])
+step = list(df['time'][start:end])
 
-fig, ax = pl.subplots()
-ax.plot(step, temp, 'r.')
-ax.set_xlabel('Timestep')
-ax.set_ylabel('Temperature [K]')
-ax.grid()
-fig.tight_layout()
+k, r, index = auto(temp)
 
-print(sum(step))
+count = 0
+a = [5, 10]
 
 data = {}
-a = [1, 10, 20, 30]
 for i in a:
-    print('a='+str(i))
+    data[i], bins = blockdata(temp, a=i)
 
-    x = batch(step, b=i)
-    print(sum([sum(i) for i in x]))
-
-'''
+corblocking = blockdata(temp, b=index)
+data[corblocking[1]] = corblocking[0]
 
 fig, ax = pl.subplots()
 
 for key in data:
-    ax.plot(data[key], label=key, marker='.')
+
+    i, j = endfinder(data[key])
+
+    x = np.array(list(range(1, key+1)))
+    y = np.array(data[key])
+
+    ax.plot(
+            x,
+            y,
+            label='Bins='+str(key),
+            marker='.'
+            )
+
+    ax.plot(
+            x[[i, j]],
+            y[[i, j]],
+            label='Settled Range',
+            marker='o',
+            color='r'
+            )
 
 ax.set_xlabel('Number of Bins')
-ax.set_ylabel('Temperature [K]')
+ax.set_ylabel('Temperature STD [K]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
 
-pl.show()
+fig, ax = pl.subplots()
+ax.plot(step, temp, 'r.')
+ax.set_xlabel('Time [ps]')
+ax.set_ylabel('Temperature [K]')
+ax.grid()
+fig.tight_layout()
 
-'''
+fig, ax = pl.subplots()
+ax.plot(k, r, '.', label='data')
+ax.axvline(x=index, color='r', linestyle='--', label='k='+str(index))
+ax.set_xlabel('Autocorrelation [-]')
+ax.set_ylabel('k-lag')
+ax.grid()
+ax.legend(loc='best')
+fig.tight_layout()
+
+
+pl.show()
