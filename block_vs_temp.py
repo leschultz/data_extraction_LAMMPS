@@ -73,13 +73,6 @@ df['time'] = time
 start = None
 end = 1100
 
-start = 300
-end = 1100
-
-start = 300
-end = 1000
-
-
 temp = list(df['c_mytemp'][start:end])
 time = list(df['time'][start:end])
 
@@ -120,6 +113,7 @@ ax.set_ylabel('Temperature STD [K]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
+fig.savefig('../method')
 
 fig, ax = pl.subplots()
 ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')
@@ -133,6 +127,7 @@ ax.set_ylabel('Temperature [K]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
+fig.savefig('../data')
 
 fig, ax = pl.subplots()
 ax.plot(k, r, '.', label='data')
@@ -142,5 +137,4 @@ ax.set_xlabel('k-lag')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
-
-pl.show()
+fig.savefig('../autocorrelation')
