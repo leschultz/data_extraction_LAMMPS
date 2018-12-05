@@ -30,7 +30,7 @@ def blockdata(y, *args, **kwargs):
     for j in range(0, len(x)):
         std.append(np.std(x[j]))
 
-    return std, bins
+    return std, bins, x
 
 
 def endfinder(x):
@@ -46,7 +46,14 @@ def endfinder(x):
         if diff > 0.0:
             break
 
-    return (i, j)
+    return i, j
+
+
+def findindexes(x, i0, j0):
+    i1 = sum([len(i) for i in x[:i0]])
+    i2 = sum([len(i) for i in x[:j0]])
+
+    return i1, i2
 
 
 directory = '../runs/AlCo/98-2/'
@@ -66,18 +73,19 @@ df['time'] = time
 start = None
 end = 1100
 
+start = 300
+end = 1100
+
+start = 300
+end = 1000
+
+
 temp = list(df['c_mytemp'][start:end])
-step = list(df['time'][start:end])
+time = list(df['time'][start:end])
 
 k, r, index = auto(temp)
 
-count = 0
-a = [5, 10]
-
 data = {}
-for i in a:
-    data[i], bins = blockdata(temp, a=i)
-
 corblocking = blockdata(temp, b=index)
 data[corblocking[1]] = corblocking[0]
 
@@ -85,8 +93,10 @@ fig, ax = pl.subplots()
 
 for key in data:
 
-    i, j = endfinder(data[key])
+    i0, j0 = endfinder(data[key])
 
+    indexes = findindexes(corblocking[2], i0, j0)
+    
     x = np.array(list(range(1, key+1)))
     y = np.array(data[key])
 
@@ -98,8 +108,8 @@ for key in data:
             )
 
     ax.plot(
-            x[[i, j]],
-            y[[i, j]],
+            x[[i0, j0]],
+            y[[i0, j0]],
             label='Settled Range',
             marker='o',
             color='r'
@@ -112,20 +122,25 @@ ax.legend(loc='best')
 fig.tight_layout()
 
 fig, ax = pl.subplots()
-ax.plot(step, temp, 'r.')
+ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')
+ax.axvline(x=time[indexes[0]], color='g', linestyle='--', label='Settled Start')
+ax.axvline(x=time[indexes[1]], color='b', linestyle='--', label='Settled End')
+
+mean = np.mean(temp[indexes[0]:indexes[1]])
+ax.axhline(y=mean, color='k', label='Settled Mean='+str(mean))
 ax.set_xlabel('Time [ps]')
 ax.set_ylabel('Temperature [K]')
 ax.grid()
+ax.legend(loc='best')
 fig.tight_layout()
 
 fig, ax = pl.subplots()
 ax.plot(k, r, '.', label='data')
 ax.axvline(x=index, color='r', linestyle='--', label='k='+str(index))
-ax.set_xlabel('Autocorrelation [-]')
-ax.set_ylabel('k-lag')
+ax.set_ylabel('Autocorrelation')
+ax.set_xlabel('k-lag')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
-
 
 pl.show()
