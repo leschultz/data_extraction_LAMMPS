@@ -1,3 +1,5 @@
+from scipy import stats as st
+
 import numpy as np
 
 
@@ -20,9 +22,11 @@ class settled(object):
 
         n = len(x)
 
+        # Estimate the number of bins from block length
         if a is None:
             a = n//b
 
+        # Estimate the block length from the number of bins
         if b is None:
             b = n//a
 
@@ -59,11 +63,13 @@ class settled(object):
         '''
         n = len(x)-1
 
+        # If the start is decreasing
         if x[1]-x[0] < 0.0:
             for i in range(0, n):
                 if x[i+1]-x[i] > 0.0:
                     break
 
+        # If the start is increasing
         if x[1]-x[0] > 0.0:
             for i in range(0, n):
                 if x[i+1]-x[i] < 0.0:
@@ -82,5 +88,56 @@ class settled(object):
                 index = the starting index of settled data
         '''
         index = sum([len(j) for j in x[:i]])
+
+        return index
+
+    def ptest(self, x, alpha):
+        '''
+        Find the p-values for each bin with respect to the last bin
+
+        inputs:
+                x = binned data
+                alpha = the significance level
+        outputs:
+                index = The last bin where the p-values is less than alpha
+        '''
+
+        pvals = [st.ttest_ind(i, x[-1], equal_var=False)[1] for i in x]
+
+        count = 0
+        for i in pvals:
+            if i < alpha:
+                index = count
+
+            count += 1
+
+        index += 1  # Skip the index that failed
+
+        return index
+
+    def slopeoverstd(self, x, m):
+        '''
+        Calcualte the slope of bins over their std
+
+        inputs:
+                x = binned data
+                m = slope of binned data
+                std = std of unbinned data
+        outputs:
+        '''
+
+        deviations = [np.std(i) for i in x]
+        divisions = [i/j for i, j in zip(m, deviations)]
+
+        sigma = np.std(divisions)
+
+        count = 0
+        for i in divisions:
+            if i > sigma:
+                index = count
+
+            count += 1
+
+        index += 1  # Skip the index that failed
 
         return index

@@ -1,4 +1,5 @@
 from matplotlib import pyplot as pl
+from scipy import stats as st
 
 from itertools import islice
 
@@ -41,8 +42,16 @@ binnedtime = binnedtime[0]
 binnedtemp = corblocking.batch(temp, b=index)[0]
 binnedslopes = corblocking.binslopes(binnedtime, binnedtemp, bins)
 
-slopeindex = corblocking.findslopestart(binnedslopes)
+settledpindex = corblocking.ptest(binnedtemp, 0.05)
+settledslopeindex = corblocking.findslopestart(binnedslopes)
+
+slopeoverstdindex = corblocking.slopeoverstd(binnedtemp, binnedslopes)
+
+slopeindex = max([settledslopeindex, settledpindex, slopeoverstdindex])
+
 settledindex = corblocking.finddatastart(binnedtime, slopeindex)
+
+settledpindex = corblocking.ptest(binnedtemp, 0.05)
 
 fig, ax = pl.subplots()
 
@@ -59,7 +68,35 @@ ax.plot(
         binnedslopes[slopeindex],
         label='Settled Start',
         marker='o',
+        linestyle='none',
         color='r'
+        )
+
+ax.plot(
+        binnumber[settledslopeindex],
+        binnedslopes[settledslopeindex],
+        label='Method: Slope Change',
+        marker='*',
+        linestyle='none',
+        color='g'
+        )
+
+ax.plot(
+        binnumber[settledpindex],
+        binnedslopes[settledpindex],
+        label='Method: p-value',
+        marker='*',
+        linestyle='none',
+        color='y'
+        )
+
+ax.plot(
+        binnumber[slopeoverstdindex],
+        binnedslopes[slopeoverstdindex],
+        label='Method: slope/std',
+        marker='*',
+        linestyle='none',
+        color='k'
         )
 
 ax.set_xlabel('Number of Bins')
