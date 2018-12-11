@@ -68,6 +68,8 @@ ax.plot(
         binnedslopes[slopeindex],
         label='Settled Start',
         marker='o',
+        markerfacecolor='none',
+        markersize=15,
         linestyle='none',
         color='r'
         )
@@ -77,6 +79,7 @@ ax.plot(
         binnedslopes[settledslopeindex],
         label='Method: Slope Change',
         marker='*',
+        markersize=12,
         linestyle='none',
         color='g'
         )
@@ -85,7 +88,8 @@ ax.plot(
         binnumber[settledpindex],
         binnedslopes[settledpindex],
         label='Method: p-value',
-        marker='*',
+        marker='x',
+        markersize=12,
         linestyle='none',
         color='y'
         )
@@ -94,7 +98,9 @@ ax.plot(
         binnumber[slopeoverstdindex],
         binnedslopes[slopeoverstdindex],
         label='Method: slope/std',
-        marker='*',
+        marker='v',
+        markerfacecolor='none',
+        markersize=12,
         linestyle='none',
         color='k'
         )
