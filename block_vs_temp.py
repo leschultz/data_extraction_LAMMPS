@@ -74,7 +74,7 @@ ax.plot(
         color='g'
         )
 
-ax.set_xlabel('Number of Bins')
+ax.set_xlabel('Bin')
 ax.set_ylabel('Slope [K/ps]')
 ax.grid()
 ax.legend(loc='best')
@@ -100,7 +100,7 @@ ax.plot(
         color='y'
         )
 
-ax.set_xlabel('Number of Bins')
+ax.set_xlabel('Bin')
 ax.set_ylabel('Average Temperature [K/bin]')
 ax.grid()
 ax.legend(loc='best')
@@ -127,7 +127,7 @@ ax.plot(
         color='k'
         )
 
-ax.set_xlabel('Number of Bins')
+ax.set_xlabel('Bin')
 ax.set_ylabel('Slope/STD [ps^-1]')
 ax.grid()
 ax.legend(loc='best')
