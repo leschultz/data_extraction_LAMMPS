@@ -45,7 +45,7 @@ binnedslopes = corblocking.binslopes(binnedtime, binnedtemp, bins)
 settledpindex = corblocking.ptest(binnedtemp, 0.05)
 settledslopeindex = corblocking.findslopestart(binnedslopes)
 
-slopeoverstdindex = corblocking.slopeoverstd(binnedtemp, binnedslopes)
+slopeoverstdindex, divisions = corblocking.slopeoverstd(binnedtemp, binnedslopes)
 
 slopeindex = max([settledslopeindex, settledpindex, slopeoverstdindex])
 
@@ -56,22 +56,12 @@ settledpindex = corblocking.ptest(binnedtemp, 0.05)
 fig, ax = pl.subplots()
 
 binnumber = list(range(1, len(binnedslopes)+1))
+averagetemps = [np.mean(i) for i in binnedtemp]
 ax.plot(
         binnumber,
         binnedslopes,
-        label='Bins='+str(bins),
+        label='Input Block Length(b='+str(index)+')',
         marker='.'
-        )
-
-ax.plot(
-        binnumber[slopeindex],
-        binnedslopes[slopeindex],
-        label='Settled Start',
-        marker='o',
-        markerfacecolor='none',
-        markersize=15,
-        linestyle='none',
-        color='r'
         )
 
 ax.plot(
@@ -84,9 +74,25 @@ ax.plot(
         color='g'
         )
 
+ax.set_xlabel('Number of Bins')
+ax.set_ylabel('Slope [K/ps]')
+ax.grid()
+ax.legend(loc='best')
+fig.tight_layout()
+fig.savefig('../slopemethod')
+
+fig, ax = pl.subplots()
+
+ax.plot(
+        binnumber,
+        averagetemps,
+        label='Input Block Length(b='+str(index)+')',
+        marker='.'
+        )
+
 ax.plot(
         binnumber[settledpindex],
-        binnedslopes[settledpindex],
+        averagetemps[settledpindex],
         label='Method: p-value',
         marker='x',
         markersize=12,
@@ -94,9 +100,25 @@ ax.plot(
         color='y'
         )
 
+ax.set_xlabel('Number of Bins')
+ax.set_ylabel('Average Temperature [K/bin]')
+ax.grid()
+ax.legend(loc='best')
+fig.tight_layout()
+fig.savefig('../pmethod')
+
+fig, ax = pl.subplots()
+
+ax.plot(
+        binnumber,
+        divisions,
+        label='Input Block Length(b='+str(index)+')',
+        marker='.'
+        )
+
 ax.plot(
         binnumber[slopeoverstdindex],
-        binnedslopes[slopeoverstdindex],
+        divisions[slopeoverstdindex],
         label='Method: slope/std',
         marker='v',
         markerfacecolor='none',
@@ -106,11 +128,12 @@ ax.plot(
         )
 
 ax.set_xlabel('Number of Bins')
-ax.set_ylabel('Slope [K/ps]')
+ax.set_ylabel('Slope/STD [ps^-1]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
-fig.savefig('../method')
+fig.savefig('../slopeoverstdmethod')
+
 
 fig, ax = pl.subplots()
 ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')

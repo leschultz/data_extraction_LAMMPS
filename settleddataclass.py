@@ -140,4 +140,4 @@ class settled(object):
 
         index += 1  # Skip the index that failed
 
-        return index
+        return index, divisions
