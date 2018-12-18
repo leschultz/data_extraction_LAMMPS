@@ -8,50 +8,45 @@ import numpy as np
 
 from settleddataclass import settled
 from autocovariance import auto
+from outimport import readdata
 
 
-directory = '../runs/AlCo/98-2/'
-dirfile = directory+'data.txt'
+directory = '../'
+dirfile = directory+'test.out'
 
-with open(dirfile) as file:
-    for line in islice(file, 1, 2):
-        values = line.strip().split(' ')
-        headers = values[1:]
-
-df = pd.read_csv(dirfile, delimiter=' ', names=headers, skiprows=2)
+df = readdata(dirfile)
 
 timestep = 0.001
-time = [timestep*i for i in df['TimeStep']]
+time = [timestep*i for i in df['Step']]
 df['time'] = time
 
-start = None
-end = 1000
+start = 429
+end = 460
 
-temp = list(df['c_mytemp'][start:end])
+temp = list(df['Temp'][start:end])
 time = list(df['time'][start:end])
+steps = list(df['Step'][start:end])
+
+print('Start step: '+str(steps[0]))
+print('End step: '+str(steps[-1]))
 
 k, r, index = auto(temp)
-index *= 2  # Double the correlation length
 
-corblocking = settled()
+setindexes = settled(time, temp, b=index*2)
+binnedtime, binnedtemp = setindexes.batch()
 
-binnedtime = corblocking.batch(time, b=index)
-bins = binnedtime[-1]
-binnedtime = binnedtime[0]
+binnedslopes, binnedslopeerr = setindexes.binslopes()
 
-binnedtemp = corblocking.batch(temp, b=index)[0]
-binnedslopes = corblocking.binslopes(binnedtime, binnedtemp, bins)
+slopebin = setindexes.findslopestart()
+pbin = setindexes.ptest()
 
-settledpindex = corblocking.ptest(binnedtemp, 0.05)
-settledslopeindex = corblocking.findslopestart(binnedslopes)
+indexes = setindexes.finddatastart()
 
-slopeoverstdindex, divisions = corblocking.slopeoverstd(binnedtemp, binnedslopes)
+settledindex = []
+for key in indexes:
+    settledindex.append(indexes[key])
 
-slopeindex = max([settledslopeindex, settledpindex, slopeoverstdindex])
-
-settledindex = corblocking.finddatastart(binnedtime, slopeindex)
-
-settledpindex = corblocking.ptest(binnedtemp, 0.05)
+settledindex = max(settledindex)
 
 fig, ax = pl.subplots()
 
@@ -65,8 +60,8 @@ ax.plot(
         )
 
 ax.plot(
-        binnumber[settledslopeindex],
-        binnedslopes[settledslopeindex],
+        binnumber[slopebin],
+        binnedslopes[slopebin],
         label='Method: Slope Change',
         marker='*',
         markersize=12,
@@ -91,13 +86,13 @@ ax.plot(
         )
 
 ax.plot(
-        binnumber[settledpindex],
-        averagetemps[settledpindex],
+        binnumber[pbin],
+        averagetemps[pbin],
         label='Method: p-value',
         marker='x',
         markersize=12,
         linestyle='none',
-        color='y'
+        color='r'
         )
 
 ax.set_xlabel('Bin')
@@ -111,14 +106,14 @@ fig, ax = pl.subplots()
 
 ax.plot(
         binnumber,
-        divisions,
+        binnumber,
         label='Input Block Length(b='+str(index)+')',
         marker='.'
         )
 
 ax.plot(
-        binnumber[slopeoverstdindex],
-        divisions[slopeoverstdindex],
+        binnumber[pbin],
+        binnumber[pbin],
         label='Method: slope/std',
         marker='v',
         markerfacecolor='none',
@@ -128,12 +123,11 @@ ax.plot(
         )
 
 ax.set_xlabel('Bin')
-ax.set_ylabel('Slope/STD [ps^-1]')
+ax.set_ylabel('|Slope/STD| [ps^-1]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
 fig.savefig('../slopeoverstdmethod')
-
 
 fig, ax = pl.subplots()
 ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')
@@ -150,7 +144,13 @@ fig.savefig('../data')
 
 fig, ax = pl.subplots()
 ax.plot(k, r, '.', label='data')
-ax.axvline(x=index, color='r', linestyle='--', label='k='+str(index))
+ax.axvline(
+           x=index,
+           color='r',
+           linestyle='--',
+           label='Correlation Length (k='+str(index)+')'
+           )
+
 ax.set_ylabel('Autocorrelation')
 ax.set_xlabel('k-lag')
 ax.grid()
