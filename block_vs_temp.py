@@ -7,7 +7,6 @@ import pandas as pd
 import numpy as np
 
 from settleddataclass import settled
-from autocovariance import auto
 from outimport import readdata
 
 
@@ -30,21 +29,23 @@ steps = list(df['Step'][start:end])
 print('Start step: '+str(steps[0]))
 print('End step: '+str(steps[-1]))
 
-k, r, index = auto(temp)
-
-setindexes = settled(time, temp, b=index*2)
+setindexes = settled(time, temp)
+index = setindexes.binsize()
 binnedtime, binnedtemp = setindexes.batch()
 
-binnedslopes, binnedslopeerr = setindexes.binslopes()
+setindexes.binslopes()
 
-slopebin = setindexes.findslopestart()
-pbin = setindexes.ptest()
+binnedslopes, slopebin = setindexes.slopetest()
+pvals, pbin = setindexes.ptest()
+
+slopeerr, slopeerrbin, = setindexes.fittest()
 
 indexes = setindexes.finddatastart()
 
 settledindex = []
 for key in indexes:
-    settledindex.append(indexes[key])
+    if isinstance(indexes[key], int):
+        settledindex.append(indexes[key])
 
 settledindex = max(settledindex)
 
@@ -60,15 +61,27 @@ ax.plot(
         marker='.'
         )
 
-ax.plot(
-        binnumber[slopebin],
-        binnedslopes[slopebin],
-        label='Method: Slope Change',
-        marker='*',
-        markersize=12,
-        linestyle='none',
-        color='g'
-        )
+try:
+    ax.plot(
+            binnumber[slopebin],
+            binnedslopes[slopebin],
+            label='Method: Slope Change',
+            marker='*',
+            markersize=12,
+            linestyle='none',
+            color='g'
+            )
+
+except Exception:
+    ax.plot(
+            binnumber[-1],
+            binnedslopes[-1],
+            label='Method: Slope Change Not Settled',
+            marker='*',
+            markersize=12,
+            linestyle='none',
+            color='g'
+            )
 
 ax.set_xlabel('Bin')
 ax.set_ylabel('Slope [K/ps]')
@@ -81,23 +94,35 @@ fig, ax = pl.subplots()
 
 ax.plot(
         binnumber,
-        averagetemps,
+        pvals,
         label='Input Block Length(b='+str(index)+')',
         marker='.'
         )
 
-ax.plot(
-        binnumber[pbin],
-        averagetemps[pbin],
-        label='Method: p-value',
-        marker='x',
-        markersize=12,
-        linestyle='none',
-        color='r'
-        )
+try:
+    ax.plot(
+            binnumber[pbin],
+            pvals[pbin],
+            label='Method: p-value Not Settled',
+            marker='x',
+            markersize=12,
+            linestyle='none',
+            color='r'
+            )
+
+except Exception:
+    ax.plot(
+            binnumber[-1],
+            pvals[-1],
+            label='Method: p-value Not Settled',
+            marker='x',
+            markersize=12,
+            linestyle='none',
+            color='r'
+            )
 
 ax.set_xlabel('Bin')
-ax.set_ylabel('Average Temperature [K/bin]')
+ax.set_ylabel('p-value')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
@@ -107,28 +132,39 @@ fig, ax = pl.subplots()
 
 ax.plot(
         binnumber,
-        binnumber,
+        slopeerr,
         label='Input Block Length(b='+str(index)+')',
         marker='.'
         )
 
-ax.plot(
-        binnumber[pbin],
-        binnumber[pbin],
-        label='Method: slope/std',
-        marker='v',
-        markerfacecolor='none',
-        markersize=12,
-        linestyle='none',
-        color='k'
-        )
+try:
+    ax.plot(
+            binnumber[slopeerrbin],
+            slopeerr[slopeerrbin],
+            label='Method: Fit Error Not Settled',
+            marker='^',
+            markersize=12,
+            linestyle='none',
+            color='y'
+            )
+
+except Exception:
+    ax.plot(
+            binnumber[-1],
+            slopeerr[-1],
+            label='Method: Fit Error Not Settled',
+            marker='^',
+            markersize=12,
+            linestyle='none',
+            color='y'
+            )
 
 ax.set_xlabel('Bin')
-ax.set_ylabel('|Slope/STD| [ps^-1]')
+ax.set_ylabel('Linear Fit Error [K/ps]')
 ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
-fig.savefig('../slopeoverstdmethod')
+fig.savefig('../fiterror')
 
 fig, ax = pl.subplots()
 ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')
@@ -142,19 +178,3 @@ ax.grid()
 ax.legend(loc='best')
 fig.tight_layout()
 fig.savefig('../data')
-
-fig, ax = pl.subplots()
-ax.plot(k, r, '.', label='data')
-ax.axvline(
-           x=index,
-           color='r',
-           linestyle='--',
-           label='Correlation Length (k='+str(index)+')'
-           )
-
-ax.set_ylabel('Autocorrelation')
-ax.set_xlabel('k-lag')
-ax.grid()
-ax.legend(loc='best')
-fig.tight_layout()
-fig.savefig('../autocorrelation')

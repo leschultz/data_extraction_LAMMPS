@@ -1,4 +1,5 @@
 from scipy import stats as st
+from autocovariance import auto
 
 import numpy as np
 
@@ -8,7 +9,7 @@ class settled(object):
     Class to grab the indexes of settled data based on slopes per bin.
     '''
 
-    def __init__(self, x, y, a=None, b=None):
+    def __init__(self, x, y):
         '''
         Devide data into a number of bins.
 
@@ -24,30 +25,45 @@ class settled(object):
         self.x = x
         self.y = y
         self.n = len(x)
-        self.a = a
-        self.b = b
-        self.binselect = {}
-        self.indexes = {}
+
+        self.binselect = {}  # Store selected bin
+        self.indexes = {}  # Store first index of selected bin
+
+    def binsize(self):
+        '''
+        Use autocorrelation function to find correlation length.
+
+        inputs:
+                self.yblocks = y-axis data
+        outputs:
+                b = length of bins (approximate)
+
+        '''
+
+        k, r, index = auto(self.y)
+
+        if index <= 4:
+            index = 4
+        else:
+            index *= 2
+
+        self.b = index
+
+        return self.b
+
 
     def batch(self):
         '''
         Devide data into a number of bins.
 
         inputs:
-                a = number of bins
-                b = length of bins (approximate)
+                b = minimum bin length
         outputs:
                 blocks = binned data
-                a = number of bins
         '''
 
         # Estimate the number of bins from block length
-        if self.a is None:
-            self.a = self.n//self.b
-
-        # Estimate the block length from the number of bins
-        if self.b is None:
-            self.b = self.n//self.a
+        self.a = self.n//self.b
 
         self.xblocks = np.array_split(self.x, self.a)
         self.yblocks = np.array_split(self.y, self.a)
@@ -79,13 +95,14 @@ class settled(object):
 
         return self.blockslopes, self.errs
 
-    def findslopestart(self):
+    def slopetest(self):
         '''
         Find the index of data where
 
         inputs:
                 self.slopes = binned slope data
         outputs:
+                self.blockslopes = the slope for bins
                 i = the first slope value fitting criteria
         '''
 
@@ -105,7 +122,7 @@ class settled(object):
 
         self.binselect['slope'] = i
 
-        return i
+        return self.blockslopes, i
 
     def ptest(self, alpha=0.05):
         '''
@@ -115,7 +132,8 @@ class settled(object):
                 self.yblocks = binned y-axis data
                 alpha = the significance level
         outputs:
-                index = The last bin where the p-values is less than alpha
+                pvals = p-values for each bin with respect to the last bin
+                index = last bin where the p-values is less than alpha
         '''
 
         pvals = [
@@ -131,11 +149,47 @@ class settled(object):
 
             count += 1
 
-        index = min(indexes)
-        index += 1  # Skip the problematic bin
+        if indexes:
+            index = min(indexes)
+            if index < self.a:
+                index += 1  # Skip the problematic bin
+            else:
+                index = 'unsettled'
+
+        else:
+            index = 'unsettled'
+
         self.binselect['p'] = index
 
-        return index
+        return pvals, index
+
+    def fittest(self):
+        '''
+        Settling criterion due to liner fitting error
+
+        inputs:
+                self.blockslopes = slopes of bins
+                self.errs = slope errors from bins
+        outputs:
+                self.errs = slope errors from bins
+                index = first index where slope error exceeds std
+        '''
+
+        std = np.std(self.blockslopes)
+
+        indexes = []
+        count = 0
+        for i in self.errs:
+            if i < std:
+                indexes.append(count)
+
+            count += 1
+
+        index = min(indexes)
+
+        self.binselect['fiterror'] = index
+
+        return self.errs, index
 
     def finddatastart(self):
         '''
@@ -148,7 +202,11 @@ class settled(object):
         '''
 
         for key in self.binselect:
-            index = sum([len(j) for j in self.yblocks[:self.binselect[key]]])
-            self.indexes[key] = index
+            try:
+                index = sum([len(j) for j in self.yblocks[:self.binselect[key]]])
+                self.indexes[key] = index
+
+            except Exception:
+                self.indexes[key] = 'unsettled'
 
         return self.indexes
