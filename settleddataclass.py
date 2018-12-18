@@ -124,15 +124,15 @@ class settled(object):
                  ]
 
         count = 0
+        indexes = []
         for i in pvals:
             if i < alpha:
-                index = count
+                indexes.append(count)
 
             count += 1
 
-        if index < self.a-1:
-            index += 1  # Skip the index that failed
-
+        index = min(indexes)
+        index += 1  # Skip the problematic bin
         self.binselect['p'] = index
 
         return index

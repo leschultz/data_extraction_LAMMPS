@@ -52,6 +52,7 @@ fig, ax = pl.subplots()
 
 binnumber = list(range(1, len(binnedslopes)+1))
 averagetemps = [np.mean(i) for i in binnedtemp]
+
 ax.plot(
         binnumber,
         binnedslopes,
