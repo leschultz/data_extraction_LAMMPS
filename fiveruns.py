@@ -55,7 +55,7 @@ for item in param:
 
         points = [hold1, hold1+hold2, hold1+hold2+hold3]
 
-        dataindexes = df['Step'].between(points[1], points[2], inclusive=True)
+        dataindexes = df['Step'].between(points[1], points[2])
 
         time = list(df['time'][dataindexes])
         temp = list(df['Temp'][dataindexes])

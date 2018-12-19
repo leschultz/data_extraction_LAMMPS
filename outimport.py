@@ -26,4 +26,6 @@ def readdata(filepath):
                 pass
 
     df = pd.DataFrame(data, columns=headers)
+    df = df.drop_duplicates('Step')
+
     return df
