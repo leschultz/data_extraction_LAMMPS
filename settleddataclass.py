@@ -7,6 +7,7 @@ import numpy as np
 class settled(object):
     '''
     Class to grab the indexes of settled data based on slopes per bin.
+    Data has to be sufficiently long to not breack this code.
     '''
 
     def __init__(self, x, y):
@@ -42,7 +43,7 @@ class settled(object):
 
         k, r, index = auto(self.y)
 
-        if index <= 4:
+        if index < 3:
             index = 4
         else:
             index *= 2
@@ -97,7 +98,7 @@ class settled(object):
 
     def slopetest(self):
         '''
-        Find the index of data where
+        Find the index of data where.
 
         inputs:
                 self.slopes = binned slope data
@@ -108,17 +109,21 @@ class settled(object):
 
         n = self.n-1
 
-        # If the start is decreasing
-        if self.blockslopes[1]-self.blockslopes[0] < 0.0:
-            for i in range(0, n):
-                if self.slopes[i+1]-self.slopes[i] > 0.0:
-                    break
+        try:
+            # If the start is decreasing
+            if self.blockslopes[1]-self.blockslopes[0] < 0.0:
+                for i in range(0, n):
+                    if self.blockslopes[i+1]-self.blockslopes[i] > 0.0:
+                        break
 
-        # If the start is increasing
-        if self.blockslopes[1]-self.blockslopes[0] > 0.0:
-            for i in range(0, n):
-                if self.blockslopes[i+1]-self.blockslopes[i] < 0.0:
-                    break
+            # If the start is increasing
+            if self.blockslopes[1]-self.blockslopes[0] > 0.0:
+                for i in range(0, n):
+                    if self.blockslopes[i+1]-self.blockslopes[i] < 0.0:
+                        break
+
+        except Exception:
+            i = 'NA'
 
         self.binselect['slope'] = i
 
@@ -126,7 +131,7 @@ class settled(object):
 
     def ptest(self, alpha=0.05):
         '''
-        Find the p-values for each bin with respect to the last bin
+        Find the p-values for each bin with respect to the last bin.
 
         inputs:
                 self.yblocks = binned y-axis data
@@ -154,10 +159,10 @@ class settled(object):
             if index < self.a:
                 index += 1  # Skip the problematic bin
             else:
-                index = 'unsettled'
+                index = 'NA'
 
         else:
-            index = 'unsettled'
+            index = 'NA'
 
         self.binselect['p'] = index
 
@@ -165,7 +170,7 @@ class settled(object):
 
     def fittest(self):
         '''
-        Settling criterion due to liner fitting error
+        Settling criterion due to liner fitting error.
 
         inputs:
                 self.blockslopes = slopes of bins
@@ -185,7 +190,10 @@ class settled(object):
 
             count += 1
 
-        index = min(indexes)
+        try:
+            index = min(indexes)
+        except Exception:
+            index = 'NA'
 
         self.binselect['fiterror'] = index
 
@@ -193,7 +201,7 @@ class settled(object):
 
     def finddatastart(self):
         '''
-        Find the start of settled data
+        Find the start of settled data.
 
         inputs:
                 self.yblocks = binned y-axis data
@@ -207,6 +215,6 @@ class settled(object):
                 self.indexes[key] = index
 
             except Exception:
-                self.indexes[key] = 'unsettled'
+                self.indexes[key] = 'NA'
 
         return self.indexes

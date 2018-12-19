@@ -217,4 +217,4 @@ for folder in errors:
         name = exportdir+folder+'_mo_'+'_element_'+el
         fig.tight_layout()
         fig.savefig(name)
-        pl.close(fig)
+        pl.close('all')
