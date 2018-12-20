@@ -52,7 +52,6 @@ class settled(object):
 
         return self.b
 
-
     def batch(self):
         '''
         Devide data into a number of bins.
@@ -141,10 +140,11 @@ class settled(object):
                 index = last bin where the p-values is less than alpha
         '''
 
-        pvals = [
-                 st.ttest_ind(i, self.yblocks[-1],
-                 equal_var=False)[1] for i in self.yblocks
-                 ]
+        pvals = []
+        for i in self.yblocks:
+            pvals.append(
+                         st.ttest_ind(i, self.yblocks[-1], equal_var=False)[1]
+                         )
 
         count = 0
         indexes = []
@@ -211,7 +211,10 @@ class settled(object):
 
         for key in self.binselect:
             try:
-                index = sum([len(j) for j in self.yblocks[:self.binselect[key]]])
+                index = sum([
+                             len(j) for j in self.yblocks[:self.binselect[key]]
+                             ])
+
                 self.indexes[key] = index
 
             except Exception:

@@ -201,8 +201,21 @@ for item in param:
         fig.savefig('../test/fiterror_'+savename)
 
         fig, ax = pl.subplots()
-        ax.plot(time, temp, linestyle='none', color='r', marker='.', label='Data')
-        ax.axvline(x=time[settledindex], color='b', linestyle='--', label='Settled Start')
+        ax.plot(
+                time,
+                temp,
+                linestyle='none',
+                color='r',
+                marker='.',
+                label='Data'
+                )
+
+        ax.axvline(
+                   x=time[settledindex],
+                   color='b',
+                   linestyle='--',
+                   label='Settled Start'
+                   )
 
         mean = np.mean(temp[settledindex:])
         ax.axhline(y=mean, color='k', label='Settled Mean='+str(mean)+' [K]')

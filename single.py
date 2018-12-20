@@ -20,8 +20,8 @@ def diffusion(time, msd):
             p = linregress(time, msd[key])
             slope = p[0]
             stderr = p[-1]
-            diffusion[key] = slope/6
-            diffusion[key+'_err'] = stderr/6
+            diffusion[key] = slope/6.0
+            diffusion[key+'_err'] = stderr/6.0
 
     return diffusion
 
@@ -57,7 +57,7 @@ class analize(object):
 
         self.stepsize = stepsize  # The step size used in LAMMPS
 
-        # The rate of data acqusition and number of atoms
+        # The rate of data acquisition and number of atoms
         self.frq = dumprate
 
         self.bins = bins  # The number of bins
@@ -284,11 +284,6 @@ class analize(object):
         Plot the multiple origins diffusion.
         '''
 
-        # Control the frequency of errorbars
-        errorfreq = len(self.time)//10
-        if errorfreq == 0:
-            errorfreq = 1
-
         for key in self.diffmulti:
             if '_err' not in key:
                 pl.errorbar(
@@ -297,8 +292,7 @@ class analize(object):
                             self.diffmulti[key+'_err'],
                             label='element Type: %s' % key,
                             ecolor='r',
-                            marker='.',
-                            errorevery=errorfreq,
+                            marker='.'
                             )
 
         pl.xlabel('Start Time [ps]')

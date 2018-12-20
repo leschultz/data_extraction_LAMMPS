@@ -14,22 +14,30 @@ def exportdir(folder):
     datamsd = analysis+'msd/'
     datadiffusion = analysis+'diffusion/'
     datardf = analysis+'rdf/'
+    dataerr = analysis+'errormethods/'
 
     # The directories were images will be saved for single runs
     image_directory = first_directory+'/images/'
     msdplots = image_directory+'msd/'
     rdfplots = image_directory+'rdf/'
     diffusionplots = image_directory+'diffusion/'
+    dataerrplots = image_directory+'errormethods/'
+    correlationplot = dataerrplots+'autocorrelation/'
+    errors = dataerrplots+'errors/'
 
     directories = [
                    analysis,
                    datamsd,
                    datadiffusion,
                    datardf,
+                   dataerr,
                    image_directory,
                    msdplots,
                    rdfplots,
                    diffusionplots,
+                   dataerrplots,
+                   correlationplot,
+                   errors
                    ]
 
     for directory in directories:
