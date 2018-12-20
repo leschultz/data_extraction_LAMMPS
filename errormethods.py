@@ -20,12 +20,22 @@ def percent(x, y):
 
 
 def run(datadir):
+
     data = diffusionimport(datadir)
     errors = {}
     for folder in data:
 
+        printname = 'Error Analysis on Run: '+datadir+folder
+
+        print('-'*len(printname))
+        print(printname)
+        print('-'*len(printname))
+
         errors[folder] = []
         for temp in data[folder]['origins']:
+
+            print('Temperature step: '+str(temp)+' [K]')
+
             cols = list(data[folder]['origins'][temp].columns.values)[1:]
             cols = [i for i in cols if 'err' not in i]
 
@@ -38,6 +48,7 @@ def run(datadir):
 
                 approxtemp = str(math.ceil(temp))
                 name = (datadir +
+                        '/' +
                         folder +
                         '/images' +
                         '/errormethods' +
@@ -88,7 +99,7 @@ def run(datadir):
 
     for folder in data:
         errors[folder] = pd.concat(errors[folder])
-        exportname = datadir+folder+'/datacalculated/errormethods/correrrs.txt'
+        exportname = datadir+'/'+folder+'/datacalculated/errormethods/correrrs.txt'
         errors[folder].to_csv(
                                 exportname,
                                 sep=' ',
@@ -178,6 +189,7 @@ def run(datadir):
             ax[1].grid()
 
             name = (datadir +
+                    '/' +
                     folder +
                     '/images/errormethods/errors/' +
                     'element_' +
@@ -244,6 +256,7 @@ def run(datadir):
             ax[1].grid()
 
             name = (datadir +
+                    '/' +
                     folder +
                     '/images/errormethods/errors/' +
                     'mo_' +

@@ -1,7 +1,9 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 from infoparser import parameters
 from single import analize
+
 from errormethods import run as errmeth
+from settledanalysis import run as setmeth
 
 import argparse
 import os
@@ -19,14 +21,14 @@ def start(datadir):
     runs.files()
     param = runs.inputinfo()
 
-    return runs, param
+    return param
 
 
-def run(runs, param, exportdir):
+def run(param, exportdir):
     for item in param:
         filename = item
 
-        printname = 'Gathering of File: '+filename
+        printname = 'Gathering Data from File: '+filename
 
         print('-'*len(printname))
         print(printname)
@@ -93,6 +95,7 @@ def run(runs, param, exportdir):
             value.save_diffusion(savename)
 
 
-runs, param = start(args.i)
-run(runs, param, args.o)
+param = start(args.i)
+run(param, args.o)
 errmeth(args.o)
+setmeth(param, args.o)

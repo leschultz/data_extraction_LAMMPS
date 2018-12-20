@@ -9,7 +9,7 @@ def diffusionimport(maindir):
     for folder in folders:
         data[folder] = {}
 
-        filepath = maindir+folder+'/datacalculated/diffusion/'
+        filepath = maindir+'/'+folder+'/datacalculated/diffusion/'
         files = os.listdir(filepath)
 
         origins = [filepath+i for i in files if 'origin' in i]

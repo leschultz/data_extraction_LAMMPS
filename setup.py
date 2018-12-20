@@ -24,6 +24,9 @@ def exportdir(folder):
     dataerrplots = image_directory+'errormethods/'
     correlationplot = dataerrplots+'autocorrelation/'
     errors = dataerrplots+'errors/'
+    settling = image_directory+'settling/'
+    datarange = settling+'data/'
+    methods = settling+'methods/'
 
     directories = [
                    analysis,
@@ -37,7 +40,10 @@ def exportdir(folder):
                    diffusionplots,
                    dataerrplots,
                    correlationplot,
-                   errors
+                   errors,
+                   settling,
+                   datarange,
+                   methods
                    ]
 
     for directory in directories:
