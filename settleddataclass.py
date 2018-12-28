@@ -166,7 +166,7 @@ class settled(object):
 
         self.binselect['p'] = index
 
-        return pvals, index
+        return pvals, index, alpha
 
     def fittest(self):
         '''
@@ -180,9 +180,7 @@ class settled(object):
                 index = first index where slope error exceeds std
         '''
 
-        fit = st.linregress(self.x, self.y)
-        slope = fit[0]
-        err = fit[-1]
+        err = np.std(self.blockslopes)
 
         indexes = []
         count = 0
@@ -199,7 +197,7 @@ class settled(object):
 
         self.binselect['fiterror'] = index
 
-        return self.errs, index
+        return self.errs, index, err
 
     def finddatastart(self):
         '''

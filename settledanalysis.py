@@ -69,9 +69,9 @@ def run(param, savepath):
             setindexes.binslopes()
 
             binnedslopes, slopebin = setindexes.slopetest()
-            pvals, pbin = setindexes.ptest()
+            pvals, pbin, alpha = setindexes.ptest()
 
-            slopeerr, slopeerrbin, = setindexes.fittest()
+            slopeerr, slopeerrbin, err = setindexes.fittest()
 
             indexes = setindexes.finddatastart()
 
@@ -93,7 +93,7 @@ def run(param, savepath):
             ax.plot(
                     binnumber,
                     binnedslopes,
-                    label='Input Block Length(b='+str(index)+')',
+                    label='Input Block Length (b='+str(index)+')',
                     marker='.'
                     )
 
@@ -136,7 +136,7 @@ def run(param, savepath):
             ax.plot(
                     binnumber,
                     pvals,
-                    label='Input Block Length(b='+str(index)+')',
+                    label='Input Block Length (b='+str(index)+')',
                     marker='.'
                     )
 
@@ -163,7 +163,7 @@ def run(param, savepath):
                         )
 
             ax.set_xlabel('Bin')
-            ax.set_ylabel('p-value')
+            ax.set_ylabel('p-value (alpha='+str(alpha)+')')
             ax.grid()
             ax.legend(loc='best')
             fig.tight_layout()
@@ -178,7 +178,7 @@ def run(param, savepath):
             ax.plot(
                     binnumber,
                     slopeerr,
-                    label='Input Block Length(b='+str(index)+')',
+                    label='Input Block Length (b='+str(index)+')',
                     marker='.'
                     )
 
@@ -205,7 +205,10 @@ def run(param, savepath):
                         )
 
             ax.set_xlabel('Bin')
-            ax.set_ylabel('Linear Fit Error [K/ps]')
+            ax.set_ylabel(
+                          'Linear Fit Error [K/ps] (block slope std = ' +
+                          str(err)[:5]+')'
+                          )
             ax.grid()
             ax.legend(loc='best')
             fig.tight_layout()
@@ -237,7 +240,7 @@ def run(param, savepath):
             ax.axhline(
                        y=mean,
                        color='k',
-                       label='Settled Mean='+str(mean)+' [K]'
+                       label='Settled Mean='+str(mean)[:5]+' [K]'
                        )
 
             ax.set_xlabel('Time [ps]')
