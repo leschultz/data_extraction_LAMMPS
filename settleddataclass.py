@@ -180,12 +180,14 @@ class settled(object):
                 index = first index where slope error exceeds std
         '''
 
-        std = np.std(self.blockslopes)
+        fit = st.linregress(self.x, self.y)
+        slope = fit[0]
+        err = fit[-1]
 
         indexes = []
         count = 0
         for i in self.errs:
-            if i < std:
+            if i < err:
                 indexes.append(count)
 
             count += 1
