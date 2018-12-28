@@ -30,7 +30,4 @@ def auto(x):
         else:
             break
 
-    if last == 0:
-        last += 1
-
     return k, r, last
