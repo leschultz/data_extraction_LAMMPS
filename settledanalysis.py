@@ -69,9 +69,9 @@ def run(param, savepath):
             setindexes.binslopes()
 
             binnedslopes, slopebin = setindexes.slopetest()
-            pvals, pbin, alpha = setindexes.ptest()
+            pvals, pbin, alpha = setindexes.ptestblock()
 
-            slopeerr, slopeerrbin, err = setindexes.fittest()
+            slopeerr, slopeerrbin, err = setindexes.ptestfit()
 
             indexes = setindexes.finddatastart()
 
@@ -153,9 +153,9 @@ def run(param, savepath):
 
             except Exception:
                 ax.plot(
-                        binnumber[-1],
-                        pvals[-1],
-                        label='Method: p-value Not Settled',
+                        binnumber[0],
+                        pvals[0],
+                        label='Method: p-value Completely Settled',
                         marker='x',
                         markersize=12,
                         linestyle='none',

@@ -1,7 +1,64 @@
+'''http://iaingallagher.tumblr.com/post/50980987285/t-tests-in-python'''
+
 from scipy import stats as st
 from autocovariance import auto
 
 import numpy as np
+
+
+def ptest(x, nullhyp, a, alpha=0.05):
+    '''
+    Find the p-values for each bin with respect to the last bin.
+
+    inputs:
+            x = binned data
+            nullhyp = null hypothesis
+            a = the number of bins
+            alpha = the significance level
+    outputs:
+            pvals = p-values for each bin with respect to the last bin
+            index = last bin where the p-values is less than alpha
+    '''
+
+    # Store the bin where p-value is less than alpha
+    onoff = np.zeros(a, dtype=int)
+
+    pvals = []
+    for i in x:
+        pvals.append(
+                     st.ttest_ind(i, nullhyp, equal_var=False)[1]
+                     )
+
+    count = 0
+    indexes = []
+    for i in pvals:
+        if i < alpha:
+            onoff[count] = 1
+            indexes.append(count)
+
+        count += 1
+
+    # If a p-value below alpha occurs more than expected
+    if sum(onoff) > a*alpha:
+        reversedindex = list(range(a-1, -1, -1))
+
+        counts = []
+        for i in reversedindex:
+            endrange = onoff[i:a]  # Data starting from end
+            add = sum(endrange)  # Number of p-value below alpha counts
+            length = len(endrange)  # Length of end data
+            outof = add/length  # The rate for p-value below alpha
+            counts.append(outof)  # Make a list
+
+        # Find minimum rate that is not zero.
+        counts = np.array([reversedindex, counts]).T
+        truncated = counts[counts[:, 1] != 0, :]
+        index = int(truncated[np.argmin(truncated[:, 1])][0])
+
+    else:
+        index = 'NA'
+
+    return pvals, index, alpha
 
 
 class settled(object):
@@ -128,7 +185,7 @@ class settled(object):
 
         return self.blockslopes, i
 
-    def ptest(self, alpha=0.05):
+    def ptestblock(self, alpha=0.05):
         '''
         Find the p-values for each bin with respect to the last bin.
 
@@ -140,35 +197,18 @@ class settled(object):
                 index = last bin where the p-values is less than alpha
         '''
 
-        pvals = []
-        for i in self.yblocks:
-            pvals.append(
-                         st.ttest_ind(i, self.yblocks[-1], equal_var=False)[1]
-                         )
-
-        count = 0
-        indexes = []
-        for i in pvals:
-            if i < alpha:
-                indexes.append(count)
-
-            count += 1
-
-        if indexes:
-            index = min(indexes)
-            if index < self.a:
-                index += 1  # Skip the problematic bin
-            else:
-                index = 'NA'
-
-        else:
-            index = 'NA'
+        pvals, index, alpha = ptest(
+                                    self.yblocks,
+                                    self.yblocks[-1],
+                                    self.a,
+                                    alpha
+                                    )
 
         self.binselect['p'] = index
 
         return pvals, index, alpha
 
-    def fittest(self):
+    def ptestfit(self, alpha=0.05):
         '''
         Settling criterion due to liner fitting error.
 
@@ -180,24 +220,20 @@ class settled(object):
                 index = first index where slope error exceeds std
         '''
 
-        err = np.std(self.blockslopes)
+        print(st.ttest_1samp(self.blockslopes, 0.0))
 
-        indexes = []
-        count = 0
-        for i in self.errs:
-            if i < err:
-                indexes.append(count)
-
-            count += 1
-
-        try:
-            index = min(indexes)
-        except Exception:
-            index = 'NA'
+        pvals, index, alpha = ptest(
+                                    self.blockslopes,
+                                    0.0,
+                                    self.a,
+                                    alpha
+                                    )
+        print(pvals)
+        print(self.blockslopes)
 
         self.binselect['fiterror'] = index
 
-        return self.errs, index, err
+        return pvals, index, alpha
 
     def finddatastart(self):
         '''
