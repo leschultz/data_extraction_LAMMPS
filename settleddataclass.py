@@ -2,11 +2,12 @@
 
 from scipy import stats as st
 from autocovariance import auto
+from matplotlib import pyplot as pl
 
 import numpy as np
 
 
-def ptest(x, nullhyp, a, alpha=0.05):
+def ptest(x, nullhyp, a, alpha=0.05, n0=5):
     '''
     Find the p-values for each bin with respect to the last bin.
 
@@ -32,31 +33,19 @@ def ptest(x, nullhyp, a, alpha=0.05):
     count = 0
     indexes = []
     for i in pvals:
-        if i < alpha:
+        if i <= alpha:
             onoff[count] = 1
             indexes.append(count)
 
         count += 1
 
-    # If a p-value below alpha occurs more than expected
-    if sum(onoff) > a*alpha:
-        reversedindex = list(range(a-1, -1, -1))
-
-        counts = []
-        for i in reversedindex:
-            endrange = onoff[i:a]  # Data starting from end
-            add = sum(endrange)  # Number of p-value below alpha counts
-            length = len(endrange)  # Length of end data
-            outof = add/length  # The rate for p-value below alpha
-            counts.append(outof)  # Make a list
-
-        # Find minimum rate that is not zero.
-        counts = np.array([reversedindex, counts]).T
-        truncated = counts[counts[:, 1] != 0, :]
-        index = int(truncated[np.argmin(truncated[:, 1])][0])
-
-    else:
-        index = 'NA'
+    # Count the number of ones within n0 blocks from each other
+    diff = []
+    index = 0
+    for x, y in zip(indexes, indexes[1:]):
+        operation = y-x  # Find the number of 0's between 1
+        if operation <= n0:
+            index = y
 
     return pvals, index, alpha
 
@@ -173,10 +162,13 @@ class settled(object):
                         break
 
             # If the start is increasing
-            if self.blockslopes[1]-self.blockslopes[0] > 0.0:
+            elif self.blockslopes[1]-self.blockslopes[0] > 0.0:
                 for i in range(0, n):
                     if self.blockslopes[i+1]-self.blockslopes[i] < 0.0:
                         break
+
+            else:
+                i = 0
 
         except Exception:
             i = 'NA'
@@ -220,17 +212,12 @@ class settled(object):
                 index = first index where slope error exceeds std
         '''
 
-        print(st.ttest_1samp(self.blockslopes, 0.0))
+        pvals = []
+        for i in range(0, self.a):
+            population = [j for j in self.blockslopes if j != self.blockslopes[i]]
+            pvals.append(st.ttest_1samp(population, 0)[-1])
 
-        pvals, index, alpha = ptest(
-                                    self.blockslopes,
-                                    0.0,
-                                    self.a,
-                                    alpha
-                                    )
-        print(pvals)
-        print(self.blockslopes)
-
+        index = 'NA'
         self.binselect['fiterror'] = index
 
         return pvals, index, alpha
