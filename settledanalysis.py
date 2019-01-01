@@ -194,7 +194,7 @@ def run(param, savepath):
                        x=slopestart,
                        color='b',
                        linestyle='--',
-                       label='Method: Settled Average'
+                       label='Method: Settled Slope'
                        )
 
 

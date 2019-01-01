@@ -203,7 +203,7 @@ class settled(object):
 
         return pvals, index, alpha
 
-    def ptestfit(self, expected, withinfraction=0.001):
+    def ptestfit(self, expected, withinfraction=0.0005):
         '''
         Settling criterion due to liner fitting error.
 
@@ -234,11 +234,18 @@ class settled(object):
         lower = expected*(1-withinfraction)
 
         averages = np.array(averages)
-        start = min(np.where((averages <= upper) & (averages >= lower))[0])
 
-        posslopes = [abs(i) for i in slopes]
-        slopestart = posslopes.index(min(posslopes[start:]))
-        index = indexes[slopestart]
+        try:
+            start = min(np.where((averages <= upper) & (averages >= lower))[0])
+
+            posslopes = [abs(i) for i in slopes]
+            slopestart = posslopes.index(min(posslopes[start:]))
+            index = indexes[slopestart]
+
+        except Exception:
+            index = 'NA'
+            start = 'NA'
+            slopestart = 'NA'
 
         self.indexes['fiterror'] = index
 
