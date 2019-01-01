@@ -73,9 +73,13 @@ def run(param, savepath):
             binnedslopes, slopebin = setindexes.slopetest()
             pvals, pbin, alpha = setindexes.ptestblock()
 
-            slopeerr, averages, slopeerrbin = setindexes.ptestfit(
-                                                                  expectedtemp
-                                                                  )
+            fitvals = setindexes.ptestfit(expectedtemp)
+
+            slopeerr = fitvals[0]
+            averages = fitvals[1]
+            slopeerrbin = fitvals[2]
+            start = fitvals[3]
+            slopestart = fitvals[4]
 
             indexes = setindexes.finddatastart()
 
@@ -182,8 +186,17 @@ def run(param, savepath):
             ax.plot(
                     slopeerr,
                     label='Input Block Length (b='+str(index)+')',
-                    marker='.'
+                    marker='.',
+                    color='r'
                     )
+
+            ax.axvline(
+                       x=slopestart,
+                       color='b',
+                       linestyle='--',
+                       label='Method: Settled Average'
+                       )
+
 
             ax.set_xlabel('Data point [-]')
             ax.set_ylabel(
@@ -203,8 +216,17 @@ def run(param, savepath):
             ax.plot(
                     averages,
                     label='Input Block Length (b='+str(index)+')',
-                    marker='.'
+                    marker='.',
+                    color='r'
                     )
+
+            ax.axvline(
+                       x=start,
+                       color='b',
+                       linestyle='--',
+                       label='Method: Settled Average'
+                       )
+
 
             ax.set_xlabel('Data point [-]')
             ax.set_ylabel(

@@ -208,11 +208,14 @@ class settled(object):
         Settling criterion due to liner fitting error.
 
         inputs:
-                self.blockslopes = slopes of bins
-                self.errs = slope errors from bins
+                self.x = horizontal axis values
+                self.y = vertical axis values
+                expected = the expected value
+                withinfraction = the decimal range to stay within expected
         outputs:
-                self.errs = slope errors from bins
-                index = first index where slope error exceeds std
+                slopes = linear regression starting from end of data
+                averages = averages starting from the end of data
+                index = the starting index of settled data
         '''
 
         # Need at least two points for linear regression
@@ -234,11 +237,12 @@ class settled(object):
         start = min(np.where((averages <= upper) & (averages >= lower))[0])
 
         posslopes = [abs(i) for i in slopes]
-        index = indexes[posslopes.index(min(posslopes[start:]))]
+        slopestart = posslopes.index(min(posslopes[start:]))
+        index = indexes[slopestart]
 
         self.indexes['fiterror'] = index
 
-        return slopes, averages, index
+        return slopes, averages, index, start, slopestart
 
     def finddatastart(self):
         '''
