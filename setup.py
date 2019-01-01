@@ -15,6 +15,7 @@ def exportdir(folder):
     datadiffusion = analysis+'diffusion/'
     datardf = analysis+'rdf/'
     dataerr = analysis+'errormethods/'
+    datasettling = analysis+'settling/'
 
     # The directories were images will be saved for single runs
     image_directory = first_directory+'/images/'
@@ -25,8 +26,6 @@ def exportdir(folder):
     correlationplot = dataerrplots+'autocorrelation/'
     errors = dataerrplots+'errors/'
     settling = image_directory+'settling/'
-    datarange = settling+'data/'
-    methods = settling+'methods/'
 
     directories = [
                    analysis,
@@ -42,8 +41,7 @@ def exportdir(folder):
                    correlationplot,
                    errors,
                    settling,
-                   datarange,
-                   methods
+                   datasettling
                    ]
 
     for directory in directories:

@@ -1,12 +1,18 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 
+from matplotlib import colors as mcolors
 from matplotlib import pyplot as pl
+from cycler import cycler
+
 from infoparser import parameters
 from outimport import readdata
 from settleddataclass import settled
 
 import numpy as np
 import os
+
+colors = list(mcolors.BASE_COLORS.keys())
+colors = [i for i in colors if i != 'r']
 
 
 def run(param, savepath):
@@ -70,10 +76,20 @@ def run(param, savepath):
 
             setindexes.binslopes()
 
-            binnedslopes, slopebin = setindexes.slopetest()
-            pvals, pbin, alpha = setindexes.ptestblock()
+            setindexes.binnedslopetest()
+            setindexes.slopetest(expectedtemp)
 
             fitvals = setindexes.ptestfit(expectedtemp)
+
+            txtname = (
+                       savepath+folder +
+                       '/datacalculated/settling/temperature_' +
+                       savename +
+                       '.txt'
+                       )
+
+            dfout = setindexes.returndata()
+            dfout.to_csv(txtname, sep=' ', index=False)
 
             slopeerr = fitvals[0]
             averages = fitvals[1]
@@ -83,205 +99,8 @@ def run(param, savepath):
 
             indexes = setindexes.finddatastart()
 
-            settledindex = []
-            for key in indexes:
-                if isinstance(indexes[key], int):
-                    settledindex.append(indexes[key])
-
-            try:
-                settledindex = max(settledindex)
-            except Exception:
-                settledindex = len(time)-1
-
             fig, ax = pl.subplots()
 
-            binnumber = list(range(1, len(binnedslopes)+1))
-            averagetemps = [np.mean(i) for i in binnedtemp]
-
-            ax.plot(
-                    binnumber,
-                    binnedslopes,
-                    label='Input Block Length (b='+str(index)+')',
-                    marker='.'
-                    )
-
-            try:
-                ax.plot(
-                        binnumber[slopebin],
-                        binnedslopes[slopebin],
-                        label='Method: Slope Change',
-                        marker='*',
-                        markersize=12,
-                        linestyle='none',
-                        color='g'
-                        )
-
-            except Exception:
-                ax.plot(
-                        binnumber[-1],
-                        binnedslopes[-1],
-                        label='Method: Slope Change Not Settled',
-                        marker='*',
-                        markersize=12,
-                        linestyle='none',
-                        color='g'
-                        )
-
-            ax.set_xlabel('Bin')
-            ax.set_ylabel('Slope [K/ps]')
-            ax.grid()
-            ax.legend(loc='best')
-            fig.tight_layout()
-            fig.savefig(
-                        savepath +
-                        folder +
-                        '/images/settling/methods/slopemethod_' +
-                        savename
-                        )
-
-            fig, ax = pl.subplots()
-
-            ax.plot(
-                    binnumber,
-                    pvals,
-                    label='Input Block Length (b='+str(index)+')',
-                    marker='.'
-                    )
-
-            try:
-                ax.plot(
-                        binnumber[pbin],
-                        pvals[pbin],
-                        label='Method: p-value',
-                        marker='x',
-                        markersize=12,
-                        linestyle='none',
-                        color='r'
-                        )
-
-            except Exception:
-                ax.plot(
-                        binnumber[0],
-                        pvals[0],
-                        label='Method: p-value Completely Settled',
-                        marker='x',
-                        markersize=12,
-                        linestyle='none',
-                        color='r'
-                        )
-
-            ax.set_xlabel('Bin')
-            ax.set_ylabel('p-value (alpha='+str(alpha)+')')
-            ax.grid()
-            ax.legend(loc='best')
-            fig.tight_layout()
-            fig.savefig(
-                        savepath+folder +
-                        '/images/settling/methods/pmethod_' +
-                        savename
-                        )
-
-            fig, ax = pl.subplots()
-
-            ax.plot(
-                    slopeerr,
-                    label='Input Block Length (b='+str(index)+')',
-                    marker='.',
-                    color='r'
-                    )
-
-            ax.axvline(
-                       x=slopestart,
-                       color='b',
-                       linestyle='--',
-                       label='Method: Settled Slope'
-                       )
-
-
-            ax.set_xlabel('Data point [-]')
-            ax.set_ylabel(
-                          'Linear Fit Slope [K/ps] Starting from End'
-                          )
-            ax.grid()
-            ax.legend(loc='best')
-            fig.tight_layout()
-            fig.savefig(
-                        savepath +
-                        folder +
-                        '/images/settling/methods/endslopes_' +
-                        savename
-                        )
-
-            fig, ax = pl.subplots()
-            ax.plot(
-                    averages,
-                    label='Input Block Length (b='+str(index)+')',
-                    marker='.',
-                    color='r'
-                    )
-
-            ax.axvline(
-                       x=start,
-                       color='b',
-                       linestyle='--',
-                       label='Method: Settled Average'
-                       )
-
-
-            ax.set_xlabel('Data point [-]')
-            ax.set_ylabel(
-                          'Average Temperature [K] Starting from End'
-                          )
-            ax.grid()
-            ax.legend(loc='best')
-            fig.tight_layout()
-            fig.savefig(
-                        savepath +
-                        folder +
-                        '/images/settling/methods/averages_' +
-                        savename
-                        )
-
-            fig, ax = pl.subplots()
-            ax.plot(
-                    time,
-                    temp,
-                    marker='.',
-                    color='r',
-                    linestyle='none'
-                    )
-
-            try:
-                ax.axvline(
-                           x=time[slopeerrbin],
-                           color='b',
-                           linestyle='--',
-                           label='Method: Overall Fit'
-                           )
-
-            except Exception:
-                ax.axvline(
-                           x=time[-1],
-                           color='b',
-                           linestyle='--',
-                           label='Method: Overall Fit not Applicable'
-                           )
-
-            ax.set_xlabel('Time [ps]')
-            ax.set_ylabel(
-                          'Temperature [K]'
-                          )
-            ax.grid()
-            ax.legend(loc='best')
-            fig.tight_layout()
-            fig.savefig(
-                        savepath +
-                        folder +
-                        '/images/settling/methods/fiterror_' +
-                        savename
-                        )
-
-            fig, ax = pl.subplots()
             ax.plot(
                     time,
                     temp,
@@ -291,24 +110,31 @@ def run(param, savepath):
                     label='Data'
                     )
 
-            ax.axvline(
-                       x=time[settledindex],
-                       color='b',
-                       linestyle='--',
-                       label='Settled Start'
-                       )
+            count = 0
+            for key in indexes:
+                try:
+                    ax.axvline(
+                               x=time[indexes[key]],
+                               linestyle='--',
+                               color=colors[count],
+                               label='Method: '+key
+                               )
 
-            mean = np.mean(temp[settledindex:])
-            ax.axhline(
-                       y=mean,
-                       color='k',
-                       label='Settled Mean='+str(mean)[:5]+' [K]'
-                       )
+                except Exception:
+                    pass
+
+                count += 1
 
             ax.set_xlabel('Time [ps]')
             ax.set_ylabel('Temperature [K]')
             ax.grid()
             ax.legend(loc='best')
             fig.tight_layout()
-            fig.savefig(savepath+folder+'/images/settling/data/data_'+savename)
+            fig.savefig(
+                        savepath +
+                        folder +
+                        '/images/settling/temperature_' +
+                        savename
+                        )
+
             pl.close('all')

@@ -2,13 +2,12 @@
 
 from scipy import stats as st
 from autocovariance import auto
-from matplotlib import pyplot as pl
 
 import pandas as pd
 import numpy as np
 
 
-def ptest(x, nullhyp, a, alpha=0.05, n0=5):
+def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
     '''
     Find the p-values for each bin with respect to the last bin.
 
@@ -29,9 +28,14 @@ def ptest(x, nullhyp, a, alpha=0.05, n0=5):
 
     pvals = []
     for i in x:
-        pvals.append(
-                     st.ttest_ind(i, nullhyp, equal_var=False)[1]
-                     )
+        if test == 'distribution':
+
+            pvals.append(
+                         st.ttest_ind(i, nullhyp, equal_var=False)[1]
+                         )
+
+        if test == 'single':
+            pvals.append(st.ttest_1samp(i, nullhyp)[1])
 
     count = 0
     indexes = []
@@ -50,7 +54,7 @@ def ptest(x, nullhyp, a, alpha=0.05, n0=5):
         if operation <= n0:
             index = y
 
-    return pvals, index, alpha
+    return pvals, index
 
 
 class settled(object):
@@ -144,7 +148,7 @@ class settled(object):
 
         return self.blockslopes, self.errs
 
-    def slopetest(self):
+    def binnedslopetest(self):
         '''
         Find the index of data where.
 
@@ -176,11 +180,11 @@ class settled(object):
         except Exception:
             i = 'NA'
 
-        self.binselect['slope'] = i
+        self.binselect['binned slopes'] = i
 
         return self.blockslopes, i
 
-    def ptestblock(self, alpha=0.05):
+    def slopetest(self, expected, alpha=0.05):
         '''
         Find the p-values for each bin with respect to the last bin.
 
@@ -192,16 +196,30 @@ class settled(object):
                 index = last bin where the p-values is less than alpha
         '''
 
-        pvals, index, alpha = ptest(
-                                    self.yblocks,
-                                    self.yblocks[-1],
-                                    self.a,
-                                    alpha
-                                    )
+        distpvals, index = ptest(
+                                 self.yblocks,
+                                 self.yblocks[-1],
+                                 self.a,
+                                 'distribution',
+                                 alpha
+                                 )
 
-        self.binselect['p'] = index
+        self.binselect['p-value from distribution'] = index
 
-        return pvals, index, alpha
+        singpvals, index = ptest(
+                                 self.yblocks,
+                                 expected,
+                                 self.a,
+                                 'single',
+                                 alpha
+                                 )
+
+        self.binselect['p-value from single sample'] = index
+
+        self.distpvals = distpvals
+        self.singpvals = singpvals
+
+        return distpvals, singpvals
 
     def ptestfit(self, expected, withinfraction=0.0005):
         '''
@@ -247,7 +265,7 @@ class settled(object):
             start = 'NA'
             slopestart = 'NA'
 
-        self.indexes['fiterror'] = index
+        self.indexes['fitting from end'] = index
 
         return slopes, averages, index, start, slopestart
 
@@ -273,3 +291,25 @@ class settled(object):
                 self.indexes[key] = 'NA'
 
         return self.indexes
+
+    def returndata(self):
+        bins = list(range(0, self.a))
+
+        data = [
+                bins,
+                self.blockslopes,
+                self.distpvals,
+                self.singpvals
+                ]
+
+        headers = [
+                   'bin',
+                   'blockslopes',
+                   'distpvals',
+                   'singpvals'
+                   ]
+
+        df = pd.DataFrame(np.array(data).T, columns=headers)
+        df['bin'] = df['bin'].astype(int)
+
+        return df
