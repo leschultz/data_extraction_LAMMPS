@@ -39,9 +39,11 @@ def run(param, savepath):
 
         for iteration in list(range(0, n)):
 
+            expectedtemp = starttemp-iteration*deltatemp
+
             print(
                   'Temperature step: ' +
-                  str(starttemp-iteration*deltatemp) +
+                  str(expectedtemp) +
                   ' [K]'
                   )
 
@@ -71,7 +73,9 @@ def run(param, savepath):
             binnedslopes, slopebin = setindexes.slopetest()
             pvals, pbin, alpha = setindexes.ptestblock()
 
-            slopeerr, slopeerrbin, err = setindexes.ptestfit()
+            slopeerr, averages, slopeerrbin = setindexes.ptestfit(
+                                                                  expectedtemp
+                                                                  )
 
             indexes = setindexes.finddatastart()
 
@@ -176,38 +180,74 @@ def run(param, savepath):
             fig, ax = pl.subplots()
 
             ax.plot(
-                    binnumber,
                     slopeerr,
                     label='Input Block Length (b='+str(index)+')',
                     marker='.'
                     )
 
-            try:
-                ax.plot(
-                        binnumber[slopeerrbin],
-                        slopeerr[slopeerrbin],
-                        label='Method: Fit Error',
-                        marker='^',
-                        markersize=12,
-                        linestyle='none',
-                        color='y'
+            ax.set_xlabel('Data point [-]')
+            ax.set_ylabel(
+                          'Linear Fit Slope [K/ps] Starting from End'
+                          )
+            ax.grid()
+            ax.legend(loc='best')
+            fig.tight_layout()
+            fig.savefig(
+                        savepath +
+                        folder +
+                        '/images/settling/methods/endslopes_' +
+                        savename
                         )
+
+            fig, ax = pl.subplots()
+            ax.plot(
+                    averages,
+                    label='Input Block Length (b='+str(index)+')',
+                    marker='.'
+                    )
+
+            ax.set_xlabel('Data point [-]')
+            ax.set_ylabel(
+                          'Average Temperature [K] Starting from End'
+                          )
+            ax.grid()
+            ax.legend(loc='best')
+            fig.tight_layout()
+            fig.savefig(
+                        savepath +
+                        folder +
+                        '/images/settling/methods/averages_' +
+                        savename
+                        )
+
+            fig, ax = pl.subplots()
+            ax.plot(
+                    time,
+                    temp,
+                    marker='.',
+                    color='r',
+                    linestyle='none'
+                    )
+
+            try:
+                ax.axvline(
+                           x=time[slopeerrbin],
+                           color='b',
+                           linestyle='--',
+                           label='Method: Overall Fit'
+                           )
 
             except Exception:
-                ax.plot(
-                        binnumber[-1],
-                        slopeerr[-1],
-                        label='Method: Fit Error Not Settled',
-                        marker='^',
-                        markersize=12,
-                        linestyle='none',
-                        color='y'
-                        )
+                ax.axvline(
+                           x=time[-1],
+                           color='b',
+                           linestyle='--',
+                           label='Method: Overall Fit not Applicable'
+                           )
 
-            ax.set_xlabel('Bin')
+            ax.set_xlabel('Time [ps]')
             ax.set_ylabel(
-                          'Linear Fit Error [K/ps] (block slope std = ' +
-                          str(err)[:5]+')'
+                          'Temperature [K]'
                           )
             ax.grid()
             ax.legend(loc='best')

@@ -4,6 +4,7 @@ from scipy import stats as st
 from autocovariance import auto
 from matplotlib import pyplot as pl
 
+import pandas as pd
 import numpy as np
 
 
@@ -16,9 +17,11 @@ def ptest(x, nullhyp, a, alpha=0.05, n0=5):
             nullhyp = null hypothesis
             a = the number of bins
             alpha = the significance level
+            n0 = the threshold for then number of agreements with nullhyp
     outputs:
             pvals = p-values for each bin with respect to the last bin
             index = last bin where the p-values is less than alpha
+            alpha = return alpha if default is used
     '''
 
     # Store the bin where p-value is less than alpha
@@ -200,7 +203,7 @@ class settled(object):
 
         return pvals, index, alpha
 
-    def ptestfit(self, alpha=0.05):
+    def ptestfit(self, expected, withinfraction=0.001):
         '''
         Settling criterion due to liner fitting error.
 
@@ -212,15 +215,30 @@ class settled(object):
                 index = first index where slope error exceeds std
         '''
 
-        pvals = []
-        for i in range(0, self.a):
-            population = [j for j in self.blockslopes if j != self.blockslopes[i]]
-            pvals.append(st.ttest_1samp(population, 0)[-1])
+        # Need at least two points for linear regression
+        slopes = []
+        averages = []
+        indexes = []
+        for i in range(self.n-2, -1, -1):
+            indexes.append(i)
+            x = self.x[i:]
+            y = self.y[i:]
+            averages.append(sum(self.y[i:])/len(self.y[i:]))
+            fit = st.linregress(x, y)
+            slopes.append(fit[0])
 
-        index = 'NA'
-        self.binselect['fiterror'] = index
+        upper = expected*(1+withinfraction)
+        lower = expected*(1-withinfraction)
 
-        return pvals, index, alpha
+        averages = np.array(averages)
+        start = min(np.where((averages <= upper) & (averages >= lower))[0])
+
+        posslopes = [abs(i) for i in slopes]
+        index = indexes[posslopes.index(min(posslopes[start:]))]
+
+        self.indexes['fiterror'] = index
+
+        return slopes, averages, index
 
     def finddatastart(self):
         '''

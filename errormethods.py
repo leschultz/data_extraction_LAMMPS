@@ -99,7 +99,13 @@ def run(datadir):
 
     for folder in data:
         errors[folder] = pd.concat(errors[folder])
-        exportname = datadir+'/'+folder+'/datacalculated/errormethods/correrrs.txt'
+        exportname = (
+                      datadir +
+                      '/' +
+                      folder +
+                      '/datacalculated/errormethods/correrrs.txt'
+                      )
+
         errors[folder].to_csv(
                                 exportname,
                                 sep=' ',
