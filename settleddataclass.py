@@ -1,10 +1,10 @@
-'''http://iaingallagher.tumblr.com/post/50980987285/t-tests-in-python'''
-
 from scipy import stats as st
 from autocovariance import auto
 
 import pandas as pd
 import numpy as np
+
+from matplotlib import pyplot as pl
 
 
 def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
@@ -54,6 +54,17 @@ def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
         if operation <= n0:
             index = y
 
+    # If the first index returns 0, then check for first instance of fail
+    if (index == 0) & (sum(onoff) > 0):
+        index = np.where(onoff == 1)[0]
+        index = min(index)
+        index += 1
+
+    elif sum(onoff) == 0:
+        index = 0
+    else:
+        index += 1  # Skip problematic bin
+
     return pvals, index
 
 
@@ -96,8 +107,8 @@ class settled(object):
 
         k, r, index = auto(self.y)
 
-        if index < 3:
-            index = 4
+        if index < 5:
+            index = 10
         else:
             index *= 2
 
@@ -220,6 +231,44 @@ class settled(object):
         self.singpvals = singpvals
 
         return distpvals, singpvals
+
+    def overlappingdistribution(self, alpha=0.05):
+        '''
+        Check whether a slope observation is outside the confidence interval
+        of a normal distribution.
+
+        inputs:
+                alpha = the significance level
+                self.blockslopes = the bins with linear fits
+        outputs:
+                failbins = The bins that fail the test
+        '''
+
+        mean = 0.0  # The mean is supposed to be zero for settled data
+        std = np.std(self.blockslopes)
+
+
+        failbins = []
+        count = 0
+        for i in self.blockslopes:
+            # The minimum absolute value before going outside 2*sigma
+            limit = st.norm.ppf(1-alpha, mean, self.errs[count])
+
+            if (i <= -limit) | (i >= limit):
+                failbins.append(count)
+
+            count += 1
+
+        # Choose the last bin where data failed
+        if failbins:
+            index = max(failbins)
+
+        else:
+            index = 0
+
+        self.binselect['distribution'] = index
+
+        return failbins
 
     def finddatastart(self):
         '''

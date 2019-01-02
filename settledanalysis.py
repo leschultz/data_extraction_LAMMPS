@@ -13,6 +13,7 @@ import os
 
 colors = list(mcolors.BASE_COLORS.keys())
 colors = [i for i in colors if i != 'r']
+lstyle = [':', '-.', '--', '-']
 
 
 def run(param, savepath):
@@ -79,6 +80,8 @@ def run(param, savepath):
             setindexes.binnedslopetest()
             setindexes.ptests(expectedtemp)
 
+            setindexes.overlappingdistribution()
+
             txtname = (
                        savepath+folder +
                        '/datacalculated/settling/temperature_' +
@@ -99,7 +102,11 @@ def run(param, savepath):
                     linestyle='none',
                     color='r',
                     marker='.',
-                    label='Data'
+                    label=(
+                           'Data (start of hold is ' +
+                           str(points[1]*timestep) +
+                           ' [ps])'
+                           )
                     )
 
             count = 0
@@ -107,13 +114,18 @@ def run(param, savepath):
                 try:
                     ax.axvline(
                                x=time[indexes[key]],
-                               linestyle='--',
+                               linestyle=lstyle[count],
                                color=colors[count],
                                label='Method: '+key
                                )
 
                 except Exception:
-                    pass
+                    ax.axvline(
+                               x=time[-1],
+                               linestyle=lstyle[count],
+                               color=colors[count],
+                               label='Method: '+key+' unsettled'
+                               )
 
                 count += 1
 
