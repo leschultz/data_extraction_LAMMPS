@@ -184,7 +184,7 @@ class settled(object):
 
         return self.blockslopes, i
 
-    def slopetest(self, expected, alpha=0.05):
+    def ptests(self, expected, alpha=0.05):
         '''
         Find the p-values for each bin with respect to the last bin.
 
@@ -220,54 +220,6 @@ class settled(object):
         self.singpvals = singpvals
 
         return distpvals, singpvals
-
-    def ptestfit(self, expected, withinfraction=0.0005):
-        '''
-        Settling criterion due to liner fitting error.
-
-        inputs:
-                self.x = horizontal axis values
-                self.y = vertical axis values
-                expected = the expected value
-                withinfraction = the decimal range to stay within expected
-        outputs:
-                slopes = linear regression starting from end of data
-                averages = averages starting from the end of data
-                index = the starting index of settled data
-        '''
-
-        # Need at least two points for linear regression
-        slopes = []
-        averages = []
-        indexes = []
-        for i in range(self.n-2, -1, -1):
-            indexes.append(i)
-            x = self.x[i:]
-            y = self.y[i:]
-            averages.append(sum(self.y[i:])/len(self.y[i:]))
-            fit = st.linregress(x, y)
-            slopes.append(fit[0])
-
-        upper = expected*(1+withinfraction)
-        lower = expected*(1-withinfraction)
-
-        averages = np.array(averages)
-
-        try:
-            start = min(np.where((averages <= upper) & (averages >= lower))[0])
-
-            posslopes = [abs(i) for i in slopes]
-            slopestart = posslopes.index(min(posslopes[start:]))
-            index = indexes[slopestart]
-
-        except Exception:
-            index = 'NA'
-            start = 'NA'
-            slopestart = 'NA'
-
-        self.indexes['fitting from end'] = index
-
-        return slopes, averages, index, start, slopestart
 
     def finddatastart(self):
         '''

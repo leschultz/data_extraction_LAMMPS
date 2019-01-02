@@ -77,9 +77,7 @@ def run(param, savepath):
             setindexes.binslopes()
 
             setindexes.binnedslopetest()
-            setindexes.slopetest(expectedtemp)
-
-            fitvals = setindexes.ptestfit(expectedtemp)
+            setindexes.ptests(expectedtemp)
 
             txtname = (
                        savepath+folder +
@@ -90,12 +88,6 @@ def run(param, savepath):
 
             dfout = setindexes.returndata()
             dfout.to_csv(txtname, sep=' ', index=False)
-
-            slopeerr = fitvals[0]
-            averages = fitvals[1]
-            slopeerrbin = fitvals[2]
-            start = fitvals[3]
-            slopestart = fitvals[4]
 
             indexes = setindexes.finddatastart()
 
