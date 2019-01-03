@@ -1,0 +1,118 @@
+units           metal                 # Angstrom, eV, ps, bar
+boundary        p p p                 # Periodic boundaries in all dimensions.
+atom_style      atomic                # Pair potentials.
+
+#------------------------------------------------------------------
+#  Define simulation box.
+#------------------------------------------------------------------
+#read_data     input 
+
+#lattice custom  3.74 a1 1 0 0 a2 0 1 0 a3 0 0 1
+lattice fcc 4.04
+#lattice custom  3.74 a1 1.0 0.0 0.0 a2 0.0 1.0 0.0 a3 0.0 0.0 1.0 &
+#		basis 0.0 0.0 0.0 basis 0.5 0.5 0.5
+region my_box block 0 10 0 10 0 10
+#region          my_box block 0 4 0 5 0 5 
+create_box      2 my_box
+create_atoms    1  box
+#create_atoms    2 region my_box basis 1 1 basis 2 2
+
+#create_atoms    1 random 16000 341341 my_box 
+#create_atoms    2 random 16000 127569 my_box 
+#group cus type 2
+#set group all type/fraction 1 0.990503 341341
+
+
+#------------------------------------------------------------------
+#  Define interatomic potential.
+#------------------------------------------------------------------
+pair_style     eam/fs
+pair_coeff      * * Al_Sm.eam.fs Al Sm
+
+thermo 500
+thermo_style    custom step temp press etotal pe enthalpy
+thermo_modify   flush yes
+#pair_coeff      *3 4 lj/cut 1 0.5 1.2
+
+neigh_modify    every 1 delay 0 check no
+
+
+
+#------------------------------------------------------------------
+#  How to write the trajectory.
+#------------------------------------------------------------------
+dump            dump_name all custom 500 traj.lammpstrj id type x y z 
+dump_modify     dump_name sort id 
+
+#-----------------------------------------------------------------
+#  write continuation files
+#-----------------------------------------------------------------
+restart 1000 traj.restart1.mpiio traj.restart2.mpiio
+
+#------------------------------------------------------------------
+#  How to write thermodynamic information.
+#------------------------------------------------------------------
+#run 		500
+
+#------------------------------------------------------------------
+#  Define statistical ensemble.
+#------------------------------------------------------------------
+fix	1 all nve 
+#fix		fix_name all  flow temp/rescale 1 0 300 0.02 10
+#fix   1 all nve temp/rescale 100 1.0 1.1 0.02 0.5
+
+#fix_modify  all  temp mytemp
+#fix             fix_name all npt  300.0 400.0 1.0 
+#fix             fix_name all box/relax  iso 0.0
+#fix             fix_name all nvt temp 300 300 0.1
+#fix             fix_name all npt temp 300 300 0.1 aniso 0 0 1 couple xy
+#fix	     1 all nvt 200.0 300.0 1.0
+#run	     1000 start 0 stop 10000
+
+#------------------------------------------------------------------
+#  Initial velocities and timestep (ps).
+#------------------------------------------------------------------
+timestep 0.001
+velocity        all create 300 10011 mom yes rot yes dist gaussian
+run 5000
+unfix 1
+
+fix             md all npt temp 300 300 0.1 iso 0 0 1
+run 5000
+unfix md
+
+fix             md all npt temp 300 2000 0.1 iso 0 0 1
+run 30000
+unfix md
+
+fix             md all npt temp 2000 2000 0.1 iso 0 0 1
+run 30000
+unfix md
+
+
+fix             md all npt temp 2000 1350 0.1 iso 0 0 1
+run 5000
+unfix md
+
+fix             md all npt temp 1350 1350 0.1 iso 0 0 1
+run 5000
+unfix md
+
+variable imax equal 25
+variable i loop ${imax}
+label start_of_loop_1
+
+variable tin equal 1400-${i}*50
+variable tfi equal 1350-${i}*50
+
+fix             nnn all npt temp ${tin} ${tfi} 0.1 iso 0 0 1
+run 5000
+unfix           nnn
+
+fix             md all npt temp ${tfi} ${tfi} 0.1 iso 0 0 1
+run 45000
+unfix md
+
+next i
+jump dep.in start_of_loop_1
+
