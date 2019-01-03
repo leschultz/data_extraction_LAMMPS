@@ -72,7 +72,7 @@ class settled(object):
     Data has to be sufficiently long to not breack this code.
     '''
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, alpha=0.05, n0=5):
         '''
         Devide data into a number of bins.
 
@@ -88,6 +88,9 @@ class settled(object):
         self.x = x
         self.y = y
         self.n = len(x)
+
+        self.alpha = alpha  # Defined under ptest function
+        self.n0 = n0  # Defined under ptest function
 
         self.binselect = {}  # Store selected bin
         self.indexes = {}  # Store first index of selected bin
@@ -193,7 +196,7 @@ class settled(object):
 
         return self.blockslopes, i
 
-    def ptests(self, expected, alpha=0.05):
+    def ptests(self, expected):
         '''
         Find the p-values for each bin with respect to the last bin.
 
@@ -210,10 +213,10 @@ class settled(object):
                                  self.yblocks[-1],
                                  self.a,
                                  'distribution',
-                                 alpha
+                                 self.alpha
                                  )
 
-        keydistpvals = r'p-value from distribution ($\alpha$='+str(alpha)+')'
+        keydistpvals = r'p-value from distribution ($\alpha$='+str(self.alpha)+')'
         self.binselect[keydistpvals] = index
 
         singpvals, index = ptest(
@@ -221,10 +224,10 @@ class settled(object):
                                  expected,
                                  self.a,
                                  'single',
-                                 alpha
+                                 self.alpha
                                  )
 
-        keysingpvals = r'p-value from single sample ($\alpha$='+str(alpha)+')'
+        keysingpvals = r'p-value from single sample ($\alpha$='+str(self.alpha)+')'
         self.binselect[keysingpvals] = index
 
         self.distpvals = distpvals
@@ -232,7 +235,7 @@ class settled(object):
 
         return distpvals, singpvals
 
-    def normaldistribution(self, alpha=0.05):
+    def normaldistribution(self):
         '''
         Check whether a slope observation is outside the confidence interval
         of a normal distribution.
@@ -244,15 +247,13 @@ class settled(object):
                 failbins = The bins that fail the test
         '''
 
-        mean = 0.0  # The mean is supposed to be zero for settled data
-
         failbins = []
         count = 0
         ppf = []
         for i in self.blockslopes:
             # The minimum absolute value before going outside 2*sigma
             # The 2*sigma is defined by 1-alpha and can be altered
-            limit = st.norm.ppf(1-alpha, i, self.errs[count])
+            limit = st.norm.ppf(1-self.alpha, i, self.errs[count])
             ppf.append(limit)
 
             if (0.0 <= -limit) | (0.0 >= limit):
@@ -269,7 +270,7 @@ class settled(object):
 
         index += 1  # Choose the next bin as being settled
 
-        self.binselect['slope confidence interval '+str(1-alpha)] = index
+        self.binselect['slope confidence interval '+str(1-self.alpha)] = index
         self.ppf = ppf
 
         return ppf

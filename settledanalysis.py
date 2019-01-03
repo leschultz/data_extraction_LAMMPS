@@ -16,7 +16,7 @@ colors = [i for i in colors if i != 'r']
 lstyle = [':', '-.', '--', '-']
 
 
-def run(param, savepath):
+def run(param, savepath, alpha, n0):
     for item in param:
 
         path = item.replace('uwtraj.lammpstrj', '')
@@ -71,7 +71,7 @@ def run(param, savepath):
             time = list(df['time'][dataindexes])
             temp = list(df['Temp'][dataindexes])
 
-            setindexes = settled(time, temp)
+            setindexes = settled(time, temp, alpha, n0)
             index = setindexes.binsize()
             binnedtime, binnedtemp = setindexes.batch()
 

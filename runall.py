@@ -16,6 +16,16 @@ parser.add_argument('-o')
 
 args = parser.parse_args()
 
+if args.p:
+    with open(args.p) as file:
+        for line in file:
+            values = line.strip().split(' ')
+            if 'alpha' in values[0]:
+                alpha = float(values[0].split('=')[-1])
+
+            if 'n0' in values[0]:
+                n0 = int(values[0].split('=')[-1])
+
 
 def start(datadir):
     runs = parameters(datadir)
@@ -96,14 +106,7 @@ def run(param, exportdir):
             value.save_diffusion(savename)
 
 
-if args.p:
-    with open(args.p) as file:
-        for line in file:
-            values = line.strip().split(' ')
-            if values[0] != '#':
-                print(values)
-
 param = start(args.i)
 run(param, args.o)
 errmeth(args.o)
-setmeth(param, args.o)
+setmeth(param, args.o, alpha, n0)
