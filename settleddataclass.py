@@ -4,8 +4,6 @@ from autocovariance import auto
 import pandas as pd
 import numpy as np
 
-from matplotlib import pyplot as pl
-
 
 def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
     '''
@@ -16,7 +14,7 @@ def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
             nullhyp = null hypothesis
             a = the number of bins
             alpha = the significance level
-            n0 = the threshold for then number of agreements with nullhyp
+            n0 = the threshold for the number of agreements with nullhyp
     outputs:
             pvals = p-values for each bin with respect to the last bin
             index = last bin where the p-values is less than alpha
@@ -107,8 +105,8 @@ class settled(object):
 
         k, r, index = auto(self.y)
 
-        if index < 5:
-            index = 10
+        if index <= 2:
+            index = 4
         else:
             index *= 2
 
@@ -215,7 +213,8 @@ class settled(object):
                                  alpha
                                  )
 
-        self.binselect['p-value from distribution'] = index
+        keydistpvals = r'p-value from distribution ($\alpha$='+str(alpha)+')'
+        self.binselect[keydistpvals] = index
 
         singpvals, index = ptest(
                                  self.yblocks,
@@ -225,14 +224,15 @@ class settled(object):
                                  alpha
                                  )
 
-        self.binselect['p-value from single sample'] = index
+        keysingpvals = r'p-value from single sample ($\alpha$='+str(alpha)+')'
+        self.binselect[keysingpvals] = index
 
         self.distpvals = distpvals
         self.singpvals = singpvals
 
         return distpvals, singpvals
 
-    def overlappingdistribution(self, alpha=0.05):
+    def normaldistribution(self, alpha=0.05):
         '''
         Check whether a slope observation is outside the confidence interval
         of a normal distribution.
@@ -245,30 +245,34 @@ class settled(object):
         '''
 
         mean = 0.0  # The mean is supposed to be zero for settled data
-        std = np.std(self.blockslopes)
-
 
         failbins = []
         count = 0
+        ppf = []
         for i in self.blockslopes:
             # The minimum absolute value before going outside 2*sigma
-            limit = st.norm.ppf(1-alpha, mean, self.errs[count])
+            # The 2*sigma is defined by 1-alpha and can be altered
+            limit = st.norm.ppf(1-alpha, i, self.errs[count])
+            ppf.append(limit)
 
-            if (i <= -limit) | (i >= limit):
+            if (0.0 <= -limit) | (0.0 >= limit):
                 failbins.append(count)
 
             count += 1
 
-        # Choose the last bin where data failed
+        # Choose the first bin where data failed
         if failbins:
-            index = max(failbins)
+            index = min(failbins)
 
         else:
             index = 0
 
-        self.binselect['distribution'] = index
+        index += 1  # Choose the next bin as being settled
 
-        return failbins
+        self.binselect['slope confidence interval '+str(1-alpha)] = index
+        self.ppf = ppf
+
+        return ppf
 
     def finddatastart(self):
         '''
@@ -300,14 +304,16 @@ class settled(object):
                 bins,
                 self.blockslopes,
                 self.distpvals,
-                self.singpvals
+                self.singpvals,
+                self.ppf
                 ]
 
         headers = [
                    'bin',
                    'blockslopes',
                    'distpvals',
-                   'singpvals'
+                   'singpvals',
+                   'ppf'
                    ]
 
         df = pd.DataFrame(np.array(data).T, columns=headers)

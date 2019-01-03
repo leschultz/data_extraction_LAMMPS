@@ -1,0 +1,5 @@
+# alpha defines the significance level for p-test in the settling class
+# n0 the threshold for the number of agreements with the null hypothesis
+
+alpha=0.05
+n0=5

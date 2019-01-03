@@ -10,6 +10,7 @@ import os
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-p')
 parser.add_argument('-i')
 parser.add_argument('-o')
 
@@ -94,6 +95,13 @@ def run(param, exportdir):
             value.save_multiple_origins_diffusion(savename)
             value.save_diffusion(savename)
 
+
+if args.p:
+    with open(args.p) as file:
+        for line in file:
+            values = line.strip().split(' ')
+            if values[0] != '#':
+                print(values)
 
 param = start(args.i)
 run(param, args.o)

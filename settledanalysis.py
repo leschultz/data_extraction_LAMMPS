@@ -66,7 +66,7 @@ def run(param, savepath):
 
             points = [hold1, hold1+hold2, hold1+hold2+hold3]
 
-            dataindexes = df['Step'].between(points[1], points[2])
+            dataindexes = df['Step'].between(points[0], points[2])
 
             time = list(df['time'][dataindexes])
             temp = list(df['Temp'][dataindexes])
@@ -76,11 +76,9 @@ def run(param, savepath):
             binnedtime, binnedtemp = setindexes.batch()
 
             setindexes.binslopes()
-
             setindexes.binnedslopetest()
             setindexes.ptests(expectedtemp)
-
-            setindexes.overlappingdistribution()
+            setindexes.normaldistribution()
 
             txtname = (
                        savepath+folder +
