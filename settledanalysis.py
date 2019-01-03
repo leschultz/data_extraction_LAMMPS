@@ -2,14 +2,9 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 
 from matplotlib import colors as mcolors
 from matplotlib import pyplot as pl
-from cycler import cycler
 
-from infoparser import parameters
 from outimport import readdata
 from settleddataclass import settled
-
-import numpy as np
-import os
 
 colors = list(mcolors.BASE_COLORS.keys())
 colors = [i for i in colors if i != 'r']

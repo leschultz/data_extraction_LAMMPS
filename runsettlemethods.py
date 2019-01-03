@@ -2,8 +2,6 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 import argparse
 
 from settledanalysis import run as setmeth
-from stepanalysis import run as stepmeth
-from errormethods import run as errmeth
 
 from infoparser import parameters
 
@@ -27,6 +25,4 @@ runs = parameters(args.i)
 runs.files()
 param = runs.inputinfo()
 
-stepmeth(param, args.o)
-errmeth(args.o)
 setmeth(param, args.o, alpha, n0)
