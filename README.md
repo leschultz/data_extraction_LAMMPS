@@ -108,7 +108,7 @@ pycodestyle script.py
 
 * **Lane Schultz** - *Initial work* - [leschultz](https://github.com/leschultz)
 
-Benjamin Afflerback [bafflerbach](https://github.com/bafflerbach)
+* **Benjamin Afflerback** - *CCT runs* - [bafflerbach](https://github.com/bafflerbach)
 
 ## Acknowledgments
 
