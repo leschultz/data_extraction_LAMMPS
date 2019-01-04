@@ -1,3 +1,7 @@
+'''
+This script creates needed directories to save data and images.
+'''
+
 import os
 
 
@@ -44,6 +48,7 @@ def exportdir(folder):
                    datasettling
                    ]
 
+    # Create directories if they do not exist
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)

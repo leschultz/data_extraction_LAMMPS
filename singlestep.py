@@ -1,3 +1,7 @@
+'''
+Calculate the diffusion and RDF data from a set of data.
+'''
+
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
 from ovito_calc import calc, rdfcalc
@@ -11,6 +15,12 @@ import numpy as np
 def diffusion(time, msd):
     '''
     Calculate the diffusivity from a linear fit of MSD data.
+
+    inputs:
+            time = the time data set
+            msd = the mean squared displacement dataset
+    outputs:
+            diffusion = diffusion by the Einstein relationship
     '''
 
     # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
@@ -27,7 +37,7 @@ def diffusion(time, msd):
 
 
 class analize(object):
-    '''Computation functions are defined here'''
+    '''A class to add freedon on what data is calculated'''
 
     def __init__(
                  self,
@@ -42,7 +52,7 @@ class analize(object):
                  bins=50
                  ):
 
-        '''Load data'''
+        '''Load data and set variables used throughout methods'''
 
         # Create the folder for where data will be saved
         exportdir(savepath)
@@ -191,6 +201,9 @@ class analize(object):
     def save_msd(self, savename):
         '''
         Method for saving MSD data
+
+        inputs:
+                savename = the name of the data file
         '''
 
         df = pd.DataFrame(data=self.data['msd'])
@@ -201,7 +214,10 @@ class analize(object):
 
     def save_multiple_origins_diffusion(self, savename):
         '''
-        Save the diffusion data for multiple origins.
+        Save the diffusion data for multiple origins
+
+        inputs:
+                savename = the name of the data file
         '''
 
         fmt = ''
@@ -224,6 +240,9 @@ class analize(object):
     def save_rdf(self, savename):
         '''
         Method for saving the RDF data
+
+        inputs:
+                savename = the name of the data file
         '''
 
         data = {}
@@ -239,6 +258,9 @@ class analize(object):
     def save_diffusion(self, savename):
         '''
         Method for saving the diffusion data
+
+        inputs:
+                savename = the name of the data file
         '''
 
         df = pd.DataFrame(data=self.data['diffusion'], index=[0])
@@ -253,7 +275,10 @@ class analize(object):
 
     def plot_msd(self, savename):
         '''
-        Plot mean squared displacement.
+        Plot mean squared displacement
+
+        inputs:
+                savename = the name of the image file
         '''
 
         # Control the frequency of errorbars
@@ -281,7 +306,10 @@ class analize(object):
 
     def plot_diffusion(self, savename):
         '''
-        Plot the multiple origins diffusion.
+        Plot the multiple origins diffusion
+
+        inputs:
+                savename = the name of the image file
         '''
 
         for key in self.diffmulti:
@@ -305,7 +333,10 @@ class analize(object):
 
     def plot_rdf(self, savename):
         '''
-        Plot the radial distribution at a point and throughout time.
+        Plot the radial distribution at a point and throughout time
+
+        inputs:
+                savename = the name of the image file
         '''
 
         # Plot the RDF for a specific timestep
