@@ -264,11 +264,10 @@ class settled(object):
         # Choose the first bin where data failed
         if failbins:
             index = min(failbins)
+            index += 1  # Choose the next bin as being settled
 
         else:
             index = 0
-
-        index += 1  # Choose the next bin as being settled
 
         self.binselect['slope confidence interval '+str(1-self.alpha)] = index
         self.ppf = ppf
