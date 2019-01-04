@@ -5,7 +5,36 @@ import pandas as pd
 import numpy as np
 
 
-def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
+def failfrequencycheck(onoff, indexes, n0):
+    '''
+    Checks if the fail freequency of bins is above a threshold.
+
+    input:
+            x = the fail (1) and pass (0) list
+            alpha = the probability criterion
+
+    output:
+            index = the choosen index that passes the test
+    '''
+
+    # If there are no rejections in data
+    if sum(onoff) == 0:
+        index = 0
+
+    else:
+        diff = []
+        index = 0
+        for x, y in zip(indexes, indexes[1:]):
+            operation = y-x  # Find the number of 0's between 1
+            if operation <= n0:
+                index = y
+
+        index += 1  # Skip problematic bin
+
+    return index
+
+
+def ptest(x, nullhyp, a, test, alpha=0.05):
     '''
     Find the p-values for each bin with respect to the last bin.
 
@@ -14,7 +43,6 @@ def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
             nullhyp = null hypothesis
             a = the number of bins
             alpha = the significance level
-            n0 = the threshold for the number of agreements with nullhyp
     outputs:
             pvals = p-values for each bin with respect to the last bin
             index = last bin where the p-values is less than alpha
@@ -44,24 +72,7 @@ def ptest(x, nullhyp, a, test, alpha=0.05, n0=5):
 
         count += 1
 
-    # Count the number of ones within n0 blocks from each other
-    diff = []
-    index = 0
-    for x, y in zip(indexes, indexes[1:]):
-        operation = y-x  # Find the number of 0's between 1
-        if operation <= n0:
-            index = y
-
-    # If the first index returns 0, then check for first instance of fail
-    if (index == 0) & (sum(onoff) > 0):
-        index = np.where(onoff == 1)[0]
-        index = min(index)
-        index += 1
-
-    elif sum(onoff) == 0:
-        index = 0
-    else:
-        index += 1  # Skip problematic bin
+    index = failfrequencycheck(onoff, indexes, int(alpha*100))
 
     return pvals, index
 
@@ -216,7 +227,12 @@ class settled(object):
                                  self.alpha
                                  )
 
-        keydistpvals = r'p-value from distribution ($\alpha$='+str(self.alpha)+')'
+        keydistpvals = (
+                        r'p-value from distribution ($\alpha$=' +
+                        str(self.alpha) +
+                        ')'
+                        )
+
         self.binselect[keydistpvals] = index
 
         singpvals, index = ptest(
@@ -227,7 +243,12 @@ class settled(object):
                                  self.alpha
                                  )
 
-        keysingpvals = r'p-value from single sample ($\alpha$='+str(self.alpha)+')'
+        keysingpvals = (
+                        r'p-value from single sample ($\alpha$=' +
+                        str(self.alpha) +
+                        ')'
+                        )
+
         self.binselect[keysingpvals] = index
 
         self.distpvals = distpvals
@@ -250,6 +271,7 @@ class settled(object):
         failbins = []
         count = 0
         ppf = []
+        onoff = []
         for i in self.blockslopes:
             # The minimum absolute value before going outside 2*sigma
             # The 2*sigma is defined by 1-alpha and can be altered
@@ -258,16 +280,13 @@ class settled(object):
 
             if (0.0 <= -limit) | (0.0 >= limit):
                 failbins.append(count)
+                onoff.append(1)
+            else:
+                onoff.append(0)
 
             count += 1
 
-        # Choose the first bin where data failed
-        if failbins:
-            index = min(failbins)
-            index += 1  # Choose the next bin as being settled
-
-        else:
-            index = 0
+        index = failfrequencycheck(onoff, failbins, int(self.alpha*100))
 
         self.binselect['slope confidence interval '+str(1-self.alpha)] = index
         self.ppf = ppf

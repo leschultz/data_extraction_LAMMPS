@@ -46,7 +46,7 @@ def error(x):
     inputs:
             x = correlated data
     outputs:
-            SEM = standard error in the mean 
+            SEM = standard error in the mean
     '''
 
     n = len(x)  # Length of data
