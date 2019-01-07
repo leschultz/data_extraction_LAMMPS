@@ -66,13 +66,13 @@ def run(param, savepath, alpha, n0):
             time = list(df['time'][dataindexes])
             temp = list(df['Temp'][dataindexes])
 
-            setindexes = settled(time, temp, alpha, n0)
+            setindexes = settled(time, temp, alpha)
             index = setindexes.binsize()
             binnedtime, binnedtemp = setindexes.batch()
 
             setindexes.binslopes()
             setindexes.binnedslopetest()
-            setindexes.ptests(expectedtemp)
+            setindexes.ptest()
             setindexes.normaldistribution()
 
             txtname = (

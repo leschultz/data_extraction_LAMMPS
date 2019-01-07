@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def failfrequencycheck(onoff, indexes, n0):
+def failfrequencycheck(onoff, alpha):
     '''
     Checks if the fail freequency of bins is above a threshold.
 
@@ -17,8 +17,6 @@ def failfrequencycheck(onoff, indexes, n0):
             index = the choosen index that passes the test
     '''
 
-    print(onoff)
-    alpha = 0.05
     n = len(onoff)
     rev = onoff[::-1]  # Reverse list to start from right
 
@@ -77,7 +75,7 @@ def ptest(x, nullhyp, a, alpha=0.05):
 
         count += 1
 
-    index = failfrequencycheck(onoff, indexes, int(alpha*100))
+    index = failfrequencycheck(onoff, alpha)
 
     return pvals, index
 
@@ -88,35 +86,28 @@ class settled(object):
     Data has to be sufficiently long to not breack this code.
     '''
 
-    def __init__(self, x, y, alpha=0.05, n0=5):
+    def __init__(self, x, y, alpha=0.05):
         '''
         Devide data into a number of bins.
 
         inputs:
                 x = x-axis data
                 y = y-axis data
-                n = length of x values
-                a = number of bins
-                b = length of bins (approximate)
-                n = length of x values
+                alpha = the significance level
         '''
 
         self.x = x
         self.y = y
-        self.n = len(x)
+        self.n = len(x)  # Data length
 
         self.alpha = alpha  # Defined under ptest function
-        self.n0 = n0  # Defined under ptest function
-
-        self.binselect = {}  # Store selected bin
-        self.indexes = {}  # Store first index of selected bin
+        self.binselect = {}  # Store selected settled bin bin
+        self.indexes = {}  # Store first index of settled data 
 
     def binsize(self):
         '''
         Use autocorrelation function to find correlation length.
 
-        inputs:
-                self.yblocks = y-axis data
         outputs:
                 b = length of bins (approximate)
 
@@ -137,10 +128,9 @@ class settled(object):
         '''
         Devide data into a number of bins.
 
-        inputs:
-                b = minimum bin length
         outputs:
-                blocks = binned data
+                self.xblocks = binned x-data
+                self.yblocks = binned y-data
         '''
 
         # Estimate the number of bins from block length
@@ -156,12 +146,9 @@ class settled(object):
         Linear regression for each block of data.
         Data blocks must be same for both x and y.
 
-        inputs:
-                self.xblocks = binned x-axis data
-                self.yblocks = binned y-axis data
         outputs:
                 self.slopes = slopes for each bin
-                self.err = error from fitting
+                self.errs = standard error in the slope for each bin
         '''
 
         slopes = []
@@ -180,8 +167,6 @@ class settled(object):
         '''
         Find the index of data where.
 
-        inputs:
-                self.slopes = binned slope data
         outputs:
                 self.blockslopes = the slope for bins
                 i = the first slope value fitting criteria
@@ -212,16 +197,12 @@ class settled(object):
 
         return self.blockslopes, i
 
-    def ptests(self, expected):
+    def ptest(self):
         '''
         Find the p-values for each bin with respect to the last bin.
 
-        inputs:
-                self.yblocks = binned y-axis data
-                alpha = the significance level
         outputs:
-                pvals = p-values for each bin with respect to the last bin
-                index = last bin where the p-values is less than alpha
+                distpvals = p-values for each bin with respect to the last bin
         '''
 
         distpvals, index = ptest(
@@ -247,11 +228,8 @@ class settled(object):
         Check whether a slope observation is outside the confidence interval
         of a normal distribution.
 
-        inputs:
-                alpha = the significance level
-                self.blockslopes = the bins with linear fits
         outputs:
-                failbins = The bins that fail the test
+                ppf = values outside the limit given by the ppf
         '''
 
         failbins = []
@@ -272,7 +250,7 @@ class settled(object):
 
             count += 1
 
-        index = failfrequencycheck(onoff, failbins, int(self.alpha*100))
+        index = failfrequencycheck(onoff, self.alpha)
 
         name = (
                 r'mean slope within ' +
@@ -289,8 +267,6 @@ class settled(object):
         '''
         Find the start of settled data.
 
-        inputs:
-                self.yblocks = binned y-axis data
         outputs:
                 index = the starting index of settled data
         '''
@@ -309,6 +285,13 @@ class settled(object):
         return self.indexes
 
     def returndata(self):
+        '''
+        Export a data frame containing pertinent information.
+
+        outputs:
+                df = data of collected values
+        '''
+
         bins = list(range(0, self.a))
 
         data = [
