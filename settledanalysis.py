@@ -8,7 +8,7 @@ from settleddataclass import settled
 
 colors = list(mcolors.BASE_COLORS.keys())
 colors = [i for i in colors if i != 'r']
-lstyle = [':', '-.', '--', '-']
+lstyle = ['-', '-.', '--', ':']
 
 
 def run(param, savepath, alpha, n0):
@@ -61,7 +61,7 @@ def run(param, savepath, alpha, n0):
 
             points = [hold1, hold1+hold2, hold1+hold2+hold3]
 
-            dataindexes = df['Step'].between(points[0], points[2])
+            dataindexes = df['Step'].between(points[1], points[2])
 
             time = list(df['time'][dataindexes])
             temp = list(df['Temp'][dataindexes])

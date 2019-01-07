@@ -34,7 +34,7 @@ def failfrequencycheck(onoff, indexes, n0):
     return index
 
 
-def ptest(x, nullhyp, a, test, alpha=0.05):
+def ptest(x, nullhyp, a, alpha=0.05):
     '''
     Find the p-values for each bin with respect to the last bin.
 
@@ -50,18 +50,13 @@ def ptest(x, nullhyp, a, test, alpha=0.05):
     '''
 
     # Store the bin where p-value is less than alpha
-    onoff = np.zeros(a, dtype=int)
+    onoff = list(np.zeros(a, dtype=int))
 
     pvals = []
     for i in x:
-        if test == 'distribution':
-
-            pvals.append(
-                         st.ttest_ind(i, nullhyp, equal_var=False)[1]
-                         )
-
-        if test == 'single':
-            pvals.append(st.ttest_1samp(i, nullhyp)[1])
+        pvals.append(
+                     st.ttest_ind(i, nullhyp, equal_var=False)[1]
+                     )
 
     count = 0
     indexes = []
@@ -122,7 +117,7 @@ class settled(object):
         if index <= 2:
             index = 4
         else:
-            index *= 2
+            index += 1
 
         self.b = index
 
@@ -203,7 +198,7 @@ class settled(object):
         except Exception:
             i = 'NA'
 
-        self.binselect['binned slopes'] = i
+        self.binselect['slope change between bins'] = i
 
         return self.blockslopes, i
 
@@ -223,38 +218,19 @@ class settled(object):
                                  self.yblocks,
                                  self.yblocks[-1],
                                  self.a,
-                                 'distribution',
                                  self.alpha
                                  )
 
         keydistpvals = (
-                        r'p-value from distribution ($\alpha$=' +
+                        r'bin distribution comparison to final bin ($\alpha$=' +
                         str(self.alpha) +
                         ')'
                         )
 
         self.binselect[keydistpvals] = index
-
-        singpvals, index = ptest(
-                                 self.yblocks,
-                                 expected,
-                                 self.a,
-                                 'single',
-                                 self.alpha
-                                 )
-
-        keysingpvals = (
-                        r'p-value from single sample ($\alpha$=' +
-                        str(self.alpha) +
-                        ')'
-                        )
-
-        self.binselect[keysingpvals] = index
-
         self.distpvals = distpvals
-        self.singpvals = singpvals
 
-        return distpvals, singpvals
+        return distpvals
 
     def normaldistribution(self):
         '''
@@ -288,7 +264,13 @@ class settled(object):
 
         index = failfrequencycheck(onoff, failbins, int(self.alpha*100))
 
-        self.binselect['slope confidence interval '+str(1-self.alpha)] = index
+        name = (
+                r'mean slope within ' +
+                str(100-100*self.alpha) +
+                ' $\%$'
+                )
+
+        self.binselect[name] = index
         self.ppf = ppf
 
         return ppf
@@ -323,7 +305,6 @@ class settled(object):
                 bins,
                 self.blockslopes,
                 self.distpvals,
-                self.singpvals,
                 self.ppf
                 ]
 
@@ -331,7 +312,6 @@ class settled(object):
                    'bin',
                    'blockslopes',
                    'distpvals',
-                   'singpvals',
                    'ppf'
                    ]
 
