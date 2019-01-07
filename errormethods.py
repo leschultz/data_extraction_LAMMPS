@@ -14,37 +14,63 @@ from dfdiff import diffusionimport
 
 
 def percent(x, y):
-    return [i/j*100.0 for i, j in zip(x, y)]
+    '''
+    Return a percent value.
+
+    inputs:
+            x = uncertainty values
+            y = absolute values
+    output:
+            z = list of percent uncertainties
+    '''
+
+    z = [i/j*100.0 for i, j in zip(x, y)]
+
+    return z
 
 
 def run(datadir):
+    '''
+    Run uncerainty analysis for all runs in a directory.
+    '''
 
+    # Apply for each run in the main directory
     data = diffusionimport(datadir)
     errors = {}
     for folder in data:
 
+        # Run name
         printname = 'Error Analysis on Run: '+datadir+folder
 
+        # Print on screen the run analyzed
         print('-'*len(printname))
         print(printname)
         print('-'*len(printname))
 
+        # Apply uncertainty methods for each step
         errors[folder] = []
         for temp in data[folder]['origins']:
 
-            print('Temperature step: '+str(temp)+' [K]')
+            tempstr = str(math.ceil(temp))  # Step temperature
 
+            print('Temperature step: '+tempstr+' [K]')
+
+            # Diffusion coluns for all and each element
             cols = list(data[folder]['origins'][temp].columns.values)[1:]
             cols = [i for i in cols if 'err' not in i]
 
+            # Single linear regression diffusion
             regulardata = data[folder]['regular'][temp]
+
+            # Multiple origins data for diffusion
             modata = data[folder]['origins'][temp]
 
+            # Apply error methods for all and each element
             errordf = {}
             for col in cols:
-                k, r, index = auto(modata[col])
+                k, r, index = auto(modata[col])  # Autocorrelation function
 
-                approxtemp = str(math.ceil(temp))
+                # Name for autocorrelation plot
                 name = (datadir +
                         '/' +
                         folder +
@@ -52,12 +78,12 @@ def run(datadir):
                         '/errormethods' +
                         '/autocorrelation' +
                         '/autocorrelation_temp_' +
-                        approxtemp +
+                        tempstr +
                         '_' +
                         col
                         )
 
-                pl.plot(k, r, 'b.', label=approxtemp+' [K]')
+                pl.plot(k, r, 'b.', label=tempstr+' [K]')
                 pl.axvline(
                         x=index,
                         linestyle='--',
@@ -72,6 +98,7 @@ def run(datadir):
                 pl.savefig(name)
                 pl.clf()
 
+                # Apply error methods
                 errordf[col+'_diff'] = regulardata[col]
                 errordf[col+'_fiterr'] = regulardata[col+'_err']
                 errordf[col+'_mo_ukui'] = ukui(list(modata[col]))
@@ -87,14 +114,13 @@ def run(datadir):
 
                 corbatch = batch(list(modata[col]), b=k[index])
                 errordf[col+'_mo_batch(a=corbatch)'] = corbatch[0]
-
                 errordf[col+'_mo_scipysem'] = st.sem(list(modata[col]))
-                errordf[col+'_mo_fitavg'] = np.mean(list(modata[col+'_err']))
 
                 errordf['temp'] = temp
                 errordf = pd.DataFrame(errordf, index=[0])
                 errors[folder].append(errordf)
 
+    # Plot data from error methods error methods
     for folder in data:
         errors[folder] = pd.concat(errors[folder])
         exportname = (
@@ -110,6 +136,7 @@ def run(datadir):
                                 index=False
                                 )
 
+    # Plotting style for batch means with 5 bins
     batch5label = lines.Line2D(
                             [],
                             [],
@@ -120,6 +147,7 @@ def run(datadir):
                             label='Batch Means (a=5)'
                             )
 
+    # Plotting style for batch means with 10 bins
     batch10label = lines.Line2D(
                             [],
                             [],
@@ -130,6 +158,7 @@ def run(datadir):
                             label='Batch Means (a=10)'
                             )
 
+    # Plotting style for batch means with bin length of one correlation length
     batchlcorrlabel = lines.Line2D(
                             [],
                             [],
@@ -140,6 +169,7 @@ def run(datadir):
                             label='Batch Means (b=lcorr)'
                             )
 
+    # Plotting style for a method in a paper by Ukoi
     ukuilabel = lines.Line2D(
                             [],
                             [],
@@ -150,6 +180,7 @@ def run(datadir):
                             label='Ukui Estimator'
                             )
 
+    # Plotting style for data treated as independent
     scipylabel = lines.Line2D(
                             [],
                             [],
@@ -160,6 +191,7 @@ def run(datadir):
                             label='Scipy SEM'
                             )
 
+    # List containing each of the plotting styles
     plotlabels = []
     plotlabels.append(batch5label)
     plotlabels.append(batch10label)
@@ -167,31 +199,38 @@ def run(datadir):
     plotlabels.append(ukuilabel)
     plotlabels.append(scipylabel)
 
-    size = (15, 5)
+    size = (15, 5)  # Define figure size
 
+    # Plotting caluclated errors
     for folder in errors:
 
+        # Gather the elements including all
         cols = list(errors[folder].columns.values)
         elements = [i.split('_')[0] for i in cols if len(i.split('_')) > 1]
         elements = list(set(elements))
 
+        # Plot errors for each element including all
         for el in elements:
+
+            # Start plotting diffusions and their fit errors per temperature
+            # From a single linear interpolation
             fig, ax = pl.subplots(1, 2, figsize=size)
 
-            x = errors[folder]['temp']
+            x = errors[folder]['temp']  # Step temperature
 
+            # Plot diffusion for each temperature
             ax[0].plot(x, errors[folder][el+'_diff'], 'b.')
-
             ax[0].set_ylabel('Diffusion [*10^-4 cm^2 s^-1]')
             ax[0].set_xlabel('Temperature [K]')
             ax[0].grid()
 
+            # Plot standard error in the slope from fitting
             ax[1].plot(x, errors[folder][el+'_fiterr'], 'r.')
-
             ax[1].set_ylabel('Diffusion Fit Error [*10^-4 cm^2 s^-1]')
             ax[1].set_xlabel('Temperature [K]')
             ax[1].grid()
 
+            # Save name for diffusion and fit error plots
             name = (datadir +
                     '/' +
                     folder +
@@ -204,8 +243,10 @@ def run(datadir):
             fig.savefig(name)
             pl.close(fig)
 
+            # Start plotting all other error methods
             fig, ax = pl.subplots(1, 2, figsize=size)
 
+            # Absolute uncertainties from multiple origins on diffusion
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=5)'], 'b.')
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=10)'], 'r.')
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=corbatch)'], 'g.')
@@ -248,6 +289,7 @@ def run(datadir):
                                     diff
                                     )
 
+            # Plot percent uncertainties from multiple origins
             ax[1].plot(x, runsbatch5percent, 'b.')
             ax[1].plot(x, runsbatch10percent, 'r.')
             ax[1].plot(x, runsbatchlcorrpercent, 'g.')
@@ -259,6 +301,7 @@ def run(datadir):
             ax[1].legend(handles=plotlabels, loc='upper right')
             ax[1].grid()
 
+            # Save name for multiple origin uncertaintites
             name = (datadir +
                     '/' +
                     folder +

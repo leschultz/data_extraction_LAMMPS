@@ -24,12 +24,9 @@ with open(args.p) as file:
         if 'alpha' in values[0]:
             alpha = float(values[0].split('=')[-1])
 
-        if 'n0' in values[0]:
-            n0 = int(values[0].split('=')[-1])
-
 # Gather ditionary containing all the needed parameters for runs
 runs = parameters(args.i)
 runs.files()
 param = runs.inputinfo()
 
-setmeth(param, args.o, alpha, n0)  # Settling analysis
+setmeth(param, args.o, alpha)  # Settling analysis
