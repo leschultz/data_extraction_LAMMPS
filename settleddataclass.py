@@ -128,10 +128,10 @@ class settled(object):
 
         k, r, index = auto(self.y)
 
-        if index < 10:
-            index = 10
+        if index < 4:
+            index = 4
         else:
-            index += 1
+            index *= 2
 
         self.b = index
 
@@ -268,7 +268,7 @@ class settled(object):
         name = (
                 r'mean slope within ' +
                 str(100-100*self.alpha) +
-                ' $\%$'
+                '$\%$ of zero slope'
                 )
 
         self.binselect[name] = index
