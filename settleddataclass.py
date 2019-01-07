@@ -123,19 +123,19 @@ class settled(object):
 
         outputs:
                 b = length of bins (approximate)
-
         '''
 
         k, r, index = auto(self.y)
 
-        if index < 4:
+        if index < 2:
             index = 4
-        else:
-            index *= 2
 
         self.b = index
 
-        return self.b
+        # Estimate the number of bins from block length
+        self.a = self.n//self.b
+
+        return self.a, self.b
 
     def batch(self):
         '''
@@ -145,9 +145,6 @@ class settled(object):
                 self.xblocks = binned x-data
                 self.yblocks = binned y-data
         '''
-
-        # Estimate the number of bins from block length
-        self.a = self.n//self.b
 
         self.xblocks = np.array_split(self.x, self.a)
         self.yblocks = np.array_split(self.y, self.a)
