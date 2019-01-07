@@ -10,7 +10,7 @@ def failfrequencycheck(onoff, alpha):
     Checks if the fail freequency of bins is above a threshold.
 
     input:
-            x = the fail (1) and pass (0) list
+            onoff = the fail (1) and pass (0) list
             alpha = the probability criterion
 
     output:
@@ -18,26 +18,39 @@ def failfrequencycheck(onoff, alpha):
     '''
 
     n = len(onoff)
-    rev = onoff[::-1]  # Reverse list to start from right
 
-    # Check if p-test fails more than the random amount of alpha*100 percent
-    if alpha < sum(onoff)/n:
-        count = 1
-        for i in rev:
-            if alpha < sum(rev[:count])/n:
-                index = count
+    # Split fail indexes set for analysis
+    if sum(onoff) == 0:
+        index = 0
+
+    else:
+        rev = onoff[::-1]  # Reverse list to start from right
+
+        # Indexes of failure
+        failindexes = [i for i, x in enumerate(onoff) if x]
+
+        # Indexes of failure in reversed list
+        revfailindexes = sorted([n-i-1 for i in failindexes])
+
+        # Gather ranges to evaluate frequency of failure
+        revranges = []
+        for i in revfailindexes:
+            revranges.append(rev[:i])
+
+        revranges.pop(0)  # The first will be empty or all zeros
+        revranges.append(rev)  # Include all in case the last fails
+
+        for i in revranges:
+
+            # Check for first range that fails the frequency check
+            if np.mean(i) > alpha:
+                revindex = [j for j, x in enumerate(i) if x]
+                revindex = max(revindex)
+                index = n-revindex
                 break
 
             else:
-                pass
-
-            count += 1
-
-        index = n-index
-        index += 1  # Skip problematic bin
-
-    else:
-        index = 0
+                index = 0
 
     return index
 
@@ -232,18 +245,18 @@ class settled(object):
                 ppf = values outside the limit given by the ppf
         '''
 
-        failbins = []
+        interval = 1-self.alpha
+
         count = 0
         ppf = []
         onoff = []
         for i in self.blockslopes:
             # The minimum absolute value before going outside 2*sigma
             # The 2*sigma is defined by 1-alpha and can be altered
-            limit = st.norm.ppf(1-self.alpha, i, self.errs[count])
+            limit = st.norm.ppf(interval, i, self.errs[count])
             ppf.append(limit)
 
             if (0.0 <= -limit) | (0.0 >= limit):
-                failbins.append(count)
                 onoff.append(1)
             else:
                 onoff.append(0)
