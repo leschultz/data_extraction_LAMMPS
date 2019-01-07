@@ -8,7 +8,7 @@ from settleddataclass import settled
 
 colors = list(mcolors.BASE_COLORS.keys())
 colors = [i for i in colors if i != 'r']
-lstyle = ['-', '-.', '--', ':']
+lstyle = ['-.', '--', ':']
 
 
 def run(param, savepath, alpha, n0):

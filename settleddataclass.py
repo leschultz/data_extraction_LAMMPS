@@ -17,19 +17,29 @@ def failfrequencycheck(onoff, indexes, n0):
             index = the choosen index that passes the test
     '''
 
-    # If there are no rejections in data
-    if sum(onoff) == 0:
-        index = 0
+    print(onoff)
+    alpha = 0.05
+    n = len(onoff)
+    rev = onoff[::-1]  # Reverse list to start from right
+
+    # Check if p-test fails more than the random amount of alpha*100 percent
+    if alpha < sum(onoff)/n:
+        count = 1
+        for i in rev:
+            if alpha < sum(rev[:count])/n:
+                index = count
+                break
+
+            else:
+                pass
+
+            count += 1
+
+        index = n-index
+        index += 1  # Skip problematic bin
 
     else:
-        diff = []
         index = 0
-        for x, y in zip(indexes, indexes[1:]):
-            operation = y-x  # Find the number of 0's between 1
-            if operation <= n0:
-                index = y
-
-        index += 1  # Skip problematic bin
 
     return index
 
@@ -114,8 +124,8 @@ class settled(object):
 
         k, r, index = auto(self.y)
 
-        if index <= 2:
-            index = 4
+        if index < 10:
+            index = 10
         else:
             index += 1
 
