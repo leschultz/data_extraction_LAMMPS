@@ -5,7 +5,7 @@ This scripts computes the autocorrelation function for different k-lags.
 import numpy as np
 
 
-def autocovariance(x, n, k, mean):
+def autocovariance(x, n, k, mean, bias=0.0):
     '''
     Compute the autocovariance of a set.
 
@@ -14,6 +14,7 @@ def autocovariance(x, n, k, mean):
             n = the size of data
             k = the k-lag between values
             mean = the mean of the x-data
+            bias = adjust the bias calculation
 
     outputs:
             autocov = the autocovariance at a k-lag
@@ -23,6 +24,6 @@ def autocovariance(x, n, k, mean):
     for i in np.arange(0, n-k):
         autocov += (x[i+k]-mean)*(x[i]-mean)
 
-    autocov *= (1/(n-1))  # Need two values or more for this to work
+    autocov /= n-bias
 
     return autocov

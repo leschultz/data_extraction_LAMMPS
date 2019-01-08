@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import math
 
-from uncertainty.ukuiestimator import error as ukui
+from uncertainty.estimator import error as okui
 from uncertainty.batchmeans import error as batch
 
 from uncertainty.autocorrelation import autocorrelation
@@ -103,7 +103,7 @@ def run(datadir):
                 # Apply error methods
                 errordf[col+'_diff'] = regulardata[col]
                 errordf[col+'_fiterr'] = regulardata[col+'_err']
-                errordf[col+'_mo_ukui'] = ukui(list(modata[col]))
+                errordf[col+'_mo_okui'] = okui(list(modata[col]))
                 errordf[col+'_mo_batch(a=5)'] = batch(
                                                       list(modata[col]),
                                                       a=5
@@ -172,7 +172,7 @@ def run(datadir):
                             )
 
     # Plotting style for a method in a paper by Ukoi
-    ukuilabel = lines.Line2D(
+    okuilabel = lines.Line2D(
                             [],
                             [],
                             color='y',
@@ -198,7 +198,7 @@ def run(datadir):
     plotlabels.append(batch5label)
     plotlabels.append(batch10label)
     plotlabels.append(batchlcorrlabel)
-    plotlabels.append(ukuilabel)
+    plotlabels.append(okuilabel)
     plotlabels.append(scipylabel)
 
     size = (15, 5)  # Define figure size
@@ -252,7 +252,7 @@ def run(datadir):
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=5)'], 'b.')
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=10)'], 'r.')
             ax[0].plot(x, errors[folder][el+'_mo_batch(a=corbatch)'], 'g.')
-            ax[0].plot(x, errors[folder][el+'_mo_ukui'], 'y+')
+            ax[0].plot(x, errors[folder][el+'_mo_okui'], 'y+')
             ax[0].plot(x, errors[folder][el+'_mo_scipysem'], 'kx')
 
             ax[0].set_ylabel('Diffusion MO Error [*10^-4 cm^2 s^-1]')
@@ -281,8 +281,8 @@ def run(datadir):
                                             diff
                                             )
 
-            runsukuipercent = percent(
-                                    errors[folder][el+'_mo_ukui'],
+            runsokuipercent = percent(
+                                    errors[folder][el+'_mo_okui'],
                                     diff
                                     )
 
@@ -295,7 +295,7 @@ def run(datadir):
             ax[1].plot(x, runsbatch5percent, 'b.')
             ax[1].plot(x, runsbatch10percent, 'r.')
             ax[1].plot(x, runsbatchlcorrpercent, 'g.')
-            ax[1].plot(x, runsukuipercent, 'y+')
+            ax[1].plot(x, runsokuipercent, 'y+')
             ax[1].plot(x, runsscipypercent, 'kx')
 
             ax[1].set_ylabel('Diffusion MO Percent Error')

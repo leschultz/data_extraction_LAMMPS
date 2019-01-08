@@ -29,7 +29,7 @@ def error(x, a=None, b=None):
     if b is None:
         b = n//a  # Division that removes remainder
 
-    blocks = np.array_split(x, a)  # Divide dat into blocks
+    blocks = np.array_split(x, a)  # Divide data into blocks
 
     averages = [np.mean(i) for i in blocks]  # Mean for each block
 
