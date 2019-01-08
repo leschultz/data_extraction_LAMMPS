@@ -61,7 +61,7 @@ There are three main scripts for this tool that can be run independelty or toget
 This script has to be run for any of the other scripts to work. The following line can be used to gather self diffusion and RDF data from Ovito:
 
 ```
-python3 -m runsteps -i ./testdata -o ./testexport
+python3 -m runtypes.runsteps -i ./testdata -o ./testexport
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported.
@@ -71,7 +71,7 @@ The option -i points to the folder where data was collected from LAMMPS. Option 
 The following line can be used to gather uncertainties:
 
 ```
-python3 -m runerrormethods -o ./testexport
+python3 -m runtypes.runerrormethods -o ./testexport
 ```
 
 Option -o points to the folder where data is to be exported.
@@ -81,7 +81,7 @@ Option -o points to the folder where data is to be exported.
 The following line can be used to analyze how data settles:
 
 ```
-python3 -m runsettlemethods -i ./testdata -o ./testexport -p ./templateinputfile.txt
+python3 -m runtypes.runsettlemethods -i ./testdata -o ./testexport -p ./templateinputfile.txt
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.
@@ -91,7 +91,7 @@ The option -i points to the folder where data was collected from LAMMPS. Option 
 The following line can be used to analyze how data settles:
 
 ```
-python3 -m runall -i ./testdata -o ./testexport -p ./templateinputfile.txt
+python3 -m runtypes.runall -i ./testdata -o ./testexport -p ./templateinputfile.txt
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.

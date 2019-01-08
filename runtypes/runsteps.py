@@ -3,11 +3,11 @@ This script caluclates diffusion and RDF using Ovito.
 '''
 
 from PyQt5 import QtGui  # Added to be able to import ovito
-from infoparser import parameters
+from importers.infoparser import parameters
 import argparse
 import os
 
-from stepanalysis import run as stepmeth
+from physical.stepanalysis import run as stepmeth
 
 # Command line arguments
 parser = argparse.ArgumentParser()

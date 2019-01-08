@@ -4,9 +4,9 @@ Calculate the diffusion and RDF data from a set of data.
 
 from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
-from ovito_calc import calc, rdfcalc
+from physical.ovito_calc import calc, rdfcalc
 from scipy.stats import linregress
-from setup import exportdir
+from setup.setup import exportdir
 
 import pandas as pd
 import numpy as np

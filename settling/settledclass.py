@@ -1,5 +1,5 @@
 from scipy import stats as st
-from autocovariance import auto
+from uncertainty.autocovariance import auto
 
 import pandas as pd
 import numpy as np

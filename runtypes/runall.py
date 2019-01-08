@@ -5,11 +5,11 @@ This script runs all the possible analysis tools developed
 from PyQt5 import QtGui  # Added to be able to import ovito
 import argparse
 
-from settledanalysis import run as setmeth
-from stepanalysis import run as stepmeth
-from errormethods import run as errmeth
+from settling.settledanalysis import run as setmeth
+from uncertainty.errormethods import run as errmeth
+from physical.stepanalysis import run as stepmeth
 
-from infoparser import parameters
+from importers.infoparser import parameters
 
 # Command line arguments
 parser = argparse.ArgumentParser()

@@ -6,11 +6,11 @@ import pandas as pd
 import numpy as np
 import math
 
-from ukuiestimator import error as ukui
-from batchmeans import error as batch
+from uncertainty.ukuiestimator import error as ukui
+from uncertainty.batchmeans import error as batch
 
-from autocovariance import auto
-from dfdiff import diffusionimport
+from uncertainty.autocovariance import auto
+from importers.dfdiff import diffusionimport
 
 
 def percent(x, y):

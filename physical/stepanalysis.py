@@ -3,7 +3,7 @@ Apply the diffusion and RDF analysis for all steps in a run.
 '''
 
 from PyQt5 import QtGui  # Added to be able to import ovito
-from singlestep import analize
+from physical.singlestep import analize
 
 
 def run(param, exportdir):

@@ -6,9 +6,9 @@ runsteps.py.
 from PyQt5 import QtGui  # Added to be able to import ovito
 import argparse
 
-from errormethods import run as errmeth
+from uncertainty.errormethods import run as errmeth
 
-from infoparser import parameters
+from importers.infoparser import parameters
 
 # Command line arguments
 parser = argparse.ArgumentParser()

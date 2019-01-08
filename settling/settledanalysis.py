@@ -3,8 +3,8 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import colors as mcolors
 from matplotlib import pyplot as pl
 
-from outimport import readdata
-from settleddataclass import settled
+from settling.settledclass import settled
+from importers.outimport import readdata
 
 # Add colors and line stiles for three methods
 colors = list(mcolors.BASE_COLORS.keys())

@@ -6,9 +6,9 @@ This requires runsteps data exported.
 from PyQt5 import QtGui  # Added to be able to import ovito
 import argparse
 
-from settledanalysis import run as setmeth
+from settling.settledanalysis import run as setmeth
 
-from infoparser import parameters
+from importers.infoparser import parameters
 
 # Command line arguments
 parser = argparse.ArgumentParser()
