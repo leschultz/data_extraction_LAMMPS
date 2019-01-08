@@ -1,26 +1,56 @@
-def rho(x, mean, n, k):
-    numerator = 0.0
-    for i in range(0, n-k):
-        numerator += (x[i]-mean)*(x[i+k]-mean)
+'''
+This scripts computes the autocorrelation function for different k-lags.
+'''
 
-    denominator = 0.0
-    for i in range(0, n):
-        denominator += (x[i]-mean)**2.0
+import numpy as np
 
-    normcor = numerator/denominator
 
-    return normcor
+def autocovariance(x, n, k, mean):
+    '''
+    Compute the autocovariance of a set.
+
+    inputs:
+            x = the list of data
+            n = the size of data
+            k = the k-lag between values
+            mean = the mean of the x-data
+
+    outputs:
+            autocov = the autocovariance at a k-lag
+    '''
+
+    autocov = 0.0
+    for i in np.arange(0, n-k):
+        autocov += (x[i+k]-mean)*(x[i]-mean)
+
+    autocov *= (1/(n-1))  # Need two values or more for this to work
+
+    return autocov
 
 
 def auto(x):
+    '''
+    Compute the autocorrelation for all possible k-lags.
+
+    inputs:
+            x = the data
+    outputs:
+            k = the distance between x indexes (k-lag)
+            r = the autocorrelation at a k-lag
+            last = the last index before r becomes zero or negative
+    '''
+
     n = len(x)
-    mean = sum(x)/n
+    mean = np.mean(x)
+
+    denominator = autocovariance(x, n, 0, mean)
 
     k = []
     r = []
-    for i in range(0, n):
+    numerator = []
+    for i in np.arange(0, n+1):
         k.append(i)
-        r.append(rho(x, mean, n, i))
+        r.append(autocovariance(x, n, i, mean)/denominator)
 
     count = 0
     for i in r:

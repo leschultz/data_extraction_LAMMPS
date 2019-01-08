@@ -56,9 +56,6 @@ def error(x):
 
     gammaj = 0.0  # Variable for sum of k-lag autocovariances
     for j in range(1, n-1):
-        # Break off higher covariances
-        if j >= n**0.5:
-            break
         gammaj += (n-j)/n*autocovariance(x, j, n, mean)
 
     gammaj *= 2.0
