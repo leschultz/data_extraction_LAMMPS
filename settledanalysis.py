@@ -45,7 +45,6 @@ def methodplotter(time, ax, indexes):
         count += 1
 
 
-
 def run(param, savepath, alpha):
     '''
     Run settling methods for all runs in a directory.

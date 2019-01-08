@@ -1,3 +1,7 @@
+'''
+Find pertinent information in LAMMPS input files.
+'''
+
 import os
 
 
@@ -17,8 +21,9 @@ class parameters(object):
         Grab the trajectory and input file names with the path.
         '''
 
-        folders = os.listdir(self.path)
+        folders = os.listdir(self.path)  # List all runs
 
+        # Find input and trajectory files
         inputs = []
         trajectories = []
         for folder in folders:
@@ -27,6 +32,7 @@ class parameters(object):
             inputs.append(directory+'dep.in')
             trajectories.append(directory+'uwtraj.lammpstrj')
 
+        # Store file paths in self variable
         self.input_files = inputs
         self.trajectory_files = trajectories
 
@@ -35,14 +41,17 @@ class parameters(object):
         Parse the input file to grab run information.
         '''
 
+        # Grap run infor from inputs files
         count = 0
         for item in self.input_files:
 
+            # Open file and iterate per line
             runsteps = []
             with open(item) as file:
                 for line in file:
                     value = line.strip().split(' ')
 
+                    # Find timestep if word in line
                     if 'timestep' in value[0]:
                         for i in value:
                             try:
@@ -50,6 +59,7 @@ class parameters(object):
                             except Exception:
                                 pass
 
+                    # Find the dump rate if word in line
                     if 'dump' in value:
                         for i in value:
                             try:
@@ -57,6 +67,7 @@ class parameters(object):
                             except Exception:
                                 pass
 
+                    # Find all defined run steps and save under runsteps
                     if 'run' in value:
                         for i in value:
                             try:
@@ -64,6 +75,7 @@ class parameters(object):
                             except Exception:
                                 pass
 
+                    # The number of steps for contant temperatures
                     if 'imax' in value:
                         for i in value:
                             try:
@@ -71,6 +83,7 @@ class parameters(object):
                             except Exception:
                                 pass
 
+                    # Determine the drop in temperature between steps
                     if 'tfi' in value:
                         tfi = value[-1]
                         tfi = tfi.split('-${i}*')
@@ -78,15 +91,14 @@ class parameters(object):
                         deltatemp = float(tfi[1])
                         tempstart -= deltatemp
 
-            increment = sum(runsteps[-2:])
+            increment = sum(runsteps[-2:])  # The steps to the start of hold
 
-            hold1 = sum(runsteps[:-2])
-            hold2 = runsteps[-2]
-            hold3 = runsteps[-1]
+            hold1 = sum(runsteps[:-2])  # The steps until temperature steps
+            hold2 = runsteps[-2]  # The start of hold
+            hold3 = runsteps[-1]  # The end of hold
 
+            # Save paramters for each trajectory file
             traj = self.trajectory_files[count]
-            count += 1
-
             self.parameters[traj] = {
                                      'timestep': timestep,
                                      'dumprate': dumprate,
@@ -98,5 +110,7 @@ class parameters(object):
                                      'deltatemp': deltatemp,
                                      'increment': increment
                                      }
+
+            count += 1
 
         return self.parameters

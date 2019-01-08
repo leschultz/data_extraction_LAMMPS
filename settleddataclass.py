@@ -115,7 +115,7 @@ class settled(object):
 
         self.alpha = alpha  # Defined under ptest function
         self.binselect = {}  # Store selected settled bin bin
-        self.indexes = {}  # Store first index of settled data 
+        self.indexes = {}  # Store first index of settled data
 
     def binsize(self):
         '''
@@ -223,7 +223,8 @@ class settled(object):
                                  )
 
         keydistpvals = (
-                        r'bin distribution comparison to final bin ($\alpha$=' +
+                        'bin distribution comparison to final bin ' +
+                        r'($\alpha$=' +
                         str(self.alpha) +
                         ')'
                         )
@@ -265,7 +266,7 @@ class settled(object):
         name = (
                 r'mean slope within ' +
                 str(100-100*self.alpha) +
-                '$\%$ of zero slope'
+                '% of zero slope'
                 )
 
         self.binselect[name] = index
