@@ -15,28 +15,7 @@ Error estimates on averages of correlated data
 This script is NOT to be trusted for actuall error
 '''
 
-
-def autocovariance(x, k, n, mean):
-    '''
-    Find the autocovaraince between values k-lag appart.
-
-    inputs:
-            x = the set of data
-            k = the lag between values
-            n = the length of x data
-            mean = the mean of x values
-    outputs:
-            gamma = the kth order autocovariance
-    '''
-
-    gamma = 0.0
-    for i in range(0, n):
-        for t in range(k, n):
-            gamma += (x[t]-mean)*(x[t-k]-mean)
-
-    gamma /= n*(n-k)
-
-    return gamma
+from uncertainty.autocovariance import autocovariance
 
 
 def error(x):
@@ -56,7 +35,7 @@ def error(x):
 
     gammaj = 0.0  # Variable for sum of k-lag autocovariances
     for j in range(1, n-1):
-        gammaj += (n-j)/n*autocovariance(x, j, n, mean)
+        gammaj += (n-j)/n*autocovariance(x, n, j, mean)
 
     gammaj *= 2.0
 

@@ -1,5 +1,5 @@
-__all__  = [
-            'dfdiff',
-            'infoparser',
-            'outimport'
-            ]
+__all__ = [
+           'dfdiff',
+           'infoparser',
+           'outimport'
+           ]

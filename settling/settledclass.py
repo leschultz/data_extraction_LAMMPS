@@ -1,5 +1,5 @@
 from scipy import stats as st
-from uncertainty.autocovariance import auto
+from uncertainty.autocorrelation import autocorrelation
 
 import pandas as pd
 import numpy as np
@@ -125,7 +125,7 @@ class settled(object):
                 b = length of bins (approximate)
         '''
 
-        k, r, index = auto(self.y)
+        k, r, index = autocorrelation(self.y)
 
         if index < 2:
             index = 4

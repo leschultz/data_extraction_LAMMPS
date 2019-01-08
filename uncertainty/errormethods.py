@@ -9,7 +9,7 @@ import math
 from uncertainty.ukuiestimator import error as ukui
 from uncertainty.batchmeans import error as batch
 
-from uncertainty.autocovariance import auto
+from uncertainty.autocorrelation import autocorrelation
 from importers.dfdiff import diffusionimport
 
 
@@ -68,7 +68,9 @@ def run(datadir):
             # Apply error methods for all and each element
             errordf = {}
             for col in cols:
-                k, r, index = auto(modata[col])  # Autocorrelation function
+
+                # Autocorrelation function
+                k, r, index = autocorrelation(modata[col])
 
                 # Name for autocorrelation plot
                 name = (datadir +
