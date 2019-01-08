@@ -54,14 +54,14 @@ export PYTHONPATH=/home/myname/tools/data_extraction_LAMMPS:$PYTHONPATH
 
 ## Running
 
-There are three main scripts for this tool that can be run independelty or together.
+There are three main scripts for this tool that can be run independelty or together. Within the tool, there is a samplefile directory that containts a sample run. The commands in the following sections should work to create a sample export if they are run in the tool directory.
 
 ### Ovito Data Collection
 
 This script has to be run for any of the other scripts to work. The following line can be used to gather self diffusion and RDF data from Ovito:
 
 ```
-python3 -m runtypes.runsteps -i ./testdata -o ./testexport
+python3 -m runtypes.runsteps -i ./samplefiles/sampledata -o ./samplefiles/sampleexport
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported.
@@ -71,7 +71,7 @@ The option -i points to the folder where data was collected from LAMMPS. Option 
 The following line can be used to gather uncertainties:
 
 ```
-python3 -m runtypes.runerrormethods -o ./testexport
+python3 -m runtypes.runerrormethods -o ./samplefiles/sampleexport
 ```
 
 Option -o points to the folder where data is to be exported.
@@ -81,7 +81,7 @@ Option -o points to the folder where data is to be exported.
 The following line can be used to analyze how data settles:
 
 ```
-python3 -m runtypes.runsettlemethods -i ./testdata -o ./testexport -p ./templateinputfile.txt
+python3 -m runtypes.runsettlemethods -i ./samplefiles/sampledata -o ./samplefiles/sampleexport -p ./samplefiles/templateinputfile.txt
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.
@@ -91,7 +91,7 @@ The option -i points to the folder where data was collected from LAMMPS. Option 
 The following line can be used to analyze how data settles:
 
 ```
-python3 -m runtypes.runall -i ./testdata -o ./testexport -p ./templateinputfile.txt
+python3 -m runtypes.runall -i ./samplefiles/sampledata -o ./samplefiles/sampleexport -p ./samplefiles/templateinputfile.txt
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.
