@@ -221,7 +221,7 @@ class analize(object):
                   self.savepath +
                   '/datacalculated/diffusion/' +
                   savename +
-                  '_origins'
+                  '_MO'
                   )
 
         df = self.diffmulti.copy()
@@ -323,7 +323,7 @@ class analize(object):
         pl.grid(b=True, which='both')
         pl.tight_layout()
         pl.legend(loc='best')
-        pl.savefig(self.savepath+'/images/diffusion/'+savename)
+        pl.savefig(self.savepath+'/images/diffusion/'+savename+'_MO')
         pl.clf()
 
     def plot_rdf(self, savename):
