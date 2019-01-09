@@ -152,16 +152,23 @@ def run(param, exportdir, alpha):
             setindexes.binslopes()
             setindexes.binnedslopetest()
             setindexes.ptest()
-            setindexes.normaldistribution()
 
             # The indexes of data from settling methods
             indexes = setindexes.finddatastart()
+
+            # Get the maximum cut
+            cuts = []
+            for key in indexes:
+                cuts.append(indexes[key])
+
+            cut = max(cuts)  # The cut index
+            cut *= dumprate  # Convert to MD steps
 
             # Start the method for data analysis for the step
             value = analize(
                             item,
                             savepath,
-                            points[1],
+                            points[1]+cut,
                             points[2],
                             timestep,
                             dumprate,
@@ -269,10 +276,6 @@ def run(param, exportdir, alpha):
             value.save_rdf(savename)
             value.save_multiple_origins_diffusion(savename)
             value.save_diffusion(savename)
-
-            # Export a text file for settling analysis data
-            dfout = setindexes.returndata()
-            dfout.to_csv(settlingtxt, sep=' ', index=False)
 
             # Plot relevant plots
             value.plot_msd(savename)

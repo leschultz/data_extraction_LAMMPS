@@ -294,32 +294,3 @@ class settled(object):
                 self.indexes[key] = 'NA'
 
         return self.indexes
-
-    def returndata(self):
-        '''
-        Export a data frame containing pertinent information.
-
-        outputs:
-                df = data of collected values
-        '''
-
-        bins = list(range(0, self.a))
-
-        data = [
-                bins,
-                self.blockslopes,
-                self.distpvals,
-                self.ppf
-                ]
-
-        headers = [
-                   'bin',
-                   'blockslopes',
-                   'distpvals',
-                   'ppf'
-                   ]
-
-        df = pd.DataFrame(np.array(data).T, columns=headers)
-        df['bin'] = df['bin'].astype(int)
-
-        return df

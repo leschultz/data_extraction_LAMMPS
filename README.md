@@ -36,7 +36,7 @@ Any data analysed must have the following format (note that trajectories are unw
 └── runnamefolder
     ├── dep.in
     ├── test.out
-    └── unwrappedcoordinatestraj.lammpstrj
+    └── untraj.lammpstrj
 ```
 
 ### Installing

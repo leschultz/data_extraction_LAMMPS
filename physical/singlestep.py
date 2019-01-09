@@ -315,7 +315,6 @@ class analize(object):
                             self.diffmulti[key],
                             self.diffmulti[key+'_err'],
                             label='element Type: %s' % key,
-                            ecolor='r',
                             marker='.'
                             )
 
