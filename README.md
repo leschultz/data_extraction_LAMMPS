@@ -58,40 +58,13 @@ There are three main scripts for this tool that can be run independelty or toget
 
 ### Ovito Data Collection
 
-This script has to be run for any of the other scripts to work. The following line can be used to gather self diffusion and RDF data from Ovito:
+This tool calculates the mean squared displacement (MSD), diffusion, and radial distribution function (RDF), for a trajectory file exported by LAMMPS. Additionally, error propagation of data is done using various methods on multiple origins data on diffusion from MSD. Methods to determine when data is settled for analysis is also implemented.
+The following line can be used to gather self diffusion and RDF data from Ovito:
+
+The following line can be used to run the tool:
 
 ```
-python3 -m runtypes.runsteps -i ./samplefiles/sampledata -o ./samplefiles/sampleexport
-```
-
-The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported.
-
-### Uncertainty Methods
-
-The following line can be used to gather uncertainties:
-
-```
-python3 -m runtypes.runerrormethods -o ./samplefiles/sampleexport
-```
-
-Option -o points to the folder where data is to be exported.
-
-### Settling Methods
-
-The following line can be used to analyze how data settles:
-
-```
-python3 -m runtypes.runsettlemethods -i ./samplefiles/sampledata -o ./samplefiles/sampleexport -p ./samplefiles/templateinputfile.txt
-```
-
-The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.
-
-### All Methods
-
-The following line can be used to analyze how data settles:
-
-```
-python3 -m runtypes.runall -i ./samplefiles/sampledata -o ./samplefiles/sampleexport -p ./samplefiles/templateinputfile.txt
+python3 -m runtypes.runsteps -i ./samplefiles/sampledata -o ./samplefiles/sampleexport -p ./samplefiles/templateinputfile.txt
 ```
 
 The option -i points to the folder where data was collected from LAMMPS. Option -o points to the folder where data is to be exported. Option -p points to a file that has certain parameters for analysis. A template is provided under samplefiles.

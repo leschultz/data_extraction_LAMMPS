@@ -1,6 +1,6 @@
 __all__ = [
            'autocovariance',
+           'autocorrelation',
            'batchmeans',
-           'errormethods',
            'estimator'
            ]

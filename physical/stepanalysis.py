@@ -125,7 +125,7 @@ def run(param, exportdir, alpha):
 
             # Naming convention for temperature settling image
             settlingimg = (
-                           savepath + 
+                           savepath +
                            '/images/settling/temperature_' +
                            savename
                            )
@@ -176,9 +176,6 @@ def run(param, exportdir, alpha):
             value.calculate_diffusion()  # Diffusion from linear fit
             value.multiple_origins_diffusion()  # Diffusion Multiple Origins
             data = value.calculation_export()  # Grab data calculated
-
-            print(data.__dict__.keys())
-            print(savename)
 
             elements = list(data.diffmulti.keys())
             elements = [i for i in elements if '_' not in i]
@@ -236,20 +233,27 @@ def run(param, exportdir, alpha):
                 perbatchcorl = batchcorl*conversion
                 perscipyerr = scipyerr*conversion
 
+                methods = [
+                           'Natural Estimator',
+                           'Batch Means 5 Blocks',
+                           'Batch Means 10 Blocks',
+                           'Batch Means Correlation Length Blocks',
+                           'Standard Error in the Mean'
+                           ]
+
                 # Save to dictionary that will be use in a data frame
-                errdf['Natural Estimator'] = okuierr
-                errdf['Batch Means 5 Blocks'] = batch5
-                errdf['Batch Means 10 Blocks'] = batch10
-                errdf['Batch Means Correlation Length Blocks'] = batchcorl
-                errdf['Standard Error in the Mean'] = scipyerr
+                errdf[methods[0]] = okuierr
+                errdf[methods[1]] = batch5
+                errdf[methods[2]] = batch10
+                errdf[methods[3]] = batchcorl
+                errdf[methods[4]] = scipyerr
 
                 # Percent Errors
-                errdfpercent['Natural Estimator'] = perokuierr
-                errdfpercent['Batch Means 5 Blocks'] = perbatch5
-                errdfpercent['Batch Means 10 Blocks'] = perbatch10
-                errdfpercent['Batch Means Correlation Length Blocks'] = perbatchcorl
-                errdfpercent['Standard Error in the Mean'] = perscipyerr
-
+                errdfpercent[methods[0]] = perokuierr
+                errdfpercent[methods[1]] = perbatch5
+                errdfpercent[methods[2]] = perbatch10
+                errdfpercent[methods[3]] = perbatchcorl
+                errdfpercent[methods[4]] = perscipyerr
 
                 errdf['holdtemp'] = holdtemp  # Hold temperature
                 errdf['element'] = key  # Element
@@ -320,7 +324,6 @@ def run(param, exportdir, alpha):
 
         dferrspercent.to_csv(errtxtpercent, sep=' ', index=False)
 
-
         elements = set(list(dferrs.element))
 
         # Save name for multiple origin uncertaintites
@@ -330,7 +333,6 @@ def run(param, exportdir, alpha):
                    'mo_' +
                    '_element_'
                    )
-
 
         # Start the error plots
         for key in elements:
