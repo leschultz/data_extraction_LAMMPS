@@ -192,6 +192,10 @@ def run(param, exportdir, alpha):
                 # Autocorrelation function
                 k, r, corl = autocorrelation(data.diffmulti[key])
 
+                # If the correlation length is zero, give at least some data
+                if corl < 4:
+                    corl = 4
+
                 # Name for autocorrelation plot
                 acorname = (
                             savepath +
