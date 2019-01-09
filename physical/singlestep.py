@@ -45,7 +45,7 @@ class analize(object):
                  savepath,
                  start,
                  stop,
-                 stepsize,
+                 timestep,
                  dumprate,
                  step=None,
                  cut=10,
@@ -65,7 +65,7 @@ class analize(object):
         # Relevant file (trajectories)
         self.trjfile = run
 
-        self.stepsize = stepsize  # The step size used in LAMMPS
+        self.timestep = timestep  # The step size used in LAMMPS
 
         # The rate of data acquisition and number of atoms
         self.frq = dumprate
@@ -91,9 +91,8 @@ class analize(object):
         '''
 
         self.steps = list(range(0, self.stop-self.start+1, self.frq))
-        time = [i*self.stepsize for i in self.steps]  # Time from steps
+        time = [i*self.timestep for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
-        self.data['time'] = self.time
 
     def calculate_msd(self):
         '''
@@ -107,12 +106,14 @@ class analize(object):
                         self.stopframe
                         )
 
-        self.data['msd'] = self.msd
+        self.msd = pd.DataFrame(self.msd)
 
     def calculate_rdf(self):
         '''
         Gather the RDF dat from Ovito.
         '''
+
+        headers = ['r', 'gr']
 
         # Gather the RDF for steps defined
         if self.step is not None:
@@ -121,15 +122,14 @@ class analize(object):
                 if self.rdf.get(item) is None:
                     self.rdf[item] = []
 
-                self.rdf[item] = (rdfcalc(
-                                          self.trjfile,
-                                          int(item/self.frq),
-                                          self.cut,
-                                          self.bins
-                                          ))
+                self.rdf[item] = rdfcalc(
+                                         self.trjfile,
+                                         int(item/self.frq),
+                                         self.cut,
+                                         self.bins
+                                         )
 
-            # The RDF data if the acquisition steps are defined
-            self.data['rdf'] = self.rdf
+                self.rdf[item] = pd.DataFrame(self.rdf[item], columns=headers)
 
     def calculate_diffusion(self):
         '''
@@ -138,7 +138,6 @@ class analize(object):
 
         # Calculate the self diffusion coefficient [*10^-4 cm^2 s^-1]
         self.diffusion = diffusion(self.time, self.msd)
-        self.data['diffusion'] = self.diffusion
 
     def multiple_origins_diffusion(self):
         '''
@@ -156,10 +155,11 @@ class analize(object):
         time = self.time[0:halflength+1]
 
         diffmulti = {}
-        startpoints = []
         for key in self.diffusion:
             diffmulti[key] = []
 
+        self.mostart = []
+        self.mostop = []
         count = 0
         while count <= halflength:
 
@@ -176,8 +176,9 @@ class analize(object):
             # Calculate the diffusion from each line of MSD
             diff = diffusion(time, msd)
 
-            # Save the begginging time for each line of best fit
-            startpoints.append(count*self.frq*self.stepsize)
+            # Save the time range for each line of best fit
+            self.mostart.append(count*self.frq*self.timestep)
+            self.mostop.append((halflength+count)*self.frq*self.timestep)
 
             # Save the diffusion for each line of bet fit
             for key in diff:
@@ -185,18 +186,14 @@ class analize(object):
 
             count += 1
 
-        self.diffmulti = diffmulti
-        self.startpoints = startpoints
-
-        self.data['diffusion_multiple_origins'] = self.diffmulti
-        self.data['startpoints'] = self.startpoints
+        self.diffmulti = pd.DataFrame(diffmulti)
 
     def calculation_export(self):
         '''
         Return the data for calculated properties.
         '''
 
-        return self.data
+        return self
 
     def save_msd(self, savename):
         '''
@@ -206,10 +203,10 @@ class analize(object):
                 savename = the name of the data file
         '''
 
-        df = pd.DataFrame(data=self.data['msd'])
-        df.insert(loc=0, value=self.data['time'], column='time')
-
         export = self.savepath+'/datacalculated/msd/'+savename
+
+        df = self.msd
+        df.insert(0, 'time', self.time)
         df.to_csv(export, sep=' ', index=False)
 
     def save_multiple_origins_diffusion(self, savename):
@@ -220,12 +217,6 @@ class analize(object):
                 savename = the name of the data file
         '''
 
-        fmt = ''
-        nh = ''
-        for key in self.diffmulti:
-            fmt += '%f '
-            nh += key+' '
-
         output = (
                   self.savepath +
                   '/datacalculated/diffusion/' +
@@ -233,8 +224,9 @@ class analize(object):
                   '_origins'
                   )
 
-        df = pd.DataFrame(data=self.diffmulti)
-        df.insert(0, 'start_time', self.startpoints)
+        df = self.diffmulti
+        df.insert(0, 'start_time', self.mostart)
+        df.insert(1, 'stop_time', self.mostop)
         df.to_csv(output, sep=' ', index=False)
 
     def save_rdf(self, savename):
@@ -245,15 +237,20 @@ class analize(object):
                 savename = the name of the data file
         '''
 
-        data = {}
-        for key in self.data['rdf']:
-            data['step_'+str(key)+'_coord'] = self.data['rdf'][key][0]
-            data['step_'+str(key)+'_rdf'] = self.data['rdf'][key][1]
+        if self.step is not None:
 
-        df = pd.DataFrame(data=data)
+            for key in self.rdf:
+                df = pd.DataFrame(data=self.rdf[key])
 
-        export = self.savepath+'/datacalculated/rdf/'+savename
-        df.to_csv(export, sep=' ', index=False)
+                export = (
+                          self.savepath +
+                          '/datacalculated/rdf/' +
+                          savename +
+                          '_step' +
+                          str(key)
+                          )
+
+                df.to_csv(export, sep=' ', index=False)
 
     def save_diffusion(self, savename):
         '''
@@ -263,14 +260,13 @@ class analize(object):
                 savename = the name of the data file
         '''
 
-        df = pd.DataFrame(data=self.data['diffusion'], index=[0])
-
         export = (
                   self.savepath +
                   '/datacalculated/diffusion/' +
                   savename
                   )
 
+        df = pd.DataFrame(data=self.diffusion, index=[0])
         df.to_csv(export, sep=' ', index=False)
 
     def plot_msd(self, savename):
@@ -315,7 +311,7 @@ class analize(object):
         for key in self.diffmulti:
             if '_err' not in key:
                 pl.errorbar(
-                            self.startpoints,
+                            self.mostart,
                             self.diffmulti[key],
                             self.diffmulti[key+'_err'],
                             label='element Type: %s' % key,
@@ -344,7 +340,7 @@ class analize(object):
 
             # Plot for every step in user input list
             for key in self.rdf:
-                pl.plot(self.rdf[key][0], self.rdf[key][1])
+                pl.plot(self.rdf[key]['r'], self.rdf[key]['gr'])
                 pl.legend(['Step '+str(key)], loc='best')
                 pl.xlabel('Bin Center [A]')
                 pl.ylabel('g(r)')

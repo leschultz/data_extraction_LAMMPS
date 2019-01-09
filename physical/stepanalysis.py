@@ -153,9 +153,9 @@ def run(param, exportdir, alpha):
                             points[2],
                             timestep,
                             dumprate,
-                            [points[0], points[1], points[2]],
+                            [points[1], points[2]],
                             10,
-                            50
+                            20
                             )
 
             value.calculate_time()  # Time normalized

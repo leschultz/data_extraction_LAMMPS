@@ -119,7 +119,4 @@ def rdfcalc(name, frame, cut, bins):
     # Compute RDF of the current frame
     out = node.compute(frame)
 
-    # Accumulate RDF histograms
-    rdf = np.transpose(modifier.rdf)
-
-    return rdf
+    return modifier.rdf
