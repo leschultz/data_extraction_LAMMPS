@@ -6,6 +6,15 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 
 from matplotlib import colors as mcolors
 from matplotlib import pyplot as pl
+from scipy import stats as st
+
+import pandas as pd
+import numpy as np
+
+from uncertainty.batchmeans import error as batch
+from uncertainty.estimator import error as okui
+
+from uncertainty.autocorrelation import autocorrelation
 
 from settling.settledclass import settled
 from importers.outimport import readdata
@@ -88,11 +97,14 @@ def run(param, exportdir, alpha):
         # The path to save in
         savepath = exportdir+'/'+item.split('/')[-2]
 
-        # Apply settle analysis on each step of run
-        for iteration in list(range(0, n)):
+        # Apply analysis on each step of run
+        differrors = []
+        differrorspercent = []
+        for iteration in range(n):
 
             # Temperature defined by LAMMPS input file
-            tempstr = str(int(starttemp-iteration*deltatemp))
+            holdtemp = starttemp-iteration*deltatemp
+            tempstr = str(int(holdtemp))
 
             print(
                   'Temperature step: ' +
@@ -165,10 +177,88 @@ def run(param, exportdir, alpha):
             value.multiple_origins_diffusion()  # Diffusion Multiple Origins
             data = value.calculation_export()  # Grab data calculated
 
-            # Plot relevant plots
-            value.plot_msd(savename)
-            value.plot_diffusion(savename)
-            value.plot_rdf(savename)
+            print(data.__dict__.keys())
+            print(savename)
+
+            elements = list(data.diffmulti.keys())
+            elements = [i for i in elements if '_' not in i]
+
+            for key in elements:
+
+                # Autocorrelation function
+                k, r, corl = autocorrelation(data.diffmulti[key])
+
+                # Name for autocorrelation plot
+                acorname = (
+                            savepath +
+                            '/images' +
+                            '/errormethods' +
+                            '/autocorrelation' +
+                            '/autocorrelation_' +
+                            savename +
+                            '_element_' +
+                            key
+                            )
+
+                # Plot autocorrelation function for each element
+                pl.plot(k, r, 'b.', label=tempstr+' [K]')
+                pl.axvline(
+                        x=corl,
+                        linestyle='--',
+                        color='r',
+                        label='Correlation Length='+str(corl)
+                        )
+
+                pl.grid()
+                pl.xlabel('k-lag [index]')
+                pl.ylabel('Autocorrelation [-]')
+                pl.legend(loc='upper right')
+                pl.tight_layout()
+                pl.savefig(acorname)
+                pl.clf()
+
+                errdf = {}
+                errdfpercent = {}
+                modata = list(data.diffmulti[key])  # multiple origins
+
+                # Apply uncertainty propagation methods
+                okuierr = okui(modata)
+                batch5 = batch(modata, a=5)[0]
+                batch10 = batch(modata, a=10)[0]
+                batchcorl = batch(modata, b=corl)[0]
+                scipyerr = st.sem(modata)
+
+                # Percent Errors
+                conversion = 100/data.diffusion[key]
+                perokuierr = okuierr*conversion
+                perbatch5 = batch5*conversion
+                perbatch10 = batch10*conversion
+                perbatchcorl = batchcorl*conversion
+                perscipyerr = scipyerr*conversion
+
+                # Save to dictionary that will be use in a data frame
+                errdf['Natural Estimator'] = okuierr
+                errdf['Batch Means 5 Blocks'] = batch5
+                errdf['Batch Means 10 Blocks'] = batch10
+                errdf['Batch Means Correlation Length Blocks'] = batchcorl
+                errdf['Standard Error in the Mean'] = scipyerr
+
+                # Percent Errors
+                errdfpercent['Natural Estimator'] = perokuierr
+                errdfpercent['Batch Means 5 Blocks'] = perbatch5
+                errdfpercent['Batch Means 10 Blocks'] = perbatch10
+                errdfpercent['Batch Means Correlation Length Blocks'] = perbatchcorl
+                errdfpercent['Standard Error in the Mean'] = perscipyerr
+
+
+                errdf['holdtemp'] = holdtemp  # Hold temperature
+                errdf['element'] = key  # Element
+
+                errdfpercent['holdtemp'] = holdtemp  # Hold temperature
+                errdfpercent['element'] = key  # Element
+
+                differrors.append(errdf)
+                differrorspercent.append(errdfpercent)
 
             # Save relevant data
             value.save_msd(savename)
@@ -179,6 +269,11 @@ def run(param, exportdir, alpha):
             # Export a text file for settling analysis data
             dfout = setindexes.returndata()
             dfout.to_csv(settlingtxt, sep=' ', index=False)
+
+            # Plot relevant plots
+            value.plot_msd(savename)
+            value.plot_diffusion(savename)
+            value.plot_rdf(savename)
 
             # Plot temperature step along with method limits for settling
             fig, ax = pl.subplots()
@@ -206,3 +301,58 @@ def run(param, exportdir, alpha):
             fig.savefig(settlingimg)
 
             pl.close('all')
+
+        # Make a dataframe containing uncertainties for a run
+        dferrs = pd.DataFrame(differrors)
+        errtxt = (
+                  savepath +
+                  '/datacalculated/errormethods/uncertainties.txt'
+                  )
+
+        dferrs.to_csv(errtxt, sep=' ', index=False)
+
+        dferrspercent = pd.DataFrame(differrorspercent)
+        errtxtpercent = (
+                         savepath +
+                         '/datacalculated/' +
+                         'errormethods/percentuncertainties.txt'
+                         )
+
+        dferrspercent.to_csv(errtxtpercent, sep=' ', index=False)
+
+
+        elements = set(list(dferrs.element))
+
+        # Save name for multiple origin uncertaintites
+        errname = (
+                   savepath +
+                   '/images/errormethods/errors/' +
+                   'mo_' +
+                   '_element_'
+                   )
+
+
+        # Start the error plots
+        for key in elements:
+            condition = dferrs.element == key
+            conditionper = dferrspercent.element == key
+
+            ax = dferrs[condition].plot(x='holdtemp', style='.')
+
+            ax.set_xlabel('Temperature [K]')
+            ax.set_ylabel('Diffusion MO Error [*10^-4 cm^2 s^-1]')
+            ax.grid()
+
+            plot = ax.get_figure()
+            plot.tight_layout()
+            plot.savefig(errname+key)
+
+            axper = dferrspercent[conditionper].plot(x='holdtemp', style='.')
+
+            axper.set_xlabel('Temperature [K]')
+            axper.set_ylabel('Diffusion MO Percent Error')
+            axper.grid()
+
+            plotper = axper.get_figure()
+            plotper.tight_layout()
+            plotper.savefig(errname+key+'_percent')

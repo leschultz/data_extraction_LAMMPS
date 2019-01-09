@@ -205,7 +205,7 @@ class analize(object):
 
         export = self.savepath+'/datacalculated/msd/'+savename
 
-        df = self.msd
+        df = self.msd.copy()
         df.insert(0, 'time', self.time)
         df.to_csv(export, sep=' ', index=False)
 
@@ -224,7 +224,7 @@ class analize(object):
                   '_origins'
                   )
 
-        df = self.diffmulti
+        df = self.diffmulti.copy()
         df.insert(0, 'start_time', self.mostart)
         df.insert(1, 'stop_time', self.mostop)
         df.to_csv(output, sep=' ', index=False)
@@ -246,7 +246,7 @@ class analize(object):
                           self.savepath +
                           '/datacalculated/rdf/' +
                           savename +
-                          '_step' +
+                          '_step_' +
                           str(key)
                           )
 
@@ -350,7 +350,7 @@ class analize(object):
                            self.savepath +
                            '/images/rdf/' +
                            savename +
-                           '_step' +
+                           '_step_' +
                            str(key) +
                            '_rdf'
                            )
