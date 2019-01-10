@@ -33,8 +33,7 @@ def error(x, a=None, b=None):
             warnings = message
             b = 1
 
-        else:
-            a = n//b  # Division that removes remainder
+        a = n//b  # Division that removes remainder
 
     # Find b if a is defined
     if b is None:
