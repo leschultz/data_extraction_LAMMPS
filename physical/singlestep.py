@@ -6,7 +6,6 @@ from PyQt5 import QtGui  # Added to be able to import ovito
 from matplotlib import pyplot as pl
 from physical.ovito_calc import calc, rdfcalc
 from scipy.stats import linregress
-from setup.setup import exportdir
 
 import pandas as pd
 import numpy as np
@@ -55,7 +54,6 @@ class analize(object):
         '''Load data and set variables used throughout methods'''
 
         # Create the folder for where data will be saved
-        exportdir(savepath)
         self.savepath = savepath
 
         # The name of the run

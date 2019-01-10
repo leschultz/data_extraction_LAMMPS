@@ -13,6 +13,7 @@ import numpy as np
 
 import logging
 
+from setup.setup import exportdir as createfolders
 from uncertainty.batchmeans import error as batch
 from uncertainty.estimator import error as okui
 
@@ -26,6 +27,17 @@ from physical.singlestep import analize
 colors = list(mcolors.BASE_COLORS.keys())
 colors = [i for i in colors if i != 'r']
 lstyle = ['-.', '--', ':']
+
+# Format the logging style
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+                              '%(asctime)s - ' +
+                              '%(name)s - ' +
+                              '%(levelname)s - ' +
+                              '%(message)s'
+                              )
+ch.setFormatter(formatter)
 
 
 def methodplotter(time, ax, indexes):
@@ -72,6 +84,7 @@ def run(param, exportdir, alpha):
         path = item.replace('uwtraj.lammpstrj', '')  # Run directory
         folder = '/'+path.split('/')[-2]  # Run name
         outfile = path+'test.out'  # LAMMPS data export
+        createfolders(exportdir+folder)  # Create relevant folders
 
         printname = 'Gathering Data from File: '+item
 
@@ -79,19 +92,6 @@ def run(param, exportdir, alpha):
         print('-'*len(printname))
         print(printname)
         print('-'*len(printname))
-
-        # Setup logger
-        logger = logging.getLogger(folder[1:])
-        logger.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(
-                                      '%(name)s - ' +
-                                      '%(levelname)s - ' +
-                                      '%(message)s'
-                                      )
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
 
         # Parsed parameters
         n = param[item]['iterations']
@@ -145,6 +145,11 @@ def run(param, exportdir, alpha):
                            savename
                            )
 
+            # Setup logger
+            logger = logging.getLogger(savename)
+            logger.setLevel(logging.DEBUG)
+            logger.addHandler(ch)
+
             # Find the start of quench to the next step
             hold1 = param[item]['hold1']
             hold1 += iteration*increment
@@ -175,14 +180,14 @@ def run(param, exportdir, alpha):
             setmethwarn = setindexes.warningsout()
             for key, value in setmethwarn.items():
                 if value:
-                    logger.warn(value+' (Settling analysis on temperatures)')
+                    logger.warn('Settling analysis on temperatures - '+value)
 
             # Save the start time of data analysis
             totlength = len(time)
             cuttimes = {}
             for key, value in indexes.items():
                 cuttimes[key] = (value+points[1])*dumprate*timestep
-    
+
             indexdf = pd.DataFrame(cuttimes, index=['Cut Times [ps]'])
             indexdf.to_csv(
                            savepath +

@@ -5,9 +5,9 @@ This script caluclates diffusion and RDF using Ovito.
 from PyQt5 import QtGui  # Added to be able to import ovito
 from importers.infoparser import parameters
 
-import datetime
 import argparse
 import logging
+import shutil
 import os
 
 from physical.stepanalysis import run as stepmeth
@@ -26,18 +26,17 @@ with open(args.p) as file:
         if 'alpha' in values[0]:
             alpha = float(values[0].split('=')[-1])
 
+# Create export directory
+if not os.path.exists(args.o):
+    os.makedirs(args.o)
+
 # Setup a logging file
 logging.basicConfig(
                     filename=args.o+'/overview.log',
                     )
 
-now = datetime.datetime.now()
-logging.info(
-             'This a log file for general warnings and set parameters.' +
-             '\n' +
-             'The time is: ' +
-             now.strftime("%Y-%m-%d %H:%M")
-             )
+logging.basicConfig(format='%(message)s %(asctime)s')
+logging.info('Time: ')
 
 # Gather ditionary containing all the needed parameters for runs
 runs = parameters(args.i)
@@ -45,3 +44,7 @@ runs.files()
 param = runs.inputinfo()
 
 stepmeth(param, args.o, alpha)  # Use ovito for calculating diffuison and RDF
+
+# Zip the original data and include in export directory
+print('Compressing original data')
+shutil.make_archive(args.o+'/originaldata', 'zip', base_dir=args.i)
