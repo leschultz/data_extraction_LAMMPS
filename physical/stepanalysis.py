@@ -11,6 +11,8 @@ from scipy import stats as st
 import pandas as pd
 import numpy as np
 
+import logging
+
 from uncertainty.batchmeans import error as batch
 from uncertainty.estimator import error as okui
 
@@ -77,6 +79,19 @@ def run(param, exportdir, alpha):
         print('-'*len(printname))
         print(printname)
         print('-'*len(printname))
+
+        # Setup logger
+        logger = logging.getLogger(folder[1:])
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+                                      '%(name)s - ' +
+                                      '%(levelname)s - ' +
+                                      '%(message)s'
+                                      )
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
 
         # Parsed parameters
         n = param[item]['iterations']
@@ -192,10 +207,6 @@ def run(param, exportdir, alpha):
                 # Autocorrelation function
                 k, r, corl = autocorrelation(data.diffmulti[key])
 
-                # If the correlation length is zero, give at least some data
-                if corl < 4:
-                    corl = 4
-
                 # Name for autocorrelation plot
                 acorname = (
                             savepath +
@@ -231,17 +242,27 @@ def run(param, exportdir, alpha):
 
                 # Apply uncertainty propagation methods
                 okuierr = okui(modata)
-                batch5 = batch(modata, a=5)[0]
-                batch10 = batch(modata, a=10)[0]
-                batchcorl = batch(modata, b=corl)[0]
+                batch5 = batch(modata, a=5)
+                batch10 = batch(modata, a=10)
+                batchcorl = batch(modata, b=corl)
                 scipyerr = st.sem(modata)
+
+                # Warning handling
+                if batch5[2]:
+                    logger.warn('MO Diffusion Element '+key+' - '+batch5[2])
+
+                if batch10[2]:
+                    logger.warn('MO Diffusion Element '+key+' - '+batch10[2])
+
+                if batchcorl[2]:
+                    logger.warn('MO Diffusion Element '+key+' - '+batchcorl[2])
 
                 # Percent Errors
                 conversion = 100/data.diffusion[key]
                 perokuierr = okuierr*conversion
-                perbatch5 = batch5*conversion
-                perbatch10 = batch10*conversion
-                perbatchcorl = batchcorl*conversion
+                perbatch5 = batch5[0]*conversion
+                perbatch10 = batch10[0]*conversion
+                perbatchcorl = batchcorl[0]*conversion
                 perscipyerr = scipyerr*conversion
 
                 methods = [
@@ -254,9 +275,9 @@ def run(param, exportdir, alpha):
 
                 # Save to dictionary that will be use in a data frame
                 errdf[methods[0]] = okuierr
-                errdf[methods[1]] = batch5
-                errdf[methods[2]] = batch10
-                errdf[methods[3]] = batchcorl
+                errdf[methods[1]] = batch5[0]
+                errdf[methods[2]] = batch10[0]
+                errdf[methods[3]] = batchcorl[0]
                 errdf[methods[4]] = scipyerr
 
                 # Percent Errors

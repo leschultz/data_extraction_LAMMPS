@@ -31,6 +31,7 @@ def autocorrelation(x):
         k.append(i)
         r.append(autocovariance(x, n, i, mean)/denominator)
 
+    # Find the last index before r becomes zero
     count = 0
     for i in r:
         if i >= 0.0:
