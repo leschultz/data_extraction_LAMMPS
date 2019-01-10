@@ -116,6 +116,7 @@ class settled(object):
         self.alpha = alpha  # Defined under ptest function
         self.binselect = {}  # Store selected settled bin bin
         self.indexes = {}  # Store first index of settled data
+        self.warnings = {}  # Store warning messages
 
     def binsize(self):
         '''
@@ -127,8 +128,14 @@ class settled(object):
 
         k, r, index = autocorrelation(self.y)
 
-        if index < 2:
+        if index < 4:
             index = 4
+            message = (
+                       'Corrleation length is less than 4.' +
+                       ' Setting correlation length to 4.'
+                       )
+
+            self.warnings['corrl'] = message
 
         self.b = index
 
@@ -294,3 +301,10 @@ class settled(object):
                 self.indexes[key] = 'NA'
 
         return self.indexes
+
+    def warningsout(self):
+        '''
+        Return any warnings that come up.
+        '''
+
+        return self.warnings

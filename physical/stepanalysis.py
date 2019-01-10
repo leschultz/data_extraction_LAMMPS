@@ -171,13 +171,45 @@ def run(param, exportdir, alpha):
             # The indexes of data from settling methods
             indexes = setindexes.finddatastart()
 
+            # Return warnings from settling methods
+            setmethwarn = setindexes.warningsout()
+            for key, value in setmethwarn.items():
+                if value:
+                    logger.warn(value+' (Settling analysis on temperatures)')
+
+            # Save the start time of data analysis
+            totlength = len(time)
+            cuttimes = {}
+            for key, value in indexes.items():
+                cuttimes[key] = (value+points[1])*dumprate*timestep
+    
+            indexdf = pd.DataFrame(cuttimes, index=['Cut Times [ps]'])
+            indexdf.to_csv(
+                           savepath +
+                           '/datacalculated/settlingindexes/' +
+                           'cutindexfrommethods.txt'
+                           )
+
             # Get the maximum cut
             cuts = []
             for key in indexes:
                 cuts.append(indexes[key])
 
-            cut = max(cuts)  # The cut index
-            cut *= dumprate  # Convert to MD steps
+            cutpoint = max(cuts)  # The cut index
+            cut = dumprate*cutpoint  # Convert to MD steps
+
+            # Warning for too much data being rejected 15%
+            cutlength = len(time[cutpoint:])
+            if 0.85 > cutlength/totlength:
+                logger.warn(
+                            'More than 15% of data was cut for analysis.' +
+                            '\n' +
+                            '   Total Length: ' +
+                            str(totlength) +
+                            '\n' +
+                            '   Length After Cut: ' +
+                            str(cutlength)
+                            )
 
             # Start the method for data analysis for the step
             value = analize(
