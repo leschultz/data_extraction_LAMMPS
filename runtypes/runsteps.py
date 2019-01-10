@@ -31,12 +31,17 @@ if not os.path.exists(args.o):
     os.makedirs(args.o)
 
 # Setup a logging file
+formating =(
+            '%(asctime)s - ' +
+            '%(name)s - ' +
+            '%(levelname)s - ' +
+            '%(message)s'
+            )
+
 logging.basicConfig(
                     filename=args.o+'/overview.log',
+                    format=formating
                     )
-
-logging.basicConfig(format='%(message)s %(asctime)s')
-logging.info('Time: ')
 
 # Gather ditionary containing all the needed parameters for runs
 runs = parameters(args.i)

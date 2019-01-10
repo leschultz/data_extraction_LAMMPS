@@ -78,6 +78,12 @@ def run(param, exportdir, alpha):
     Iterate initial data analysis for all steps in all runs
     '''
 
+    # Setup logger
+    logger = logging.getLogger('Start')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
+    logger.info('Tool Initialized')
+
     # Apply for each run in the main directory
     for item in param:
 
