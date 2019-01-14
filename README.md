@@ -1,6 +1,10 @@
 # LAMMPS Data Extraction Tool
 
-This tool gathers diffusivity, rdf, uncertainties, and settling data for CCT curves in LAMMPS. A specific file format is needed along with directory structure for this tool to work.
+This tool gathers diffusivity, rdf, uncertainties, and settling data for CCT curves in LAMMPS. A specific file format is needed along with directory structure for this tool to work. For a detailed description of this tool, visit the following link:
+
+```
+https://www.overleaf.com/read/wpbkywczbcvv
+```
 
 ## Getting Started
 
