@@ -4,6 +4,7 @@ Modified from https://ovito.org/manual/python/modules/ovito_modifiers.html
 
 from ovito.modifiers import CalculateDisplacementsModifier
 from ovito.modifiers import CoordinationNumberModifier
+from ovito.modifiers import VoronoiAnalysisModifier
 from ovito.modifiers import PythonScriptModifier
 from ovito.io import import_file
 from scipy import stats as st
@@ -120,3 +121,31 @@ def rdfcalc(name, frame, cut, bins):
     out = node.compute(frame)
 
     return modifier.rdf
+
+def vp(name, frame, maxedge=6, threshold=0.1):
+    '''
+    Calculate the Voronoi polyhedra.
+
+    inputs:
+            name = trajectory file
+            frame = frame of interest
+            maxedge = the maximum Voronoi polyhedra edge count
+            threshold = minimum length for an edge to be counted
+    '''
+
+    # Load input data and create an ObjectNode with a data pipeline.
+    node = import_file(name, multiple_frames=True)
+
+    voro = VoronoiAnalysisModifier(
+                                   compute_indices = True,
+                                   use_radii = False,
+                                   edge_count = maxedge,
+                                   edge_threshold = threshold
+                                   )
+
+    node.modifiers.append(voro)
+    out = node.compute(frame)
+
+    indexes = out.particle_properties['Voronoi Index'].array
+
+    return indexes
