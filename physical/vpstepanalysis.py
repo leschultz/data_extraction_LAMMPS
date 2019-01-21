@@ -62,44 +62,29 @@ def run(param, exportdir):
         starttemp = param[item]['tempstart']
         timestep = param[item]['timestep']
         dumprate = param[item]['dumprate']
+        hold1 = param[item]['hold1']
         hold2 = param[item]['hold2']
         hold3 = param[item]['hold3']
+        trajsteps = param[item]['trajectorysteps']
 
         # The path to save in
         savepath = exportdir+'/'+item.split('/')[-2]
 
         # Apply analysis on each step of run
         dfs = []
-        for iteration in range(n):
+        for i in trajsteps:
 
-            # Temperature defined by LAMMPS input file
-            holdtemp = starttemp-iteration*deltatemp
-            tempstr = str(int(holdtemp))
-
-            print(
-                  'Temperature step: ' +
-                  tempstr +
-                  ' [K]'
-                  )
-
-            # Savename convention
-            savename = folder[1:]+'_'+tempstr+'K'
+            print('ICO analysis for step: '+str(i))
 
             # Setup logger
-            logger = logging.getLogger(savename)
+            logger = logging.getLogger('ICO Step: '+str(i))
             logger.setLevel(logging.DEBUG)
             logger.addHandler(ch)
 
-            # Find the start of quench to the next step
-            hold1 = param[item]['hold1']
-            hold1 += iteration*increment
+            df = icofrac(item, i//dumprate)
 
-            # Start of quench, start of hold, and end of hold
-            points = [hold1, hold1+hold2, hold1+hold2+hold3]
-
-            df = icofrac(item, points[2]//dumprate)
-
-            df.insert(loc=0, column='temp', value=holdtemp)
+            df.insert(loc=1, column='time', value=i*timestep)
+            df.insert(loc=0, column='step', value=i)
             dfs.append(df)
 
         df = pd.concat(dfs, sort=False)
@@ -111,8 +96,8 @@ def run(param, exportdir):
 
         imagepath = savepath+'/images/ico/icofrac.png'
 
-        ax = df.plot(x='temp', style='.')
-        ax.set_xlabel('Temperature [K]')
+        ax = df.plot(x='time', style='.')
+        ax.set_xlabel('Time [ps]')
         ax.set_ylabel('ICO Fraction [-]')
         ax.grid()
         plot = ax.get_figure()

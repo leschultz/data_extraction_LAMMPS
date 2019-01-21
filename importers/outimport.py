@@ -41,5 +41,6 @@ def readdata(filepath):
     # Save the exported data into a pandas dataframe
     df = pd.DataFrame(data, columns=headers)
     df = df.drop_duplicates('Step')
+    df = df.reset_index()
 
     return df

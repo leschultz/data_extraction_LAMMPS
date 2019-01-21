@@ -4,6 +4,8 @@ Find pertinent information in LAMMPS input files.
 
 import os
 
+from importers.trajframes import trajectorysteps
+
 
 class parameters(object):
     '''
@@ -108,7 +110,8 @@ class parameters(object):
                                      'iterations': iterations,
                                      'tempstart': tempstart,
                                      'deltatemp': deltatemp,
-                                     'increment': increment
+                                     'increment': increment,
+                                     'trajectorysteps': trajectorysteps(traj)
                                      }
 
             count += 1
