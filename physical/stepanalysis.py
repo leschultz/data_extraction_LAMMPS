@@ -87,7 +87,7 @@ def run(param, exportdir, alpha):
     # Apply for each run in the main directory
     for item in param:
 
-        path = item.replace('uwtraj.lammpstrj', '')  # Run directory
+        path = item.replace('traj.lammpstrj', '')  # Run directory
         folder = '/'+path.split('/')[-2]  # Run name
         outfile = path+'test.out'  # LAMMPS data export
         createfolders(exportdir+folder)  # Create relevant folders

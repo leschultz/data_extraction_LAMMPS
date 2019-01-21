@@ -30,7 +30,7 @@ class parameters(object):
             directory = self.path+'/'+folder+'/'
 
             inputs.append(directory+'dep.in')
-            trajectories.append(directory+'uwtraj.lammpstrj')
+            trajectories.append(directory+'traj.lammpstrj')
 
         # Store file paths in self variable
         self.input_files = inputs
