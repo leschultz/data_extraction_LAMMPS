@@ -70,9 +70,18 @@ def run(param, exportdir):
         # The path to save in
         savepath = exportdir+'/'+item.split('/')[-2]
 
+        dftime = {
+                  'step': trajsteps,
+                  }
+
+        dftime = pd.DataFrame(dftime)
+
+        # Cut the time into the start of isothermal holds
+        dfcut = dftime.loc[dftime['step'] >= hold1]
+
         # Apply analysis on each step of run
         dfs = []
-        for i in trajsteps:
+        for i in dfcut['step']:
 
             print('ICO analysis for step: '+str(i))
 
@@ -83,7 +92,6 @@ def run(param, exportdir):
 
             df = icofrac(item, i//dumprate)
 
-            df.insert(loc=1, column='time', value=i*timestep)
             df.insert(loc=0, column='step', value=i)
             dfs.append(df)
 
@@ -96,7 +104,7 @@ def run(param, exportdir):
 
         imagepath = savepath+'/images/ico/icofrac.png'
 
-        ax = df.plot(x='time', style='.')
+        ax = df.plot(x='step', style='.')
         ax.set_xlabel('Time [ps]')
         ax.set_ylabel('ICO Fraction [-]')
         ax.grid()
