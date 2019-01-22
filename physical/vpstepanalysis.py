@@ -15,6 +15,7 @@ import logging
 
 from setup.setup import exportdir as createfolders
 
+from importers.outimport import readdata
 from physical.ico import icofrac
 
 # Format the logging style
@@ -70,18 +71,22 @@ def run(param, exportdir):
         # The path to save in
         savepath = exportdir+'/'+item.split('/')[-2]
 
-        dftime = {
-                  'step': trajsteps,
-                  }
+        # Parsed data exported from LAMMPS
+        dfsystem = readdata(outfile)
 
-        dftime = pd.DataFrame(dftime)
+        time = [timestep*i for i in dfsystem['Step']]  # Convert setps to time
+        dfsystem['time'] = time  # Add time to df
 
-        # Cut the time into the start of isothermal holds
-        dfcut = dftime.loc[dftime['step'] >= hold1]
+        # Steps where there there is system data and trajectory data
+        agreement = dfsystem['Step'].isin(trajsteps)
+        agreement = dfsystem['Step'][agreement]
+
+        # Find the start of the isothermal holds based on trajectory dumps
+        start = next(i[0] for i in enumerate(agreement) if i[1] >= hold1)
 
         # Apply analysis on each step of run
         dfs = []
-        for i in dfcut['step']:
+        for i in agreement[start:]:
 
             print('ICO analysis for step: '+str(i))
 
@@ -92,10 +97,15 @@ def run(param, exportdir):
 
             df = icofrac(item, i//dumprate)
 
+            # Instantaneous temperature (Need ensemble average)
+            temp = dfsystem[dfsystem['Step'] == i]['Temp'].values[0]
+
+            df.insert(loc=0, column='temp', value=temp)
             df.insert(loc=0, column='step', value=i)
             dfs.append(df)
 
         df = pd.concat(dfs, sort=False)
+        df = df.reset_index(drop=True)
         df.to_csv(
                   savepath+'/datacalculated/ico/icofracs.txt',
                   sep=' ',
@@ -104,8 +114,8 @@ def run(param, exportdir):
 
         imagepath = savepath+'/images/ico/icofrac.png'
 
-        ax = df.plot(x='step', style='.')
-        ax.set_xlabel('Time [ps]')
+        ax = df.loc[:, df.columns != 'step'].plot(x='temp', style='.')
+        ax.set_xlabel('Temperature [K]')
         ax.set_ylabel('ICO Fraction [-]')
         ax.grid()
         plot = ax.get_figure()
