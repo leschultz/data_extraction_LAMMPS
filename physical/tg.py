@@ -1,31 +1,55 @@
+'''
+This script calcultae the glass transition temperature based on the volume
+evolution of a system.
+'''
+
+from PyQt5 import QtGui  # Added to be able to import ovito
+
 from scipy.interpolate import UnivariateSpline
 from matplotlib import pyplot as pl
 import pandas as pd
 import numpy as np
 import math
+import re
 
-from dataimport import importdata as data
-from parmimport import importparm as parm
+from importers.outimport import readdata
 
 
-def function(E, T):
-    kb = 8.6173303e-5  # [eV/K]
-    return E-3.0*kb*T
+def tgenergy(name):
+    '''
+    For a specified output file of system properties, caluclate the glass
+    transition temperature at the "knee".
 
-param = parm()
-keys = list(param.keys())
-runs = data(int(param[keys[0]]['hold']/param[keys[0]]['rate'])+500)
+    inputs:
+            name = the name of the system data file
+    '''
 
-for run in runs:
-    print('energy: '+run)
+    df = readdata(name)
+    print(df)
+
+    dfenergy = df[['Temp', 'TotEng']]
+
+    ax = dfenergy.plot(x='Temp', style='.')
+    pl.show()
 
     runs[run] = runs[run].sort_values(by='c_mytemp', ascending=True)
 
-    energy = runs[run]['c_PE']+runs[run]['c_KE']
-    energy = [i/param[run]['atoms'] for i in energy]
-    term = [function(i, j) for i, j in zip(energy, runs[run]['c_mytemp'])]
+    parse = run.split('_')
+    ratio = parse[-1]
+    ratio = ratio.split('-')
+    ratio = [float(i)/100 for i in ratio]
 
-    percentage = run.split('-')[-1]
+    elements = re.findall('[A-Z][a-z]*', parse[0])
+
+    volume = runs[run]['v_myvol']
+
+    ratios = dict(zip(elements, ratio))
+
+    print(run)
+    mass = [masses[i]*ratios[i] for i in elements]
+    mass = sum(mass)*param[run]['atoms']
+
+    term = [i/mass for i in volume]
 
     fig, sub = pl.subplots(1, 1)
     xdata = list(runs[run]['c_mytemp'])
@@ -34,7 +58,7 @@ for run in runs:
     # Find bottom percent of data to fit
     length = len(xdata)
     start0 = 0
-    end0 = math.floor(0.15*length)
+    end0 = math.floor(0.1*length)
 
     x0 = xdata[start0:end0]
     y0 = term[start0:end0]
@@ -67,10 +91,11 @@ for run in runs:
         while len(point) > npoints:
             point = np.argwhere(np.isclose(yfit0, yfit1, atol=tolerance)).reshape(-1)
             tolerance -= tolerance/10
-            count += 1
 
-            if count >= 100:
+            if count > 100:
                 break
+
+            count += 1
 
         temps = np.array(xdata)[point]
         temp = math.floor(sum(temps)/len(temps))
@@ -80,7 +105,7 @@ for run in runs:
         pass
 
     sub.set_xlabel('Temperature [K]')
-    sub.set_ylabel('E-3*k_b*T [eV/atom]')
+    sub.set_ylabel('Specific Volume [A^3/g]')
     sub.legend(loc='upper left')
     sub.grid()
-    fig.savefig('../figures/energy_'+run)
+    fig.savefig('../figures/volume_'+run)

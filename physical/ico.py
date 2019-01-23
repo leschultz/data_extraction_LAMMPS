@@ -5,6 +5,7 @@ from physical.ovito_calc import vp
 import pandas as pd
 import numpy as np
 
+
 def icofrac(name, frame, *args, **kwargs):
     '''
     Compute the fraction of ICO clusters.
@@ -64,7 +65,6 @@ def icofrac(name, frame, *args, **kwargs):
                   'n_5 >= 8': geico2,
                   }
 
-
     # Grater than or equal for an index
     gecounts = {
                 'n_5 >= 10': 0,
@@ -92,7 +92,6 @@ def icofrac(name, frame, *args, **kwargs):
     gecountsfrac = {}
     for key in gecounts:
         gecountsfrac[key] = gecounts[key]/size[0]
-
 
     strictdf = pd.DataFrame(strictcountsfrac, index=['fraction'])
     gedf = pd.DataFrame(gecountsfrac, index=['fraction'])

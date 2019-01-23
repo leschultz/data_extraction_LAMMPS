@@ -44,3 +44,19 @@ def readdata(filepath):
     df = df.reset_index(drop=True)
 
     return df
+
+
+def atoms(name):
+    '''
+    Open a file and find the number of atoms.
+    '''
+
+    # Open the file
+    with open(name) as file:
+        for line in file:
+            if 'atoms' in line:
+                atoms = line.strip().split(' ')
+                atoms = int(atoms[1])
+                break
+
+    return atoms

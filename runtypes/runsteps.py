@@ -31,12 +31,12 @@ if not os.path.exists(args.o):
     os.makedirs(args.o)
 
 # Setup a logging file
-formating =(
-            '%(asctime)s - ' +
-            '%(name)s - ' +
-            '%(levelname)s - ' +
-            '%(message)s'
-            )
+formating = (
+             '%(asctime)s - ' +
+             '%(name)s - ' +
+             '%(levelname)s - ' +
+             '%(message)s'
+             )
 
 logging.basicConfig(
                     filename=args.o+'/overview.log',

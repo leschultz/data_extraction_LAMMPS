@@ -5,6 +5,7 @@ Import the steps that are printed onto a trajectory file.
 import sys
 import re
 
+
 def trajectorysteps(name):
 
     steps = []

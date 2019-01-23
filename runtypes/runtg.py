@@ -10,7 +10,7 @@ import logging
 import shutil
 import os
 
-from physical.vpstepanalysis import run as icofrac
+from physical.glasstransition import run as tg
 
 # Command line arguments
 parser = argparse.ArgumentParser()
@@ -48,7 +48,7 @@ runs = parameters(args.i)
 runs.files()
 param = runs.inputinfo()
 
-icofrac(param, args.o)  # Use ovito for calculating diffuison and RDF
+tg(param, args.o)  # Use ovito for calculating diffuison and RDF
 
 # Zip the original data and include in export directory
 zipfile = args.o+'/originaldata'

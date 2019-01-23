@@ -18,6 +18,7 @@ def exportdir(folder):
     dataerr = analysis+'errormethods/'
     dataset = analysis+'settlingindexes/'
     dataico = analysis+'ico/'
+    datatg = analysis+'tg/'
 
     # The directories were images will be saved for single runs
     image_directory = folder+'/images/'
@@ -29,6 +30,7 @@ def exportdir(folder):
     errors = dataerrplots+'errors/'
     settling = image_directory+'settling/'
     icoplots = image_directory+'ico/'
+    tgplots = image_directory+'tg/'
 
     directories = [
                    analysis,
@@ -46,7 +48,9 @@ def exportdir(folder):
                    settling,
                    dataset,
                    dataico,
-                   icoplots
+                   icoplots,
+                   datatg,
+                   tgplots
                    ]
 
     # Create directories if they do not exist

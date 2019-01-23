@@ -122,6 +122,7 @@ def rdfcalc(name, frame, cut, bins):
 
     return modifier.rdf
 
+
 def vp(name, frame, maxedge=6, threshold=0.1):
     '''
     Calculate the Voronoi polyhedra.
@@ -137,10 +138,10 @@ def vp(name, frame, maxedge=6, threshold=0.1):
     node = import_file(name, multiple_frames=True)
 
     voro = VoronoiAnalysisModifier(
-                                   compute_indices = True,
-                                   use_radii = False,
-                                   edge_count = maxedge,
-                                   edge_threshold = threshold
+                                   compute_indices=True,
+                                   use_radii=False,
+                                   edge_count=maxedge,
+                                   edge_threshold=threshold
                                    )
 
     node.modifiers.append(voro)
