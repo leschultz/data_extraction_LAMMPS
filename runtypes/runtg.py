@@ -26,6 +26,13 @@ with open(args.p) as file:
         if 'alpha' in values[0]:
             alpha = float(values[0].split('=')[-1])
 
+        if 'bottomtgpercent' in values[0]:
+            bottom = float(values[0].split('=')[-1])
+
+        if 'toptgpercent' in values[0]:
+            top = float(values[0].split('=')[-1])
+
+
 # Create export directory
 if not os.path.exists(args.o):
     os.makedirs(args.o)
@@ -48,7 +55,7 @@ runs = parameters(args.i)
 runs.files()
 param = runs.inputinfo()
 
-tg(param, args.o)  # Use ovito for calculating diffuison and RDF
+tg(param, args.o, bottom, top)
 
 # Zip the original data and include in export directory
 zipfile = args.o+'/originaldata'
