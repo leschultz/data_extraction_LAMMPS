@@ -2,5 +2,8 @@ __all__ = [
            'ovito_calc',
            'singlestep',
            'stepanalysis',
-           'glasstransition'
+           'glasstransition',
+           'icoanalysis',
+           'tg',
+           'ico'
            ]

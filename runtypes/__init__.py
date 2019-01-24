@@ -1,3 +1,5 @@
 __all__ = [
-           'runsteps'
+           'runsteps',
+           'runtg',
+           'runico'
            ]

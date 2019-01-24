@@ -10,7 +10,7 @@ import logging
 import shutil
 import os
 
-from physical.vpstepanalysis import run as icofrac
+from physical.icoanalysis import run as icofrac
 
 # Command line arguments
 parser = argparse.ArgumentParser()
