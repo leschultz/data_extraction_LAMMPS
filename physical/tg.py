@@ -89,7 +89,8 @@ def tgenergy(name):
         # Iterate until point of intersection is found between fits
         count = 0
         while len(point) > npoints:
-            point = np.argwhere(np.isclose(yfit0, yfit1, atol=tolerance)).reshape(-1)
+            condition = np.isclose(yfit0, yfit1, atol=tolerance)
+            point = np.argwhere(condition).reshape(-1)
             tolerance -= tolerance/10
 
             if count > 100:
@@ -99,7 +100,11 @@ def tgenergy(name):
 
         temps = np.array(xdata)[point]
         temp = math.floor(sum(temps)/len(temps))
-        sub.axvline(x=temp, linestyle='--', label='Fit Intersection at '+str(temp)+' [K]')
+        sub.axvline(
+                    x=temp,
+                    linestyle='--',
+                    label='Fit Intersection at '+str(temp)+' [K]'
+                    )
 
     except Exception:
         pass

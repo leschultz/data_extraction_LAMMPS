@@ -30,7 +30,7 @@ formatter = logging.Formatter(
 ch.setFormatter(formatter)
 
 
-def run(param, exportdir):
+def run(param, exportdir, percent):
     '''
     Iterate initial data analysis for all steps in all runs
     '''
@@ -123,61 +123,59 @@ def run(param, exportdir):
         plot.savefig(imagepath)
         pl.close('all')
 
+        # Find important temperatures from ICO curve
+        dfimptemp = []
+        for i in df.loc[:, (df.columns != 'step') & (df.columns != 'temp')]:
+            l, m, r = sindex(list(df[i]), percent)
+            tl = df['temp'].iloc[l]
+            tm = df['temp'].iloc[m]
+            tr = df['temp'].iloc[r]
 
-    # Find important temperatures from ICO curve
-    dfimptemp = []
-    for i in df.loc[:, (df.columns != 'step') & (df.columns !='temp')]:
-        l, m, r = sindex(list(df[i]), 10)
-        tl = df['temp'].iloc[l]
-        tm = df['temp'].iloc[m]
-        tr = df['temp'].iloc[r]
+            dfper = {
+                     'ltemp': tl,
+                     'mtemp': tm,
+                     'rtemp': tr,
+                     'lico': df[i].iloc[l],
+                     'mico': df[i].iloc[m],
+                     'rico': df[i].iloc[r],
+                    }
 
-        dfper = {
-                 'ltemp': tl,
-                 'mtemp': tm,
-                 'rtemp': tr,
-                 'lico': df[i].iloc[l],
-                 'mico': df[i].iloc[m],
-                 'rico': df[i].iloc[r],
-                }
+            dfper = pd.DataFrame(dfper, index=[i])
+            dfimptemp.append(dfper)
 
-        dfper = pd.DataFrame(dfper, index=[i])
-        dfimptemp.append(dfper)
+            ax = df.loc[:, df.columns != 'step'].plot(x='temp', y=i, style='.')
+            ax.axvline(
+                       x=tl,
+                       linestyle='-.',
+                       color='r',
+                       label=str(tl)+' [K]'
+                       )
 
-        ax = df.loc[:, df.columns != 'step'].plot(x='temp', y=i, style='.')
-        ax.axvline(
-                   x=tl,
-                   linestyle='-.',
-                   color='r',
-                   label=str(tl)+' [K]'
-                   )
+            ax.axvline(
+                       x=tm,
+                       linestyle='-.',
+                       color='g',
+                       label=str(tm)+' [K]'
+                       )
 
-        ax.axvline(
-                   x=tm,
-                   linestyle='-.',
-                   color='g',
-                   label=str(tm)+' [K]'
-                   )
+            ax.axvline(
+                       x=tr,
+                       linestyle='-.',
+                       color='y',
+                       label=str(tr)+' [K]'
+                       )
 
-        ax.axvline(
-                   x=tr,
-                   linestyle='-.',
-                   color='y',
-                   label=str(tr)+' [K]'
-                   )
+            ax.set_xlabel('Temperature [K]')
+            ax.set_ylabel('ICO Fraction')
+            ax.legend(loc='best')
+            ax.grid()
+            pl.tight_layout()
+            pl.savefig(savepath+'/images/ico/'+i)
+            pl.close('all')
 
-        ax.set_xlabel('Temperature [K]')
-        ax.set_ylabel('ICO Fraction')
-        ax.legend(loc='best')
-        ax.grid()
-        pl.tight_layout()
-        pl.savefig(savepath+'/images/ico/'+i)
-        pl.close('all')
+        dfimptemp = pd.concat(dfimptemp, sort=False)
 
-    dfimptemp = pd.concat(dfimptemp, sort=False)
-
-    dfimptemp.to_csv(
-                     savepath+'/datacalculated/ico/icotemps.txt',
-                     sep=' '
-                     )
-
+        dfimptemp.to_csv(
+                         savepath+'/datacalculated/ico/icotemps.txt',
+                         sep=' '
+                         )

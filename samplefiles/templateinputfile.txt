@@ -1,3 +1,5 @@
 # alpha defines the significance level for p-test in the settling class
-
 alpha=0.05
+
+# icopercent defines what deviation from the maximum value of the ico curve to take temperatures from
+icopercent=20

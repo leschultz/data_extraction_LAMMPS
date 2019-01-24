@@ -26,6 +26,9 @@ with open(args.p) as file:
         if 'alpha' in values[0]:
             alpha = float(values[0].split('=')[-1])
 
+        if 'icopercent' in values[0]:
+            percent = float(values[0].split('=')[-1])
+
 # Create export directory
 if not os.path.exists(args.o):
     os.makedirs(args.o)
@@ -48,7 +51,8 @@ runs = parameters(args.i)
 runs.files()
 param = runs.inputinfo()
 
-icofrac(param, args.o)  # Use ovito for calculating diffuison and RDF
+# Use Ovito for ICO fraction
+icofrac(param, args.o, percent)
 
 # Zip the original data and include in export directory
 zipfile = args.o+'/originaldata'

@@ -77,7 +77,7 @@ def run(param, exportdir):
         dfsystem = readdata(outfile)  # System data
         dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
         dfenergy = dfsystem[['Temp', 'TotEng']]  # Energies and Temperatures
-        dfenergy.loc[:, 'TotEng'] = dfenergy['TotEng'].divide(natoms)  # Normalize
+        dfenergy.loc[:, 'TotEng'] = dfenergy['TotEng'].divide(natoms)
 
         # Setup logger
         logger = logging.getLogger('Tg Run: '+folder)
