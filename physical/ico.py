@@ -1,9 +1,9 @@
 from PyQt5 import QtGui  # Added to be able to import ovito
 
-from physical.ovito_calc import vp
-
 import pandas as pd
 import numpy as np
+
+from physical.ovito_calc import vp
 
 
 def icofrac(name, frame, *args, **kwargs):
@@ -101,3 +101,66 @@ def icofrac(name, frame, *args, **kwargs):
     df = df.groupby(level=0).sum()
 
     return df
+
+
+def sindex(x, percent):
+    '''
+    Find the indexes on the ends and middle of an s-curve given a percent
+    deviation. The percent deviation is the last value from each end where
+    the value exceds a percent differnce. This function assumes the data
+    increases as a function of time.
+
+    inputs:
+        x = data for the s-curve
+        percent = The percent deviation from end values
+
+    outputs:
+        indexes = the indexes from the ends and middle of the s-curve
+        lindex = the leftmost index after percent comparison
+        mindex = an index in the middle
+        rindex = the rightmost index after percent comparison
+    '''
+
+    try:
+        percent /= 100.0  # Decimal form
+
+        high = max(x)
+        endslice = len(x)-1
+
+        minpercent = high*percent  # Min bound for comparison
+
+        count = 0
+        lval = x[0]  # The leftmost value
+        while lval <= minpercent:
+            lval = x[count]
+            count += 1
+
+        if count != 0:
+            lindex = count-1  # Subtract because of the final count addition
+        else:
+            lindex = 0
+
+        minpercent = high*(1-percent)  # Min bound for comparison
+
+        count = endslice
+        rval = x[-1]  # The rightmost value
+        while rval >= minpercent:
+            rval = x[count]
+            count -= 1
+
+        if count != endslice:
+            rindex = count+1  # Add because of the final count subtraction
+
+        else:
+            rindex = endslice
+
+        mindex = lindex+(rindex-lindex)//2  # Get the middle index
+
+    except Exception:
+        print('Sigmoid curve not sufficiently smooth or ill defined percent.')
+        print('Setting indexes to 0.')
+        lindex = 0
+        mindex = 0
+        rindex = 0
+
+    return lindex, mindex, rindex

@@ -5,5 +5,6 @@ __all__ = [
            'glasstransition',
            'icoanalysis',
            'tg',
-           'ico'
+           'ico',
+           'icoindexes',
            ]

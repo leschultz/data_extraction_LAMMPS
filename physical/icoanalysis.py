@@ -16,7 +16,7 @@ import logging
 from setup.setup import exportdir as createfolders
 
 from importers.outimport import readdata
-from physical.ico import icofrac
+from physical.ico import icofrac, sindex
 
 # Format the logging style
 ch = logging.StreamHandler()
@@ -112,7 +112,7 @@ def run(param, exportdir):
                   index=False
                   )
 
-        imagepath = savepath+'/images/ico/icofrac.png'
+        imagepath = savepath+'/images/ico/icofrac'
 
         ax = df.loc[:, df.columns != 'step'].plot(x='temp', style='.')
         ax.set_xlabel('Temperature [K]')
@@ -122,3 +122,62 @@ def run(param, exportdir):
         plot.tight_layout()
         plot.savefig(imagepath)
         pl.close('all')
+
+
+    # Find important temperatures from ICO curve
+    dfimptemp = []
+    for i in df.loc[:, (df.columns != 'step') & (df.columns !='temp')]:
+        l, m, r = sindex(list(df[i]), 10)
+        tl = df['temp'].iloc[l]
+        tm = df['temp'].iloc[m]
+        tr = df['temp'].iloc[r]
+
+        dfper = {
+                 'ltemp': tl,
+                 'mtemp': tm,
+                 'rtemp': tr,
+                 'lico': df[i].iloc[l],
+                 'mico': df[i].iloc[m],
+                 'rico': df[i].iloc[r],
+                }
+
+        dfper = pd.DataFrame(dfper, index=[i])
+        dfimptemp.append(dfper)
+
+        ax = df.loc[:, df.columns != 'step'].plot(x='temp', y=i, style='.')
+        ax.axvline(
+                   x=tl,
+                   linestyle='-.',
+                   color='r',
+                   label=str(tl)+' [K]'
+                   )
+
+        ax.axvline(
+                   x=tm,
+                   linestyle='-.',
+                   color='g',
+                   label=str(tm)+' [K]'
+                   )
+
+        ax.axvline(
+                   x=tr,
+                   linestyle='-.',
+                   color='y',
+                   label=str(tr)+' [K]'
+                   )
+
+        ax.set_xlabel('Temperature [K]')
+        ax.set_ylabel('ICO Fraction')
+        ax.legend(loc='best')
+        ax.grid()
+        pl.tight_layout()
+        pl.savefig(savepath+'/images/ico/'+i)
+        pl.close('all')
+
+    dfimptemp = pd.concat(dfimptemp, sort=False)
+
+    dfimptemp.to_csv(
+                     savepath+'/datacalculated/ico/icotemps.txt',
+                     sep=' '
+                     )
+

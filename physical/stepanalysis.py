@@ -429,3 +429,4 @@ def run(param, exportdir, alpha):
             plotper = axper.get_figure()
             plotper.tight_layout()
             plotper.savefig(errname+key+'_percent')
+            pl.close('all')
