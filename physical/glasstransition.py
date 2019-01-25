@@ -114,6 +114,10 @@ def run(param, exportdir, bottom, top):
 
         fitrange1 = str([math.floor(xdata[start1]), math.floor(xdata[end1])])
 
+        ax = dfenergy.plot(x='Temp', style='.')
+        ax.plot(xdata, yfit0, 'r', label='Fit Range of '+fitrange0+' [K]')
+        ax.plot(xdata, yfit1, 'g', label='Fit Range of '+fitrange1+' [K]')
+
         try:
             npoints = 2
             point = [0]*(npoints+1)  # A point larger than 1 to start with
@@ -132,27 +136,29 @@ def run(param, exportdir, bottom, top):
                 count += 1
 
             temps = np.array(xdata)[point]
-            temp = math.floor(sum(temps)/len(temps))
-            sub.axvline(
-                        x=temp,
-                        linestyle='--',
-                        label='Fit Intersection at '+str(temp)+' [K]'
-                        )
+            temp = sum(temps)/len(temps)  # Average if len > 1
+            ax.axvline(
+                       x=temp,
+                       linestyle='--',
+                       label='Fit Intersection at '+str(temp)[:5]+' [K]'
+                       )
+
+            # Export Tg
+            with open(savepath+'/datacalculated/tg/tg', 'w') as file:
+                file.write('{}'.format(str(temp)+' K'))
 
         except Exception:
+
+            logger.warn('Failed to find Tg.')
             pass
 
         dfenergy.to_csv(
-                        savepath+'/datacalculated/tg/tg_energy.txt',
+                        savepath+'/datacalculated/tg/tg_energy',
                         sep=' ',
                         index=False
                         )
 
         imagepath = savepath+'/images/tg/tg_energy.png'
-
-        ax = dfenergy.plot(x='Temp', style='.')
-        ax.plot(xdata, yfit0, 'r', label='Fit Range of '+fitrange0+' [K]')
-        ax.plot(xdata, yfit1, 'g', label='Fit Range of '+fitrange1+' [K]')
 
         ax.set_xlabel('Temperature [K]')
         ax.set_ylabel('Total Energy [eV/atom]')
