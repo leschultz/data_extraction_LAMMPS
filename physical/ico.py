@@ -133,7 +133,10 @@ def sindex(x, percent):
         lval = x[0]  # The leftmost value
         while lval <= minpercent:
             lval = x[count]
-            count += 1
+
+            # Only count if the values is still less than
+            if lval <= minpercent:
+                count += 1
 
         if count != 0:
             lindex = count-1  # Subtract because of the final count addition
@@ -146,7 +149,10 @@ def sindex(x, percent):
         rval = x[-1]  # The rightmost value
         while rval >= minpercent:
             rval = x[count]
-            count -= 1
+
+            # Only count if the values is still greater than
+            if rval >= minpercent:
+                count -= 1
 
         if count != endslice:
             rindex = count+1  # Add because of the final count subtraction
