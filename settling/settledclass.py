@@ -208,7 +208,7 @@ class settled(object):
                 i = 0
 
         except Exception:
-            i = 'NA'
+            i = len(self.blockslopes)-1  # If it fails then choose the last bin
 
         self.binselect['slope change between bins'] = i
 

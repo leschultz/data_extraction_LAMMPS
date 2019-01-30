@@ -2,7 +2,7 @@
 alpha=0.05
 
 # icopercent defines what deviation from the maximum value of the ico curve to take temperatures from
-icopercent=20
+icopercent=10
 
 # bottom and top percent fitting for Tg
 bottomtgpercent=15
