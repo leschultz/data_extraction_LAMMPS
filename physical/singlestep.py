@@ -88,7 +88,7 @@ class analize(object):
         Calculate the time from the steps.
         '''
 
-        self.steps = list(range(0, self.stop-self.start+1, self.frq))
+        self.steps = list(range(0, (self.stop-self.start)+self.frq, self.frq))
         time = [i*self.timestep for i in self.steps]  # Time from steps
         self.time = [i-time[0] for i in time]  # Normalize time
 
