@@ -113,4 +113,5 @@ def compareTg(directory):
 
     df.to_csv(directory+'/Tg', sep=' ')
 
+
 compareTg(args.o)
