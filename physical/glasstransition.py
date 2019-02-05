@@ -83,11 +83,11 @@ def run(param, exportdir, bottom, top):
         # Parsed data exported from LAMMPS
         dfsystem = readdata(outfile)  # System data
         dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
-        dfenergy = dfsystem[['Temp', 'TotEng']]  # Energies and Temperatures
-        dfenergy.loc[:, 'TotEng'] = dfenergy['TotEng'].divide(natoms)
+        dfenergy = dfsystem[['Temp', 'Enthalpy']]  # Energies and Temperatures
+        dfenergy.loc[:, 'Enthalpy'] = dfenergy['Enthalpy'].divide(natoms)
 
         xdata = list(dfenergy['Temp'])
-        ydata = list(dfenergy['TotEng'])
+        ydata = list(dfenergy['Enthalpy'])
 
         # Fit the higher temperature range
         length = len(xdata)
@@ -161,7 +161,7 @@ def run(param, exportdir, bottom, top):
         imagepath = savepath+'/images/tg/tg_energy.png'
 
         ax.set_xlabel('Temperature [K]')
-        ax.set_ylabel('Total Energy [eV/atom]')
+        ax.set_ylabel('Enthalpy [eV/atom]')
         ax.grid()
         ax.legend(loc='best')
         plot = ax.get_figure()

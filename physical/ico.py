@@ -24,34 +24,34 @@ def icofrac(name, frame, *args, **kwargs):
     size = indexes.shape
     zeros = np.zeros(size[1], dtype=int)
 
-    # (0, 0, 0, 0, 12, ...) rest are zero
+    # (0, 0, 12, ...) rest are zero
     ico1 = zeros.copy()
-    ico1[4] = 12
+    ico1[2] = 12
 
-    # (0, 0, 0, 1, 10, 2, ...) rest are zero
+    # (0, 1, 10, 2, ...) rest are zero
     ico2 = zeros.copy()
-    ico2[3] = 1
-    ico2[4] = 10
-    ico2[5] = 2
+    ico2[1] = 1
+    ico2[2] = 10
+    ico2[3] = 2
 
-    # (0, 0, 0, 1, 9, 3, ...) rest are zero
+    # (0, 1, 9, 3, ...) rest are zero
     ico3 = zeros.copy()
-    ico3[3] = 1
-    ico3[4] = 9
-    ico3[5] = 3
+    ico3[1] = 1
+    ico3[2] = 9
+    ico3[3] = 3
 
     # Store clusters of interest
     clusters = {
-                '(0, 0, 0, 0, 12)': ico1,
-                '(0, 0, 0, 1, 10, 2)': ico2,
-                '(0, 0, 0, 1, 9, 3)': ico3,
+                '(0, 0, 12)': ico1,
+                '(0, 1, 10, 2)': ico2,
+                '(0, 1, 9, 3)': ico3,
                 }
 
     # Excat matches for clusters
     strictcounts = {
-                    '(0, 0, 0, 0, 12)': 0,
-                    '(0, 0, 0, 1, 10, 2)': 0,
-                    '(0, 0, 0, 1, 9, 3)': 0,
+                    '(0, 0, 12)': 0,
+                    '(0, 1, 10, 2)': 0,
+                    '(0, 1, 9, 3)': 0,
                     }
 
     # n_5 >= 10
