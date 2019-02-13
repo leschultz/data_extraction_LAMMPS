@@ -9,6 +9,7 @@ Example: 4000atom4676
 from PyQt5 import QtGui  # Added to be able to import ovito
 
 from matplotlib import pyplot as pl
+from scipy import stats as st
 
 import pandas as pd
 import numpy as np
@@ -75,18 +76,18 @@ def compareTg(directory):
 
     # Determine averages and STD
     avgdata = {}
-    stddata = {}
+    semdata = {}
     for key, value in sizedata.items():
         avg = np.mean(value)
-        std = np.std(value)
+        sem = st.sem(value)
 
         avgdata[key] = avg
-        stddata[key] = std
+        semdata[key] = sem
 
     # Crate data with following order: size, avg, std, counts
     df = {}
     for key, value in sizedata.items():
-        df[key] = [key, avgdata[key], stddata[key], counts[key]]
+        df[key] = [key, avgdata[key], semdata[key], counts[key]]
 
     fig, ax = pl.subplots()
     for key, value in df.items():
