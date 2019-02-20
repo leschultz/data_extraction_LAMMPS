@@ -226,7 +226,7 @@ def run(param, exportdir, alpha):
             value = analize(
                             item,
                             savepath,
-                            points[1]+cut,
+                            points[1],
                             points[2],
                             timestep,
                             dumprate,
