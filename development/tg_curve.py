@@ -11,7 +11,7 @@ import math
 import os
 
 
-def dd(x, y, degree):
+def radcurve(x, y, degree):
     '''
     Fit a function and take a second derivative to find a knee of a graph.
 
@@ -27,7 +27,7 @@ def dd(x, y, degree):
 
     # Find the polynomial coefficients for a fit
     coeffs = np.polyfit(x, y, degree)
-    xfit = np.linspace(min(x), max(x), 1000)
+    xfit = np.linspace(min(x), max(x), 100)
 
     # Find the derivative of a polynomical
     dcoeffs = np.polyder(coeffs)
@@ -37,7 +37,15 @@ def dd(x, y, degree):
     dyfit = np.polyval(dcoeffs, xfit)
     ddyfit = np.polyval(ddcoeffs,xfit)
 
-    return xfit, yfit, ddyfit
+    # Compute the radius of curvature
+    num = [i**2.0 for i in dyfit]
+    num = [i+1.0 for i in num]
+    num = [i**(3.0/2.0) for i in num]
+    den = [abs(i) for i in ddyfit]
+
+    r = [i/j for i, j in zip(num, den)]
+
+    return xfit, yfit, r
 
 
 def knee(y):
@@ -53,7 +61,7 @@ def knee(y):
 
     # Find the peak of the second derivative
     count = 0
-    for i, j in zip(ddyfit[:-1], ddyfit[1:]):
+    for i, j in zip(y[:-1], y[1:]):
         # Break if the next value is less than
         if j < i:
             break
@@ -65,13 +73,13 @@ def knee(y):
 
 # The path to the google drive data
 path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
+#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)
 
-degree = 10  # The polynomial fit degree used
+degree = 5  # The polynomial fit degree used
 
 # Loop for each path
 for item in paths:
@@ -156,7 +164,7 @@ for item in paths:
         y = [i-3.0*8.6173303*(10**-5)*j for i, j in zip(y, x)]
 
         # Find the polynomial coefficients for a fit
-        xfit, yfit, ddyfit = dd(x, y, degree)
+        xfit, yfit, r = radcurve(x, y, degree)
 
         #  Save the Data from the data frame
         dfenergy.to_csv(
@@ -166,7 +174,7 @@ for item in paths:
                         )
 
         # Find the peak of the second derivative
-        count = knee(ddyfit)
+        count = knee(r)
         tg = xfit[count]
 
         fig, ax = pl.subplots()
@@ -176,10 +184,10 @@ for item in paths:
         ax.grid()
 
         ddax = ax.twinx()
-        ddax.plot(xfit, ddyfit, label='Second Derivative of Fit', color='r')
+        ddax.plot(xfit, r, label='Second Derivative of Fit', color='r')
         ddax.axvline(tg, color='k', linestyle='--', label='Tg='+str(tg)+' K')
         ddax.set_xlabel('Temperature [K]')
-        ddax.set_ylabel('[eV/(atom*K^2)]')
+        ddax.set_ylabel('Radius of Curvature')
         ddax.grid()
         ax.legend(loc='upper right')
         ddax.legend(loc='lower right')
@@ -200,7 +208,7 @@ for item in paths:
         y = list(dfvolume['Volume'])
 
         # Find the polynomial coefficients for a fit
-        xfit, yfit, ddyfit = dd(x, y, degree)
+        xfit, yfit, r = radcurve(x, y, degree)
 
         # Save the Data from the data frame
         dfvolume.to_csv(
@@ -210,7 +218,7 @@ for item in paths:
                         )
 
         # Find the peak of the second derivative
-        count = knee(ddyfit)
+        count = knee(r)
         tg = xfit[count]
 
         fig, ax = pl.subplots()
@@ -220,10 +228,10 @@ for item in paths:
         ax.grid()
 
         ddax = ax.twinx()
-        ddax.plot(xfit, ddyfit, label='Second Derivative of Fit', color='r')
+        ddax.plot(xfit, r, label='Second Derivative of Fit', color='r')
         ddax.axvline(tg, color='k', linestyle='--', label='Tg='+str(tg)+' K')
         ddax.set_xlabel('Temperature [K]')
-        ddax.set_ylabel('[A^3/(atom*K^2)]')
+        ddax.set_ylabel('Radius of Curvature')
         ddax.grid()
         ax.legend(loc='upper right')
         ddax.legend(loc='lower right')
