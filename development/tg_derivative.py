@@ -1,4 +1,4 @@
-from infoparser import inputinfo
+from development.tempinfoparser import inputinfo
 
 from matplotlib import pyplot as pl
 from io import BytesIO
@@ -35,7 +35,7 @@ def dd(x, y, degree):
 
     yfit = np.polyval(coeffs, xfit)
     dyfit = np.polyval(dcoeffs, xfit)
-    ddyfit = np.polyval(ddcoeffs,xfit)
+    ddyfit = np.polyval(ddcoeffs, xfit)
 
     return xfit, yfit, ddyfit
 
@@ -53,7 +53,7 @@ def knee(y):
 
     # Find the peak of the second derivative
     count = 0
-    for i, j in zip(ddyfit[:-1], ddyfit[1:]):
+    for i, j in zip(y[:-1], y[1:]):
         # Break if the next value is less than
         if j < i:
             break
@@ -65,13 +65,13 @@ def knee(y):
 
 # The path to the google drive data
 path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
+#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)
 
-degree = 10  # The polynomial fit degree used
+degree = 6  # The polynomial fit degree used
 
 # Loop for each path
 for item in paths:
@@ -89,11 +89,6 @@ for item in paths:
 
         # Print status
         print(name)
-
-        # Create the path to work in
-        if not os.path.exists(name):
-            os.makedirs(name)
-        savepath = os.path.join(*['./', name])
 
         # Grab the output archive file that contains run system data
         filename = os.path.join(*[item[0], 'outputs.tar.gz'])
@@ -142,6 +137,18 @@ for item in paths:
         dfsystem = pd.DataFrame(data, columns=headers)
         dfsystem = dfsystem.drop_duplicates('Step')
         dfsystem = dfsystem.reset_index(drop=True)
+
+        # Check if needed data is present
+        columns = list(dfsystem.columns)
+        needed = ['TotEng', 'Volume']
+        for item in needed:
+            if item not in columns:
+                break
+
+        # Create the path to work in
+        if not os.path.exists(name):
+            os.makedirs(name)
+        savepath = os.path.join(*['./', name])
 
         # Parsed data exported from LAMMPS
         dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
@@ -212,6 +219,7 @@ for item in paths:
         # Find the peak of the second derivative
         count = knee(ddyfit)
         tg = xfit[count]
+        print(count)
 
         fig, ax = pl.subplots()
         ax.plot(x, y, '.', label='Data')

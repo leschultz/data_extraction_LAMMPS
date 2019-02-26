@@ -1,6 +1,8 @@
-from infoparser import inputinfo
+from development.tempinfoparser import inputinfo
 
 from matplotlib import pyplot as pl
+
+from scipy.interpolate import spline
 from io import BytesIO
 
 import pandas as pd
@@ -98,11 +100,6 @@ for item in paths:
         # Print status
         print(name)
 
-        # Create the path to work in
-        if not os.path.exists(name):
-            os.makedirs(name)
-        savepath = os.path.join(*['./', name])
-
         # Grab the output archive file that contains run system data
         filename = os.path.join(*[item[0], 'outputs.tar.gz'])
         inputfile = os.path.join(*[item[0], 'dep.in'])
@@ -151,6 +148,18 @@ for item in paths:
         dfsystem = dfsystem.drop_duplicates('Step')
         dfsystem = dfsystem.reset_index(drop=True)
 
+        # Check if needed data is present
+        columns = list(dfsystem.columns)
+        needed = ['TotEng', 'Volume']
+        for item in needed:
+            if item not in columns:
+                break
+
+        # Create the path to work in
+        if not os.path.exists(name):
+            os.makedirs(name)
+        savepath = os.path.join(*['./', name])
+
         # Parsed data exported from LAMMPS
         dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
         dfenergy = dfsystem[['Temp', 'TotEng']]  # Energies and Temperature
@@ -195,7 +204,7 @@ for item in paths:
         plot.tight_layout()
 
         # Save figure
-        imagepath = savepath+'/tg_energy_derivative.png'
+        imagepath = savepath+'/tg_energy_curvature.png'
         plot.savefig(imagepath)
         pl.close('all')
 
@@ -239,6 +248,6 @@ for item in paths:
         plot.tight_layout()
 
         # Save figure
-        imagepath = savepath+'/tg_volume_derivative.png'
+        imagepath = savepath+'/tg_volume_curvature.png'
         plot.savefig(imagepath)
         pl.close('all')
