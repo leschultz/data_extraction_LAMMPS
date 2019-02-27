@@ -1,4 +1,4 @@
-from infoparser import inputinfo
+from development.tempinfoparser import inputinfo
 
 from matplotlib import pyplot as pl
 from io import BytesIO
@@ -13,6 +13,7 @@ import os
 # The path to the google drive data
 path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
 path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
+#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)

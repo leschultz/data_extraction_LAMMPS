@@ -74,14 +74,15 @@ def knee(y):
 
 
 # The path to the google drive data
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1000/job1'
+#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)
 
-degree = 5  # The polynomial fit degree used
+degree = 6  # The polynomial fit degree used
 
 # Loop for each path
 for item in paths:
