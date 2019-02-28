@@ -26,9 +26,14 @@ def fitmethod(xdata, ydata):
     toperrs = []
     for i in range(length-1):
 
-        # Remove data from the beginning
-        x = xdata[i:]
-        y = ydata[i:]
+        if i == 0:
+            x = xdata
+            y = ydata
+
+        else:
+            # Remove data from the beginning
+            x = xdata[:-i]
+            y = ydata[:-i]
 
         # The beginning and end points for the data of interest
         xpoints = [x[0], x[-1]]
@@ -190,4 +195,3 @@ fig, ax = pl.subplots()
 ax.plot(xdata, ydata)
 for item in kneesdata:
     ax.axvline(x=item[1])
-

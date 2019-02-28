@@ -1,4 +1,5 @@
 from scipy.interpolate import UnivariateSpline as spline
+from scipy.signal import argrelextrema
 from scipy.stats import linregress as fit
 from matplotlib import pyplot as pl
 
@@ -30,9 +31,14 @@ def knees(xdata, ydata, name):
     toperrs = []
     for i in range(length-1):
 
-        # Remove data from the beginning
-        x = xdata[i:]
-        y = ydata[i:]
+        if i == 0:
+            x = xdata
+            y = ydata
+
+        else:
+            # Remove data from the beginning
+            x = xdata[:-i]
+            y = ydata[:-i]
 
         # The beginning and end points for the data of interest
         xpoints = [x[0], x[-1]]
@@ -113,7 +119,7 @@ def knees(xdata, ydata, name):
     dyspline = ds(xdata)
     ddyspline = dds(xdata)
 
-    splineindex = np.argmax(ddyspline)
+    splineindex = argrelextrema(ddyspline, np.greater)[0][0]
 
     fig, ax = pl.subplots(2, 1)
 
