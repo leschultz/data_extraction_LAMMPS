@@ -5,4 +5,5 @@ __all__ = [
            'tg_energy_fits',
            'sigmoid1',
            'sigmoid2',
+           'fits',
            ]
