@@ -1,8 +1,8 @@
 from development.tempinfoparser import inputinfo
 
+from scipy.interpolate import UnivariateSpline as spline
 from matplotlib import pyplot as pl
 
-from scipy.interpolate import spline
 from io import BytesIO
 
 import pandas as pd
@@ -28,16 +28,15 @@ def radcurve(x, y, degree):
     '''
 
     # Find the polynomial coefficients for a fit
-    coeffs = np.polyfit(x, y, degree)
-    xfit = np.linspace(min(x), max(x), 100)
+    xfit = np.linspace(min(x), max(x), 1000)
 
-    # Find the derivative of a polynomical
-    dcoeffs = np.polyder(coeffs)
-    ddcoeffs = np.polyder(dcoeffs)
-
-    yfit = np.polyval(coeffs, xfit)
-    dyfit = np.polyval(dcoeffs, xfit)
-    ddyfit = np.polyval(ddcoeffs,xfit)
+    # Find the derivative of a polynomial
+    s = spline(x, y, k=degree)
+    ds = s.derivative()
+    dds = s.derivative(2)
+    yfit = s(xfit)
+    dyfit = ds(xfit)
+    ddyfit = dds(xfit)
 
     # Compute the radius of curvature
     num = [i**2.0 for i in dyfit]
@@ -82,7 +81,7 @@ path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1
 # Look for all directories as generator object
 paths = os.walk(path)
 
-degree = 6  # The polynomial fit degree used
+degree = 5  # The polynomial fit degree used
 
 # Loop for each path
 for item in paths:

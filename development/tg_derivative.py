@@ -1,4 +1,5 @@
 from development.tempinfoparser import inputinfo
+from scipy.interpolate import UnivariateSpline as spline
 
 from matplotlib import pyplot as pl
 from io import BytesIO
@@ -37,6 +38,14 @@ def dd(x, y, degree):
     dyfit = np.polyval(dcoeffs, xfit)
     ddyfit = np.polyval(ddcoeffs, xfit)
 
+    s = spline(x, y, k=degree)
+    ds = s.derivative()
+    dds = s.derivative(2)
+    yfit = s(xfit)
+    dyfit = ds(xfit)
+    ddyfit = dds(xfit)
+
+
     return xfit, yfit, ddyfit
 
 
@@ -64,14 +73,15 @@ def knee(y):
 
 
 # The path to the google drive data
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1000/job1'
+#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)
 
-degree = 6  # The polynomial fit degree used
+degree = 5  # The polynomial fit degree used
 
 # Loop for each path
 for item in paths:

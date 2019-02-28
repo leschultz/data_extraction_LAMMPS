@@ -1,5 +1,6 @@
 from development.tempinfoparser import inputinfo
 
+from scipy.interpolate import UnivariateSpline as spline
 from scipy.stats import linregress as fit
 from matplotlib import pyplot as pl
 
@@ -20,6 +21,9 @@ path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1
 
 # Look for all directories as generator object
 paths = os.walk(path)
+
+# The degree for fiting the durve with a spline
+degree = 5
 
 # Define the percent of data for the fits
 top = 50.0
@@ -100,43 +104,11 @@ for item in paths:
         xdata = list(dfenergy['Temp'])
         ydata = list(dfenergy['Volume'])
 
+        # Fit the data to have smooth transitions
+        s = spline(xdata, ydata, k=degree)
+        yspline = s(xdata)
+
         length = len(xdata)
-
-        '''
-        Fit all the data and then remove higher temperatures and calculate
-        the differences between the fitted y values and the actual y values
-        normalized by the length of data used for fitting.
-        '''
-        # Idea: I should only include two points in the fitting and then caluclate the difference to give a pseudo area between actual and fitted values. Minimize that area and you should get what you want.
-        boterrs = []
-        for i in range(length-1):
-
-            # Include all the data
-            if i == 0:
-                x = xdata
-                y = ydata
-
-            # Start removing data from the end
-            else:
-                x = xdata[:-i]
-                y = ydata[:-i]
-
-            botfit = fit(x, y)
-
-            print(x)
-
-            slope = botfit[0]
-            intercept = botfit[1]
-
-            yfit = [i*slope+intercept for i in x]
-
-            boterr = sum([abs(i-j) for i, j in zip(y, yfit)])
-            boterr /= len(x)
-
-            boterrs.append(boterr)
-
-        pl.plot(boterrs, '.')
-        pl.show()
 
         '''
         Fit all the data and then remove lower temperatures and calculate
@@ -148,24 +120,38 @@ for item in paths:
 
             # Remove data from the beginning
             x = xdata[i:]
-            y = ydata[i:]
+            y = yspline[i:]
 
-            topfit = fit(x, y)
+            # The beginning and end points for the data of interest
+            xpoints = [x[0], x[-1]]
+            ypoints = [y[0], y[-1]]
+
+            topfit = fit(xpoints, ypoints)
 
             slope = topfit[0]
             intercept = topfit[1]
 
             yfit = [i*slope+intercept for i in x]
 
-            toperr = sum([abs(i-j) for i, j in zip(y, yfit)])
-            toperr /= len(x)
+            toperr = sum([abs(i-j) for i, j in zip(y, yfit)])/len(x)
 
             toperrs.append(toperr)
 
-        pl.plot(toperrs, '.')
+
+        count = 0
+        for i, j in zip(toperrs[:-1], toperrs[1:]):
+            if i > j:
+                count += 1
+
+            else:
+                index = count
+                break
+
+        pl.plot([i/max(toperrs) for i in toperrs], '.')
+        pl.axvline(x=index)
         pl.show()
 
-        # Fit the higher temperature range
+        # Fit the temperature range
         length = len(xdata)
         start0 = 0
         end0 = math.floor((top/100)*length)
@@ -178,8 +164,8 @@ for item in paths:
 
         fitrange0 = str([math.floor(xdata[start0]), math.floor(xdata[end0])])
 
-        # Fit the lower temperature range
-        start1 = math.ceil((1-bottom/100)*length)
+        # Fit the temperature range
+        start1 = index
         end1 = -1
         x1 = xdata[start1:end1]
         y1 = ydata[start1:end1]
@@ -193,7 +179,8 @@ for item in paths:
         fig, ax = pl.subplots()
 
         ax.plot(xdata, ydata, '.')
-        ax.plot(xdata, yfit0, 'r', label='Fit Range of '+fitrange0+' [K]')
+        ax.plot(xdata, yspline, label='Spline of Degree '+str(degree))
+        #ax.plot(xdata, yfit0, 'r', label='Fit Range of '+fitrange0+' [K]')
         ax.plot(xdata, yfit1, 'g', label='Fit Range of '+fitrange1+' [K]')
 
         if not os.path.exists(name):
