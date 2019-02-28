@@ -6,4 +6,5 @@ __all__ = [
            'sigmoid1',
            'sigmoid2',
            'fits',
+           'kneefinder',
            ]
