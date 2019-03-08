@@ -109,6 +109,14 @@ def knees(xdata, ydata, lines, name):
                                 )
 
         fitindex = cutindex(toperrsnorm, cutoff)
+
+        fig, ax = pl.subplots()
+        ax.plot(toperrsnorm, marker='.')
+        ax.axhline(y=cutoff, color='k')
+        ax.grid()
+        ax.set_ylabel('Error Normalized by Maximum Error')
+        ax.set_xlabel('Index')
+        pl.show()
         indexes.append(fitindex)
 
         count += 1
@@ -160,6 +168,7 @@ def knees(xdata, ydata, lines, name):
     return kneeindex, xkneeval, ykneeval
 
 kneesdata = []
+n = 2
 
 # Evaluate a sigmoid function
 s = '50/(1+np.exp(-x*2))'
@@ -168,7 +177,7 @@ f = eval(s)
 xdata = np.linspace(-3, 0)
 ydata = f(xdata)
 
-i = knees(xdata, ydata, 3, 'sigmoid1')
+i = knees(xdata, ydata, n, 'sigmoid1')
 kneesdata.append(i)
 
 # Evaluate a sigmoid function
@@ -178,7 +187,7 @@ f = eval(s)
 xdata = np.linspace(-3, 1)
 ydata = f(xdata)
 
-i = knees(xdata, ydata, 3, 'sigmoid2')
+i = knees(xdata, ydata, n, 'sigmoid2')
 kneesdata.append(i)
 
 # Evaluate a sigmoid function
@@ -188,7 +197,7 @@ f = eval(s)
 xdata = np.linspace(-3, 3)
 ydata = f(xdata)
 
-i = knees(xdata, ydata, 3, 'sigmoid3')
+i = knees(xdata, ydata, n, 'sigmoid3')
 kneesdata.append(i)
 
 fig, ax = pl.subplots()

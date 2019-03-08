@@ -73,8 +73,7 @@ def knee(y):
 
 
 # The path to the google drive data
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1000/job1'
-#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job10'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
 #path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
 
@@ -229,7 +228,6 @@ for item in paths:
         # Find the peak of the second derivative
         count = knee(ddyfit)
         tg = xfit[count]
-        print(count)
 
         fig, ax = pl.subplots()
         ax.plot(x, y, '.', label='Data')

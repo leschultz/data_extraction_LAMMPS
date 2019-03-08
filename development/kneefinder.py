@@ -25,7 +25,7 @@ def knees(xdata, ydata):
     length = len(xdata)
 
     # Fit a spline and find the derivatives
-    s = spline(xdata, ydata, k=degree, s=0)
+    s = spline(xdata, ydata, k=degree, s=2)
     dds = s.derivative(2)
 
     yspline = s(xdata)
@@ -33,6 +33,12 @@ def knees(xdata, ydata):
 
     maxsplineindex = argrelextrema(ddyspline, np.greater)[0][0]
     minsplineindex = argrelextrema(ddyspline, np.less)[0][0]
+
+    if not maxsplineindex:
+        maxsplineindex = 0
+
+    if not minsplineindex:
+        minsplineindex = 0
 
     if maxsplineindex < minsplineindex:
         splineindex = maxsplineindex

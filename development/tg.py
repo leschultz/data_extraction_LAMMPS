@@ -14,10 +14,11 @@ import math
 import os
 
 # The path to the google drive data
-path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/1000/job2'
-#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al1.00/667/job1'
-#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Ag/Ag1.00/667/job1'
-#path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/667/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Ni-Zr/Zr0.00/1000/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Zr-Cu/Cu0.00/1000/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Pd-Si/Si0.00/1000/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/Al-Sm/Sm0.00/1000/job1'
+path = '/home/nerve/Documents/UW/gdrive/DMREF/MD/Rc_database/TEMP/La-Al/Al0.00/1000/job1'
 
 # Look for all directories as generator object
 paths = os.walk(path)
