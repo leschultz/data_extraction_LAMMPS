@@ -1,4 +1,4 @@
-from scipy.interpolate import UnivariateSpline as spline
+from scipy.interpolate import LSQUnivariateSpline as spline
 from matplotlib import pyplot as pl
 
 from scipy.signal import argrelextrema
@@ -6,49 +6,46 @@ from scipy.signal import argrelextrema
 import numpy as np
 
 
-def knees(xdata, ydata):
+def knees(x, y):
     '''
     Find the knee based on how a second derivative behaves.
     Data has to be strictly increasing.
 
     inputs:
-        xdata = The x-axis data
-        ydata = The y-axis data
+        x = The x-axis data
+        y = The y-axis data
 
     outputs:
-        yspline = The y-valeus for fitted data
+        yspline = The y-values for fitted data
         ddyspline = The second derivative for fitted data
         splineindex = The index where the knee should occur
     '''
 
-    length = len(xdata)
+    length = len(x)
+
+    # Setup the number of knots for the spline fit
+    t = [np.mean(i) for i in np.array_split(x, 5)]
 
     # Fit a spline and find the derivatives
     s = spline(
-               x=xdata,
-               y=ydata,
+               x=x,
+               y=y,
                k=5,
+               t=t
                )
 
     dds = s.derivative(2)  # Take a second derivative
 
-    xnew = np.linspace(xdata[0], xdata[-1], 1000)  # Make smooth
+    xnew = np.linspace(x[0], x[-1], 1000)  # Make smooth
     yspline = s(xnew)
     ddyspline = dds(xnew)
 
     maxsplineindex = argrelextrema(ddyspline, np.greater)[0][0]
-    minsplineindex = argrelextrema(ddyspline, np.less)[0][0]
 
     if not maxsplineindex:
-        maxsplineindex = 0
-
-    if not minsplineindex:
-        minsplineindex = 0
-
-    if maxsplineindex < minsplineindex:
-        splineindex = maxsplineindex
+        splineindex = 0
     else:
-        splineindex = minsplineindex
+        splineindex = maxsplineindex
 
     return xnew, yspline, ddyspline, splineindex
 

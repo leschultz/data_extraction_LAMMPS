@@ -93,24 +93,24 @@ def findtg(path):
             t = dfsystem['Temp'].values  # Temperatures
 
             # Attempt to do the energy analysis if data is available
-            try:
-                # Energies normalized by the number of atoms
-                e = dfsystem['TotEng'].values/natoms
-                tg(t, e, name, 'energy')
-                print('Generated E-3kT vs. Temperature plot.')
+            #try:
+            # Energies normalized by the number of atoms
+            e = dfsystem['TotEng'].values/natoms
+            tg(t, e, name, 'energy')
+            print('Generated E-3kT vs. Temperature plot.')
 
-            except Exception:
-                pass
+            #except Exception:
+            #    pass
 
             # Attempt to do the volume analysis if data is available
-            try:
-                # Volumes normalized by the number of atoms
-                v = dfsystem['Volume'].values/natoms
-                tg(t, v, name, 'volume')
-                print('Generated Specific Volume vs. Temperature plot.')
+            #try:
+            # Volumes normalized by the number of atoms
+            v = dfsystem['Volume'].values/natoms
+            tg(t, v, name, 'volume')
+            print('Generated Specific Volume vs. Temperature plot.')
 
-            except Exception:
-                pass
+            #except Exception:
+            #    pass
 
     print('-'*79)
 
@@ -147,7 +147,11 @@ def tg(x, y, name, option):
     #  Save the Data from the data frame
     data = np.column_stack((x, y))
     np.savetxt(
-               savepath+'/tg_'+option+'.txt',
+               savepath+'/tg_'+option+'_curve.txt',
                data,
                delimiter=' '
                )
+
+    # Export the glass transition temperature
+    with open(savepath+'/tg_'+option+'.txt', 'w+') as outfile:
+        outfile.write(str(xfit[kneeindex]))
