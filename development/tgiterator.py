@@ -25,94 +25,112 @@ def findtg(path):
 
     # Loop for each path
     for item in paths:
+        try:
+            finddata(item)
+        except Exception:
+            continue
 
-        if 'job' in item[0]:
 
-            # Were parsed data will be stored
-            data = []
+def finddata(item):
+    '''
+    Find the system data in compressed tar files for calculating the glass
+    transition temperature.
 
-            # Create a name from the path
-            name = item[0].split('/')
-            name = name[-4:]
-            name = os.path.join(*name)
-            savepath = os.path.join(*['./', name])
+    inputs:
+        item = The path for where data may be
 
-            # Print status
-            print(name)
+    outputs:
+        A collection of images and data files for the glass transition
+        temperature
+    '''
 
-            # Grab the output archive file that contains run system data
-            filename = os.path.join(*[item[0], 'outputs.tar.gz'])
-            inputfile = os.path.join(*[item[0], 'dep.in'])
+    if 'job' in item[0]:
 
-            # Some of the parameters from the LAMMPS input file
-            param = inputinfo(inputfile)
-            hold1 = param['hold1']
+        # Were parsed data will be stored
+        data = []
 
-            # Open the archive
-            archive = tarfile.open(filename, 'r')
+        # Create a name from the path
+        name = item[0].split('/')
+        name = name[-4:]
+        name = os.path.join(*name)
+        savepath = os.path.join(*['./', name])
 
-            # Iterate for each file in the archive
-            for member in archive.getmembers():
+        # Print status
+        print(name)
 
-                # Open the file containing system data
-                if '.out' in str(member):
-                    content = (archive.extractfile(member)).read()
-                    content = content.splitlines()
+        # Grab the output archive file that contains run system data
+        filename = os.path.join(*[item[0], 'outputs.tar.gz'])
+        inputfile = os.path.join(*[item[0], 'dep.in'])
 
-                    # Parse information in file
-                    count = 0  # Counter for headers later
-                    for line in content:
+        # Some of the parameters from the LAMMPS input file
+        param = inputinfo(inputfile)
+        hold1 = param['hold1']
 
-                        # Bunch of parsing
-                        line = line.decode('utf-8')
-                        line = line.split(' ')
-                        line = [i for i in line if '' != i]
+        # Open the archive
+        archive = tarfile.open(filename, 'r')
 
-                        if line:
-                            if (line[0] == 'Step' and count == 0):
-                                headers = line
-                                count = 1
+        # Iterate for each file in the archive
+        for member in archive.getmembers():
 
-                            if ('Created' in line and 'atoms' in line):
-                                natoms = int(line[1])
+            # Open the file containing system data
+            if '.out' in str(member):
+                content = (archive.extractfile(member)).read()
+                content = content.splitlines()
 
-                            try:
-                                line = [float(i) for i in line]
-                                data.append(line)
+                # Parse information in file
+                count = 0  # Counter for headers later
+                for line in content:
 
-                            except Exception:
-                                pass
+                    # Bunch of parsing
+                    line = line.decode('utf-8')
+                    line = line.split(' ')
+                    line = [i for i in line if '' != i]
 
-            # System data as a dataframe with removed repeated steps
-            dfsystem = pd.DataFrame(data, columns=headers)
-            dfsystem = dfsystem.drop_duplicates('Step')
-            dfsystem = dfsystem.reset_index(drop=True)
-            dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
-            dfsystem = dfsystem.sort_values(by=['Temp'])  # Needed for spline
+                    if line:
+                        if (line[0] == 'Step' and count == 0):
+                            headers = line
+                            count = 1
 
-            t = dfsystem['Temp'].values  # Temperatures
+                        if ('Created' in line and 'atoms' in line):
+                            natoms = int(line[1])
 
-            # Attempt to do the energy analysis if data is available
-            try:
-            # Energies normalized by the number of atoms
-                e = dfsystem['TotEng'].values/natoms
-                tg(t, e, name, 'energy')
-                print('Generated E-3kT vs. Temperature plot.')
+                        try:
+                            line = [float(i) for i in line]
+                            data.append(line)
 
-            except Exception:
-                pass
+                        except Exception:
+                            pass
 
-            # Attempt to do the volume analysis if data is available
-            try:
-            # Volumes normalized by the number of atoms
-                v = dfsystem['Volume'].values/natoms
-                tg(t, v, name, 'volume')
-                print('Generated Specific Volume vs. Temperature plot.')
+        # System data as a dataframe with removed repeated steps
+        dfsystem = pd.DataFrame(data, columns=headers)
+        dfsystem = dfsystem.drop_duplicates('Step')
+        dfsystem = dfsystem.reset_index(drop=True)
+        dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
+        dfsystem = dfsystem.sort_values(by=['Temp'])  # Needed for spline
 
-            except Exception:
-                pass
+        t = dfsystem['Temp'].values  # Temperatures
 
-    print('-'*79)
+        # Attempt to do the energy analysis if data is available
+        try:
+        # Energies normalized by the number of atoms
+            e = dfsystem['TotEng'].values/natoms
+            tg(t, e, name, 'energy')
+            print('Generated E-3kT vs. Temperature plot.')
+
+        except Exception:
+            pass
+
+        # Attempt to do the volume analysis if data is available
+        try:
+        # Volumes normalized by the number of atoms
+            v = dfsystem['Volume'].values/natoms
+            tg(t, v, name, 'volume')
+            print('Generated Specific Volume vs. Temperature plot.')
+
+        except Exception:
+            pass
+
+        print('-'*79)
 
 
 def tg(x, y, name, option):
