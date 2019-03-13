@@ -24,7 +24,7 @@ def knees(x, y):
     length = len(x)
 
     # Setup the number of knots for the spline fit
-    t = [np.mean(i) for i in np.array_split(x, 5)]
+    t = [np.mean(i) for i in np.array_split(x, 3)]
 
     # Fit a spline and find the derivatives
     s = spline(

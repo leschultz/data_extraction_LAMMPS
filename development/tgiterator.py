@@ -93,24 +93,24 @@ def findtg(path):
             t = dfsystem['Temp'].values  # Temperatures
 
             # Attempt to do the energy analysis if data is available
-            #try:
+            try:
             # Energies normalized by the number of atoms
-            e = dfsystem['TotEng'].values/natoms
-            tg(t, e, name, 'energy')
-            print('Generated E-3kT vs. Temperature plot.')
+                e = dfsystem['TotEng'].values/natoms
+                tg(t, e, name, 'energy')
+                print('Generated E-3kT vs. Temperature plot.')
 
-            #except Exception:
-            #    pass
+            except Exception:
+                pass
 
             # Attempt to do the volume analysis if data is available
-            #try:
+            try:
             # Volumes normalized by the number of atoms
-            v = dfsystem['Volume'].values/natoms
-            tg(t, v, name, 'volume')
-            print('Generated Specific Volume vs. Temperature plot.')
+                v = dfsystem['Volume'].values/natoms
+                tg(t, v, name, 'volume')
+                print('Generated Specific Volume vs. Temperature plot.')
 
-            #except Exception:
-            #    pass
+            except Exception:
+                pass
 
     print('-'*79)
 
