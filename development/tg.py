@@ -102,12 +102,14 @@ for item in paths:
 
         # Parsed data exported from LAMMPS
         dfsystem = dfsystem.loc[dfsystem['Step'] >= hold1]  # Start of run
-        dfenergy = dfsystem[['Temp', 'TotEng']]  # Energies and Temperature
-        dfenergy.loc[:, 'TotEng'] = dfenergy['TotEng'].divide(natoms)
-        dfenergy = dfenergy.sort_values(by=['Temp'])
+        dfsystem = dfsystem.sort_values(by=['Temp'])
 
-        x = list(dfenergy['Temp'])
-        y = list(dfenergy['TotEng'])
+        # Use only the energy temperature data
+        dfenergy = dfsystem[['Temp', 'TotEng']]  # Energies and Temperature
+        energydata = dfenergy.values
+
+        x = energydata[:, 0]
+        y = energydata[:, 1]/natoms
 
         # Subtract 3kT form the total energy
         y = [i-3.0*8.6173303*(10**-5)*j for i, j in zip(y, x)]
@@ -125,11 +127,10 @@ for item in paths:
 
         # Repeat the procedure using specific volume
         dfvolume = dfsystem[['Temp', 'Volume']]  # Energies and Temperature
-        dfvolume.loc[:, 'Volume'] = dfvolume['Volume'].divide(natoms)
-        dfvolume = dfvolume.sort_values(by=['Temp'])
+        volumedata = dfvolume.values
 
-        x = list(dfvolume['Temp'])
-        y = list(dfvolume['Volume'])
+        x = volumedata[:, 0]
+        y = volumedata[:, 1]/natoms
 
         # Find the polynomial coefficients for a fit
         yfit, ddyfit, kneeindex = knees(x, y)
