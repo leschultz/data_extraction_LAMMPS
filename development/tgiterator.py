@@ -97,6 +97,7 @@ def findtg(path):
                 # Energies normalized by the number of atoms
                 e = dfsystem['TotEng'].values/natoms
                 tg(t, e, name, 'energy')
+                print('Generated E-3kT vs. Temperature plot.')
 
             except Exception:
                 pass
@@ -106,9 +107,12 @@ def findtg(path):
                 # Volumes normalized by the number of atoms
                 v = dfsystem['Volume'].values/natoms
                 tg(t, v, name, 'volume')
+                print('Generated Specific Volume vs. Temperature plot.')
 
             except Exception:
                 pass
+
+    print('-'*79)
 
 
 def tg(x, y, name, option):
@@ -131,14 +135,14 @@ def tg(x, y, name, option):
         y = y-3.0*8.6173303*(10.0**-5.0)*x
 
     # Find the polynomial coefficients for a fit
-    yfit, ddyfit, kneeindex = knees(x, y)
+    xfit, yfit, ddyfit, kneeindex = knees(x, y)
 
     # Create the path to work in
     if not os.path.exists(name):
         os.makedirs(name)
     savepath = os.path.join(*['./', name])
 
-    plotknee(x, y, yfit, ddyfit, kneeindex, savepath+'/'+option)
+    plotknee(x, y, xfit, yfit, ddyfit, kneeindex, savepath+'/'+option)
 
     #  Save the Data from the data frame
     data = np.column_stack((x, y))

@@ -21,15 +21,20 @@ def knees(xdata, ydata):
         splineindex = The index where the knee should occur
     '''
 
-    degree = 5  # The degree for the fitting spline
     length = len(xdata)
 
     # Fit a spline and find the derivatives
-    s = spline(xdata, ydata, k=degree, s=2)
-    dds = s.derivative(2)
+    s = spline(
+               x=xdata,
+               y=ydata,
+               k=5,
+               )
 
-    yspline = s(xdata)
-    ddyspline = dds(xdata)
+    dds = s.derivative(2)  # Take a second derivative
+
+    xnew = np.linspace(xdata[0], xdata[-1], 1000)  # Make smooth
+    yspline = s(xnew)
+    ddyspline = dds(xnew)
 
     maxsplineindex = argrelextrema(ddyspline, np.greater)[0][0]
     minsplineindex = argrelextrema(ddyspline, np.less)[0][0]
@@ -45,16 +50,20 @@ def knees(xdata, ydata):
     else:
         splineindex = minsplineindex
 
-    return yspline, ddyspline, splineindex
+    return xnew, yspline, ddyspline, splineindex
 
 
-def plotknee(xdata, ydata, yfit, ddyfit, kneeindex, name):
+def plotknee(xdata, ydata, xfit, yfit, ddyfit, kneeindex, name):
     '''
     Plot data to visualize where the knee of a curve occurs.
 
     inputs:
         xdata = The x-axis data
         ydata = The y-axis data
+        xfit = The x-axis data for the spline fit
+        yfit = The y-axis data for the spline fit
+        ddyfit = The y-axis data for the second derivative of yfit
+        kneeindex = The index of the data of the knee
         name = The beginning save name for the plots
 
     outputs:
@@ -68,14 +77,14 @@ def plotknee(xdata, ydata, yfit, ddyfit, kneeindex, name):
     ax[0].set_title('Analysis of the rate of change of the slope')
 
     splineintersection = (
-                          float(str(xdata[kneeindex])[:legenddigits]),
+                          float(str(xfit[kneeindex])[:legenddigits]),
                           float(str(yfit[kneeindex])[:legenddigits])
                           )
 
     ax[0].plot(xdata, ydata, marker='.', label='Data')
-    ax[0].plot(xdata, yfit, label='Spline Fit')
+    ax[0].plot(xfit, yfit, label='Spline Fit')
     ax[0].axvline(
-                  x=xdata[kneeindex],
+                  x=xfit[kneeindex],
                   color='k',
                   label='Knee at '+str(splineintersection)
                   )
@@ -86,13 +95,13 @@ def plotknee(xdata, ydata, yfit, ddyfit, kneeindex, name):
     ax[0].grid()
 
     splineintersectionerr = (
-                             float(str(xdata[kneeindex])[:legenddigits]),
+                             float(str(xfit[kneeindex])[:legenddigits]),
                              float(str(ddyfit[kneeindex])[:legenddigits])
                              )
 
-    ax[1].plot(xdata, ddyfit)
+    ax[1].plot(xfit, ddyfit)
     ax[1].axvline(
-                  x=xdata[kneeindex],
+                  x=xfit[kneeindex],
                   color='k',
                   label='Knee at '+str(splineintersectionerr)
                   )
