@@ -2,6 +2,7 @@
 Find pertinent information in LAMMPS input files.
 '''
 
+
 def inputinfo(item):
     '''
     Parse the input file to grab run information.
