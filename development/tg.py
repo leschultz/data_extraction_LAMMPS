@@ -114,7 +114,7 @@ for item in paths:
 
         # Find the polynomial coefficients for a fit
         yfit, ddyfit, kneeindex = knees(x, y)
-        plotknee(x, y, yfit, ddyfit, kneeindex, 'energy')
+        plotknee(x, y, yfit, ddyfit, kneeindex, savepath+'/energy')
 
         #  Save the Data from the data frame
         dfenergy.to_csv(
@@ -133,7 +133,7 @@ for item in paths:
 
         # Find the polynomial coefficients for a fit
         yfit, ddyfit, kneeindex = knees(x, y)
-        plotknee(x, y, yfit, ddyfit, kneeindex, 'volume')
+        plotknee(x, y, yfit, ddyfit, kneeindex, savepath+'/volume')
 
         # Save the Data from the data frame
         dfvolume.to_csv(
