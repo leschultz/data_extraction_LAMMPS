@@ -12,7 +12,8 @@ volumefile = 'tg_volume.txt'
 # Find all the paths available in a directory
 paths = os.walk(path)
 
-systems = {}
+systems = {}  # Store data
+locations = {}  # Store job location
 for path in paths:
 
     system, composition, hold, job = path[0].split('/')[-4:]
@@ -28,6 +29,16 @@ for path in paths:
         systems[system][composition] = {}
     if systems[system][composition].get(hold) is None:
         systems[system][composition][hold] = {}
+
+    # Create the needed dictionaries
+    if locations.get(system) is None:
+        locations[system] = {}
+    if locations[system].get(composition) is None:
+        locations[system][composition] = {}
+    if locations[system][composition].get(hold) is None:
+        locations[system][composition][hold] = {}
+
+    locations[system][composition][hold] = path[0]
 
     # Load available data
     if energyfile in path[2]:
@@ -54,7 +65,8 @@ columns = [
            'Number of Mean Tg Values from E-3kT [-]',
            'Mean Tg from Specific Volume Curve [K]',
            'STD Tg from Specific Volume Curve [K]',
-           'Number of Mean Tg Values from Specific Volume Curve [-]'
+           'Number of Mean Tg Values from Specific Volume Curve [-]',
+           'Location of Jobs'
            ]
 
 df = pd.DataFrame(columns=columns)
@@ -63,6 +75,7 @@ count = 0
 for system in systems:
     for composition in systems[system]:
         for hold in systems[system][composition]:
+
             row = [
                    system,
                    composition,
@@ -73,6 +86,7 @@ for system in systems:
                    np.nan,
                    np.nan,
                    np.nan,
+                   locations[system][composition][hold]
                    ]
 
             for method, tg in systems[system][composition][hold].items():
