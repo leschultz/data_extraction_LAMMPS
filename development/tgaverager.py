@@ -1,5 +1,7 @@
 from matplotlib import pyplot as pl
 
+from IPython.display import HTML
+
 import pandas as pd
 import numpy as np
 import os
@@ -79,7 +81,7 @@ for path in paths:
     dictcreator(systems, names)  # Create keys if not present
     dictcreator(locations, names)  # Create keys if not present
 
-    locations[system][composition][hold] = path[0]
+    locations[system][composition][hold] = path[0].split('job')[0]
 
     fileload(systems, names, energyfile, path[0], path[2])
     fileload(systems, names, volumefile, path[0], path[2])
