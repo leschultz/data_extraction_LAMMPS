@@ -2,6 +2,8 @@ from matplotlib import pyplot as pl
 
 import pandas as pd
 
+import os
+
 filepath = './Tg.pkl'
 
 df = pd.read_pickle(filepath)
@@ -14,6 +16,7 @@ for system in systems:
     for composition in compositions:
 
         df2 = df1[df1['Composition [decimal]'] == composition]
+        df2 = df2.reset_index(drop=True)  # Reset the index
 
         fig, ax = pl.subplots(2, 1)
 
@@ -47,5 +50,7 @@ for system in systems:
         ax[1].grid()
 
         fig.tight_layout()
-        pl.show()
+
+        location = os.path.join(*df2['Location of Jobs'][0].split('/')[:-2])
+        fig.savefig(os.path.join(location, 'Tg_comparisons'))
         pl.close('all')

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 
-path = '../tests'
+datapath = './'
 
 energyfile = 'tg_energy.txt'
 volumefile = 'tg_volume.txt'
@@ -57,7 +57,7 @@ def fileload(dictionary, keys, datafile, path, filelist):
 
 
 # Find all the paths available in a directory
-paths = os.walk(path)
+paths = os.walk(datapath)
 
 systems = {}  # Store data
 locations = {}  # Store job location
@@ -153,5 +153,5 @@ df = df.sort_values(
 df = df.reset_index(drop=True)  # Reset the index
 
 df['Steps [-]'] = df['Steps [-]'].apply(pd.to_numeric)
-df.to_html('Tg.html')  # Export as an HTML table
-df.to_pickle('Tg.pkl')  # Export as a pickle file
+df.to_html(os.path.join(datapath, 'Tg.html'))  # Export as an HTML table
+df.to_pickle(os.path.join(datapath, 'Tg.pkl'))  # Export as a pickle file
