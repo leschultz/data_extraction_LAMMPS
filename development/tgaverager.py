@@ -1,7 +1,3 @@
-from matplotlib import pyplot as pl
-
-from IPython.display import HTML
-
 import pandas as pd
 import numpy as np
 import os
@@ -78,6 +74,13 @@ for path in paths:
     except Exception:
         continue
 
+    # Compensate for odd names from google drive
+    system = system.split(' ')[0]
+    composition = composition.split(' ')[0]
+    hold = hold.split(' ')[0]
+    job = job.split(' ')[0]
+    names = [system, composition, hold, job]
+
     dictcreator(systems, names)  # Create keys if not present
     dictcreator(locations, names)  # Create keys if not present
 
@@ -139,6 +142,16 @@ for system in systems:
             df.loc[count] = row  # Append a row to the dataframe
             count += 1
 
-df = df.sort_values(by='System')  # Alphabetically sort the dataframe
+# Alphabetically sort the dataframe
+df = df.sort_values(
+                    by=[
+                        'System',
+                        'Composition [decimal]',
+                        'Steps [-]'
+                        ]
+                        )
 df = df.reset_index(drop=True)  # Reset the index
+
+df['Steps [-]'] = df['Steps [-]'].apply(pd.to_numeric)
 df.to_html('Tg.html')  # Export as an HTML table
+df.to_pickle('Tg.pkl')  # Export as a pickle file
