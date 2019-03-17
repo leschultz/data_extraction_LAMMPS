@@ -5,6 +5,8 @@ from scipy.signal import argrelextrema
 
 import numpy as np
 
+import math
+
 
 def knees(x, y):
     '''
@@ -21,10 +23,8 @@ def knees(x, y):
         splineindex = The index where the knee should occur
     '''
 
-    length = len(x)
-
     # Setup the number of knots for the spline fit
-    t = [np.mean(i) for i in np.array_split(x, 3)]
+    t = [np.mean(i) for i in np.array_split(x, 4)]
 
     # Fit a spline and find the derivatives
     s = spline(
@@ -36,16 +36,24 @@ def knees(x, y):
 
     dds = s.derivative(2)  # Take a second derivative
 
-    xnew = np.linspace(x[0], x[-1], 1000)  # Make smooth
+    n = 1000
+    xnew = np.linspace(x[0], x[-1], n)  # Make smooth
     yspline = s(xnew)
     ddyspline = dds(xnew)
 
-    maxsplineindex = argrelextrema(ddyspline, np.greater)[0][0]
+    # Truncate the end data because of strange behavior at high temperatures
+    cut = math.ceil(n*0.75)
 
-    if not maxsplineindex:
-        splineindex = 0
+    # Find the local maxima
+    localmaxes = argrelextrema(ddyspline[:cut], np.greater)
+
+    # Find the largest of the local maxima
+    if len(localmaxes[0]) > 0:
+        splineindex = localmaxes[0][np.argmax(ddyspline[localmaxes])]
+
+    # Find the global maxima
     else:
-        splineindex = maxsplineindex
+        splineindex = np.min(np.where(ddyspline == np.max(ddyspline))[0])
 
     return xnew, yspline, ddyspline, splineindex
 

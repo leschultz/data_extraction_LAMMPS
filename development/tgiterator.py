@@ -43,9 +43,6 @@ def finddata(item):
 
     if 'job' in item[0]:
 
-        # Were parsed data will be stored
-        data = []
-
         # Create a name from the path
         name = item[0].split('/')
         name = name[-4:]
@@ -63,26 +60,27 @@ def finddata(item):
         param = inputinfo(inputfile)
         hold1 = param['hold1']
 
+        # Were parsed data will be stored
+        data = []
         with open(systemfile) as content:
 
             # Parse information in file
             count = 0  # Counter for headers later
             for line in content:
 
-                # Bunch of parsing
                 line = line.split(' ')
                 line = [i for i in line if '' != i]
 
                 if line:
                     if (line[0] == 'Step' and count == 0):
-                        headers = line
+                        headers = line[:-1]
                         count = 1
 
-                    if ('Created' in line and 'atoms' in line):
+                    if ('Created' in line and 'atoms\n' in line):
                         natoms = int(line[1])
 
                     try:
-                        line = [float(i) for i in line]
+                        line = [float(i) for i in line[:-1]]
                         data.append(line)
 
                     except Exception:
