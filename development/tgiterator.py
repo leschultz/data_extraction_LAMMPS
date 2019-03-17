@@ -25,10 +25,7 @@ def findtg(path):
 
     # Loop for each path
     for item in paths:
-        try:
-            finddata(item)
-        except Exception:
-            continue
+        finddata(item)
 
 
 def finddata(item):
@@ -56,50 +53,40 @@ def finddata(item):
         savepath = os.path.join(*['./', name])
 
         # Print status
-        print(name)
+        print('Tg analysis for: '+name)
 
         # Grab the output archive file that contains run system data
-        filename = os.path.join(*[item[0], 'outputs.tar.gz'])
+        systemfile = os.path.join(*[item[0], 'test.out'])
         inputfile = os.path.join(*[item[0], 'dep.in'])
 
         # Some of the parameters from the LAMMPS input file
         param = inputinfo(inputfile)
         hold1 = param['hold1']
 
-        # Open the archive
-        archive = tarfile.open(filename, 'r')
+        with open(systemfile) as content:
 
-        # Iterate for each file in the archive
-        for member in archive.getmembers():
+            # Parse information in file
+            count = 0  # Counter for headers later
+            for line in content:
 
-            # Open the file containing system data
-            if '.out' in str(member):
-                content = (archive.extractfile(member)).read()
-                content = content.splitlines()
+                # Bunch of parsing
+                line = line.split(' ')
+                line = [i for i in line if '' != i]
 
-                # Parse information in file
-                count = 0  # Counter for headers later
-                for line in content:
+                if line:
+                    if (line[0] == 'Step' and count == 0):
+                        headers = line
+                        count = 1
 
-                    # Bunch of parsing
-                    line = line.decode('utf-8')
-                    line = line.split(' ')
-                    line = [i for i in line if '' != i]
+                    if ('Created' in line and 'atoms' in line):
+                        natoms = int(line[1])
 
-                    if line:
-                        if (line[0] == 'Step' and count == 0):
-                            headers = line
-                            count = 1
+                    try:
+                        line = [float(i) for i in line]
+                        data.append(line)
 
-                        if ('Created' in line and 'atoms' in line):
-                            natoms = int(line[1])
-
-                        try:
-                            line = [float(i) for i in line]
-                            data.append(line)
-
-                        except Exception:
-                            pass
+                    except Exception:
+                        pass
 
         # System data as a dataframe with removed repeated steps
         dfsystem = pd.DataFrame(data, columns=headers)
