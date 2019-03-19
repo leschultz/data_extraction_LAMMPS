@@ -1,157 +1,62 @@
 import pandas as pd
 import numpy as np
-import os
 
-datapath = './'
+df = pd.read_pickle('Tg.pkl')
 
-energyfile = 'tg_energy.txt'
-volumefile = 'tg_volume.txt'
-
-
-def dictcreator(dictionary, keys):
-    '''
-    Create a dictionary to hold data given a convention.
-
-    inputs:
-        dictionary = The name of the empty wanted dictionary
-        keys = The keys for the dictionary
-
-    outputs:
-        dictionary = The name of the wanted dictionary with keys
-    '''
-
-    # Create the needed dictionaries
-    if dictionary.get(keys[0]) is None:
-        dictionary[keys[0]] = {}
-    if dictionary[keys[0]].get(keys[1]) is None:
-        dictionary[keys[0]][keys[1]] = {}
-    if dictionary[keys[0]][keys[1]].get(keys[2]) is None:
-        dictionary[keys[0]][keys[1]][keys[2]] = {}
-
-    return dictionary
-
-
-def fileload(dictionary, keys, datafile, path, filelist):
-    '''
-    Load the Tg data from a txt file.
-
-    inputs:
-        dictionary = The dictionary containing data
-        keys = The relevant key list
-        datafile = The name of the file containing Tg
-        path = The path to datafile
-        filelist = The list of available files
-
-    outputs:
-    '''
-
-    # Load available data
-    if datafile in filelist:
-        if dictionary[keys[0]][keys[1]][keys[2]].get(datafile) is None:
-            dictionary[keys[0]][keys[1]][keys[2]][datafile] = []
-
-        tg = np.loadtxt(os.path.join(path, datafile))
-        dictionary[keys[0]][keys[1]][keys[2]][datafile].append(tg)
-
-    return dictionary
-
-
-# Find all the paths available in a directory
-paths = os.walk(datapath)
-
-systems = {}  # Store data
-locations = {}  # Store job location
-for path in paths:
-
-    # Skip the loop if the file tree does not follow convention
-    try:
-        names = path[0].split('/')[-4:]
-        system, composition, hold, job = names
-
-        if '-' not in system:
-            continue
-
-    except Exception:
-        continue
-
-    # Compensate for odd names from google drive
-    system = system.split(' ')[0]
-    composition = composition.split(' ')[0]
-    hold = hold.split(' ')[0]
-    job = job.split(' ')[0]
-    names = [system, composition, hold, job]
-
-    dictcreator(systems, names)  # Create keys if not present
-    dictcreator(locations, names)  # Create keys if not present
-
-    locations[system][composition][hold] = path[0].split('job')[0]
-
-    fileload(systems, names, energyfile, path[0], path[2])
-    fileload(systems, names, volumefile, path[0], path[2])
-
-# Build a dataframe with custom column names
+# Average data by matching columns
 columns = [
            'System',
            'Composition [decimal]',
            'Steps [-]',
-           'Mean Tg from E-3kT Curve [K]',
-           'STD Tg from E-3kdT Curve [K]',
-           'Number of Mean Tg Values from E-3kT [-]',
-           'Mean Tg from Specific Volume Curve [K]',
-           'STD Tg from Specific Volume Curve [K]',
-           'Number of Mean Tg Values from Specific Volume Curve [-]',
-           'Location of Jobs'
            ]
 
-# Create a dataframe with only the columns
-df = pd.DataFrame(columns=columns)
+dfgroup = df.groupby(columns)
+dfenergygroup = dfgroup['Tg from E-3kT Curve [K]']
+dfvolumegroup = dfgroup['Tg from Specific Volume Curve [K]']
 
-count = 0  # Use the count to append row by row
-for system in systems:
-    for composition in systems[system]:
-        for hold in systems[system][composition]:
+# Column names for averages
+avgenergycolumns = [
+                    'System',
+                    'Composition [decimal]',
+                    'Steps [-]',
+                    'Mean Tg from E-3kT Curve [K]',
+                    'Std Tg from E-3kT Curve [K]',
+                    'Number of Jobs with E-3kT Curve [K]'
+                    ]
 
-            # Create a row to hold values
-            row = [
-                   system,
-                   composition,
-                   hold,
-                   np.nan,
-                   np.nan,
-                   np.nan,
-                   np.nan,
-                   np.nan,
-                   np.nan,
-                   locations[system][composition][hold]
-                   ]
+dfenergyavg = pd.DataFrame(columns=avgenergycolumns)
+count = 0
+for etg in dfenergygroup:
+    row = [etg[0][0], etg[0][1], etg[0][2]]
+    row.append(etg[1].mean())
+    row.append(etg[1].std())
+    row.append(etg[1].shape[0])
 
-            for method, tg in systems[system][composition][hold].items():
+    dfenergyavg.loc[count] = row
+    count += 1
 
-                # If the energy method has values, then replace elements
-                if method == energyfile:
-                    row[3] = np.mean(tg)
-                    row[4] = np.std(tg)
-                    row[5] = len(tg)
+# Column names for averages
+avgvolumecolumns = [
+                     'System',
+                     'Composition [decimal]',
+                     'Steps [-]',
+                     'Mean Tg from Specific Volume Curve [K]',
+                     'STD Tg from Specific Volume Curve [K]',
+                     'Number of Jobs with Specific Volume Curve [K]'
+                     ]
 
-                # If the volume method has values, then replace elements
-                if method == volumefile:
-                    row[6] = np.mean(tg)
-                    row[7] = np.std(tg)
-                    row[8] = len(tg)
+dfvolumeavg = pd.DataFrame(columns=avgvolumecolumns)
+count = 0
+for vtg in dfvolumegroup:
+    row = [vtg[0][0], vtg[0][1], vtg[0][2]]
+    row.append(vtg[1].mean())
+    row.append(vtg[1].std())
+    row.append(vtg[1].shape[0])
 
-            df.loc[count] = row  # Append a row to the dataframe
-            count += 1
+    dfvolumeavg.loc[count] = row
+    count += 1
 
-# Alphabetically sort the dataframe
-df = df.sort_values(
-                    by=[
-                        'System',
-                        'Composition [decimal]',
-                        'Steps [-]'
-                        ]
-                        )
-df = df.reset_index(drop=True)  # Reset the index
+dfavg = pd.merge(dfenergyavg, dfvolumeavg)
 
-df['Steps [-]'] = df['Steps [-]'].apply(pd.to_numeric)
-df.to_html(os.path.join(datapath, 'Tg.html'))  # Export as an HTML table
-df.to_pickle(os.path.join(datapath, 'Tg.pkl'))  # Export as a pickle file
+dfavg.to_html('Tgmean.html')  # Export as an HTML table
+dfavg.to_pickle('Tgmean.pkl')  # Export as a pickle file
