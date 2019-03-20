@@ -29,7 +29,7 @@ count = 0
 for etg in dfenergygroup:
     row = [etg[0][0], etg[0][1], etg[0][2]]
     row.append(etg[1].mean())
-    row.append(etg[1].std())
+    row.append(etg[1].std(ddof=0))
     row.append(etg[1].shape[0])
 
     dfenergyavg.loc[count] = row
@@ -50,7 +50,7 @@ count = 0
 for vtg in dfvolumegroup:
     row = [vtg[0][0], vtg[0][1], vtg[0][2]]
     row.append(vtg[1].mean())
-    row.append(vtg[1].std())
+    row.append(vtg[1].std(ddof=0))
     row.append(vtg[1].shape[0])
 
     dfvolumeavg.loc[count] = row

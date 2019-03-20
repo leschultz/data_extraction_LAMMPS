@@ -147,6 +147,5 @@ df = df.sort_values(
 df = df.reset_index(drop=True)  # Reset the index
 
 df['Steps [-]'] = df['Steps [-]'].apply(pd.to_numeric)
-df.to_html(os.path.join(datapath, 'Tg.html'))  # Export as an HTML table
-df.to_pickle(os.path.join(datapath, 'Tg.pkl'))  # Export as a pickle file
-print(df)
+df.to_html('Tg.html')  # Export as an HTML table
+df.to_pickle('Tg.pkl')  # Export as a pickle file
